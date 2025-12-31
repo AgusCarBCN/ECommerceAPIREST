@@ -98,7 +98,7 @@ VALUES
 ('LG 27UL850-W 27" Monitor', '4K UHD monitor with HDR400 and USB-C', 499.99, 36),
 ('Samsung UJ59 32" Monitor', '4K UHD monitor for productivity and entertainment', 329.99, 54),
 
--- PCs Home (40 productos)
+-- PC Home (40 productos)
 ('HP Pavilion Home Desktop', 'Home computer with Intel Core i5 and 512GB SSD for daily tasks', 649.99, 38),
 ('Dell Inspiron Home PC', 'Reliable home desktop with AMD Ryzen 5 and 1TB HDD', 579.99, 42),
 ('Lenovo IdeaCentre Home Desktop', 'Compact home computer with Intel Core i3 and 256GB SSD', 449.99, 51),
@@ -182,7 +182,7 @@ VALUES
 ('ASUS PN53 Gaming Mini PC', 'Compact gaming computer with AMD Ryzen and Radeon graphics', 899.99, 53),
 ('MSI Cubi Gaming Desktop', 'Mini gaming PC with Intel Iris Xe graphics and quiet operation', 799.99, 57),
 
--- PCs Profesionales (40 productos)
+-- PC Profesionales (40 productos)
 ('Dell Precision Workstation', 'Professional computer with Intel Xeon and NVIDIA Quadro graphics', 2499.99, 21),
 ('HP Z4 Workstation', 'Professional desktop with ECC memory and ISV certification', 2199.99, 24),
 ('Lenovo ThinkStation Workstation', 'Professional computer with triple-channel memory and tool-less design', 2399.99, 22),
@@ -493,6 +493,13 @@ FROM products_catalog p
          JOIN categories c ON c.category = 'KEYBOARDS'
 WHERE p.product_name ILIKE '%keyboard%'
    OR p.description ILIKE '%keyboard%';
+
+INSERT INTO product_categories (product_id, category_id)
+SELECT p.id, c.id
+FROM products_catalog p
+         JOIN categories c ON c.category = 'GAMING_COMPUTERS'
+WHERE p.product_name ILIKE '%gaming%'
+   OR p.description ILIKE '%gaming%';
 
 INSERT INTO product_categories (product_id, category_id)
 SELECT p.id, c.id

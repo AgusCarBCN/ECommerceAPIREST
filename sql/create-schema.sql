@@ -1,4 +1,3 @@
-
 -- ==============================================
 -- ENUMS
 -- ==============================================
@@ -14,6 +13,7 @@ CREATE TYPE category AS ENUM (
     'STORAGE_DEVICES',
     'NETWORKING_EQUIPMENT'
 );
+
 CREATE TYPE order_status AS ENUM (
     'CREATED',
     'PAID',
@@ -55,11 +55,18 @@ CREATE TYPE shipping_method AS ENUM (
 );
 
 -- ==============================================
+-- SEQUENCES
+-- ==============================================
+CREATE SEQUENCE users_seq START 1;
+CREATE SEQUENCE categories_seq START 1;
+CREATE SEQUENCE orders_seq START 1;
+CREATE SEQUENCE payments_seq START 1;
+
+-- ==============================================
 -- USERS
 -- ==============================================
-
 CREATE TABLE users (
-                       id BIGSERIAL PRIMARY KEY,
+                       id BIGINT PRIMARY KEY DEFAULT nextval('users_seq'),
                        username VARCHAR(50) UNIQUE NOT NULL,
                        email VARCHAR(100) UNIQUE NOT NULL,
                        password VARCHAR(255) NOT NULL,
@@ -69,9 +76,8 @@ CREATE TABLE users (
 -- ==============================================
 -- CATEGORIES
 -- ==============================================
-
 CREATE TABLE categories (
-                            id BIGSERIAL PRIMARY KEY,
+                            id BIGINT PRIMARY KEY DEFAULT nextval('categories_seq'),
                             category category NOT NULL,
                             description TEXT
 );
@@ -79,7 +85,6 @@ CREATE TABLE categories (
 -- ==============================================
 -- PRODUCTS CATALOG
 -- ==============================================
-
 CREATE TABLE products_catalog (
                                   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
                                   product_name VARCHAR(200) NOT NULL,
@@ -89,33 +94,41 @@ CREATE TABLE products_catalog (
                                   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-
--- Relación muchos a muchos productos-categorías
-
-
+-- ==============================================
+-- PRODUCT-CATEGORIES (Many-to-Many)
+-- ==============================================
 CREATE TABLE product_categories (
                                     product_id UUID REFERENCES products_catalog(id) ON DELETE CASCADE,
-                                    category_id BIGSERIAL REFERENCES categories(id) ON DELETE CASCADE,
+                                    category_id BIGINT REFERENCES categories(id) ON DELETE CASCADE,
                                     PRIMARY KEY(product_id, category_id)
+);
+-- ==============================================
+-- BILLS
+-- ==============================================
+CREATE TABLE bills (
+                       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                       tax_id VARCHAR(50),
+                       total_amount NUMERIC(10,2) NOT NULL,
+                       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- ==============================================
 -- ORDERS
 -- ==============================================
-
 CREATE TABLE orders (
-                        id BIGSERIAL PRIMARY KEY,
+                        id BIGINT PRIMARY KEY DEFAULT nextval('orders_seq'),
                         user_id BIGINT REFERENCES users(id),
+                        id_bill UUID UNIQUE NOT NULL,
                         status order_status NOT NULL DEFAULT 'CREATED',
                         shipping_method shipping_method DEFAULT 'STANDARD',
                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                        updated_at TIMESTAMP
+                        updated_at TIMESTAMP,
+                        FOREIGN KEY (id_bill) REFERENCES bills(id) ON DELETE CASCADE
 );
 
 -- ==============================================
 -- ORDER PRODUCTS
 -- ==============================================
-
 CREATE TABLE order_products (
                                 order_id BIGINT REFERENCES orders(id) ON DELETE CASCADE,
                                 product_catalog_id UUID REFERENCES products_catalog(id),
@@ -125,23 +138,10 @@ CREATE TABLE order_products (
 
 
 -- ==============================================
--- BILLS
--- ==============================================
-
-CREATE TABLE bills (
-                       id UUID PRIMARY KEY,
-                       order_id BIGINT REFERENCES orders(id) ON DELETE CASCADE,
-                       client_rfc VARCHAR(50),
-                       total_amount NUMERIC(10,2) NOT NULL,
-                       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- ==============================================
 -- PAYMENTS
 -- ==============================================
-
 CREATE TABLE payments (
-                          id BIGSERIAL PRIMARY KEY,
+                          id BIGINT PRIMARY KEY DEFAULT nextval('payments_seq'),
                           order_id BIGINT REFERENCES orders(id) ON DELETE CASCADE,
                           amount NUMERIC(10,2) NOT NULL,
                           method payment_method NOT NULL,
@@ -152,8 +152,6 @@ CREATE TABLE payments (
 -- ==============================================
 -- INDICES
 -- ==============================================
-
 CREATE INDEX idx_product_name ON products_catalog(product_name);
 CREATE INDEX idx_order_status ON orders(status);
 CREATE INDEX idx_payment_status ON payments(status);
-
