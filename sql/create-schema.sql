@@ -53,14 +53,29 @@ CREATE TYPE shipping_method AS ENUM (
     'PICKUP',
     'DRONE'
 );
-
+CREATE TYPE user_role AS ENUM(
+    'ADMIN',
+    'USER'
+);
 -- ==============================================
 -- SEQUENCES
 -- ==============================================
+CREATE SEQUENCE roles_seq START 1;
 CREATE SEQUENCE users_seq START 1;
 CREATE SEQUENCE categories_seq START 1;
 CREATE SEQUENCE orders_seq START 1;
 CREATE SEQUENCE payments_seq START 1;
+
+
+-- ==============================================
+-- ROLES
+-- ==============================================
+CREATE TABLE roles (
+                       id BIGINT PRIMARY KEY DEFAULT nextval('roles_seq'),
+                       role user_role NOT NULL DEFAULT 'USER'
+
+);
+
 
 -- ==============================================
 -- USERS
@@ -71,6 +86,15 @@ CREATE TABLE users (
                        email VARCHAR(100) UNIQUE NOT NULL,
                        password VARCHAR(255) NOT NULL,
                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ==============================================
+-- USER-ROLES (Many-to-Many)
+-- ==============================================
+CREATE TABLE user_roles (
+                            user_id BIGINT REFERENCES users(id),
+                            role_id BIGINT REFERENCES roles(id),
+                            PRIMARY KEY (user_id, role_id)
 );
 
 -- ==============================================

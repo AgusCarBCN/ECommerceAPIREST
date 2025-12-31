@@ -1,3 +1,9 @@
+
+
+INSERT INTO roles ( role) VALUES('USER');
+INSERT INTO roles ( role) VALUES ('ADMIN');
+
+
 -- ==============================================
 -- CATEGORIES
 -- ==============================================
@@ -510,3 +516,5 @@ WHERE p.product_name ILIKE '%headset%'
    OR p.product_name ILIKE '%earbuds%'
    OR p.description ILIKE '%headset%'
    OR p.description ILIKE '%headphones%';
+
+
