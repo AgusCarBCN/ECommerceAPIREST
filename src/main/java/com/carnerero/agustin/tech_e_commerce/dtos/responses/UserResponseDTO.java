@@ -9,7 +9,7 @@ import java.util.Set;
 @Data
 public class UserResponseDTO {
     private Long id;
-    private String username;
+    private String userName;
     private String email;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
