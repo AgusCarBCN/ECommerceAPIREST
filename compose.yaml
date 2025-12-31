@@ -1,0 +1,14 @@
+services:
+  postgres:
+    image: 'postgres:16.3'
+    container_name: db_tech_products
+    restart: always
+    volumes:
+      - ./sql/create-schema.sql:/docker-entrypoint-initdb.d/create-schema.sql
+      - ./sql/data.sql:/docker-entrypoint-initdb.d/data.sql
+    environment:
+      - 'POSTGRES_DB=db_tech_products'
+      - 'POSTGRES_PASSWORD=secret'
+      - 'POSTGRES_USER=myuser'
+    ports:
+      - "5432:5432"
