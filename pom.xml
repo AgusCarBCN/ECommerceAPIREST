@@ -14,9 +14,9 @@
     </parent>
 
     <groupId>com.carnerero.agustin</groupId>
-    <artifactId>tech_e_commerce</artifactId>
+    <artifactId>ECommerceApplication</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>tech_e_commerce</name>
+    <name>ecommerceapplication</name>
     <description>Demo project for Spring Boot</description>
 
     <properties>
