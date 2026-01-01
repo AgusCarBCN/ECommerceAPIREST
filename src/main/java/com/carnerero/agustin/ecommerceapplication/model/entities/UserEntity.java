@@ -2,10 +2,7 @@ package com.carnerero.agustin.ecommerceapplication.model.entities;
 
 import com.carnerero.agustin.ecommerceapplication.model.enums.UserStatus;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.Type;
 
 import java.time.LocalDateTime;
@@ -14,7 +11,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@Data
+@Setter
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -43,15 +41,31 @@ public class UserEntity {
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
+    @Column(name = "updated_at", updatable = false)
+    private LocalDateTime updatedAt;
+
     //Evita cargar todas las órdenes al traer un usuario, mejor para rendimiento en listas grandes.
     //Inicializa lista para evitar NullPointerException.
     @Enumerated(EnumType.STRING)
     @Column(name ="status", nullable = false)
     private UserStatus status;
+    @Column(name ="status_description", nullable = false)
+    private String statusDescription;
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderEntity> orders = new ArrayList<>();
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    // 📍 Direcciones (1 usuario → muchas direcciones)
+    @EqualsAndHashCode.Exclude// Evita que la lista genere recursión infinita
+    @OneToMany(
+            mappedBy = "user",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+
+    private Set<UserAddressEntity> addresses = new HashSet<>();
+
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "user_roles",
             joinColumns = @JoinColumn(name = "user_id"),
@@ -63,7 +77,18 @@ public class UserEntity {
     protected void onCreate() {
         LocalDateTime now = LocalDateTime.now();
         status = UserStatus.ACTIVE;
+        statusDescription="User active";
         createdAt = now;
-
+        updatedAt=now;
     }
+    public void addAddressSafe(UserAddressEntity address) {
+        if (!addresses.contains(address)) {
+            addresses.add(address);
+        }
+        if (address.getUser() != this) {
+            address.setUser(this); // asigna el lado dueño sin llamar recursivamente
+        }
+    }
+
+
 }

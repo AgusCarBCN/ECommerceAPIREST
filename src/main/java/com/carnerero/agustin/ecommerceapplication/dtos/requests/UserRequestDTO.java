@@ -9,6 +9,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Set;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -27,4 +29,5 @@ public class UserRequestDTO {
             message = "Password must contain at least one uppercase letter, one lowercase letter, one number and one special character"
     )
     private String password;
+    private Set<UserAddressRequestDTO> addresses;
 }

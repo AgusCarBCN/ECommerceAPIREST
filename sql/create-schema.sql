@@ -3,10 +3,12 @@
 -- SEQUENCES
 -- ==============================================
 CREATE SEQUENCE roles_seq START 1;
+CREATE SEQUENCE user_address_seq START 1;
 CREATE SEQUENCE users_seq START 1;
 CREATE SEQUENCE categories_seq START 1;
 CREATE SEQUENCE orders_seq START 1;
 CREATE SEQUENCE payments_seq START 1;
+
 
 
 -- ==============================================
@@ -17,8 +19,6 @@ CREATE TABLE roles (
                        role VARCHAR(30) NOT NULL DEFAULT 'USER'
 
 );
-
-
 -- ==============================================
 -- USERS
 -- ==============================================
@@ -28,8 +28,38 @@ CREATE TABLE users (
                        email VARCHAR(100) UNIQUE NOT NULL,
                        password VARCHAR(255) NOT NULL,
                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                       status VARCHAR(30) NOT NULL DEFAULT 'ACTIVE'
+                       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                       status VARCHAR(30) NOT NULL DEFAULT 'ACTIVE',
+                       status_description VARCHAR(255)
 );
+
+-- ==============================================
+-- ADDRESS
+-- ==============================================
+CREATE TABLE user_address (
+                              id BIGINT PRIMARY KEY DEFAULT nextval('user_address_seq'),
+
+                              user_id BIGINT NOT NULL,
+
+                              street VARCHAR(150) NOT NULL,
+                              city VARCHAR(80) NOT NULL,
+                              state VARCHAR(80),
+                              postal_code VARCHAR(20) NOT NULL,
+                              country VARCHAR(50) NOT NULL,
+
+                              address_type VARCHAR(20) DEFAULT 'HOME', -- HOME, WORK, BILLING, SHIPPING
+
+                              is_default BOOLEAN DEFAULT FALSE,
+
+                              created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                              updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+                              CONSTRAINT fk_user_address_user
+                                  FOREIGN KEY (user_id)
+                                      REFERENCES users(id)
+                                      ON DELETE CASCADE
+);
+
 
 -- ==============================================
 -- USER-ROLES (Many-to-Many)

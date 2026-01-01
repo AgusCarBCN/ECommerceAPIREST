@@ -3,13 +3,13 @@ package com.carnerero.agustin.ecommerceapplication.model.entities;
 import com.carnerero.agustin.ecommerceapplication.model.enums.PaymentMethod;
 import com.carnerero.agustin.ecommerceapplication.model.enums.PaymentStatus;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-@Data
+@Setter
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity

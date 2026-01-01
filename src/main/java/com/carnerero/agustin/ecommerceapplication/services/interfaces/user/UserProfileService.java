@@ -17,7 +17,6 @@ public interface UserProfileService {
      * Actualiza información de contacto del usuario
      *
      * @param userId ID del usuario
-     * @param phoneNumber Nuevo número de teléfono
      * @param address Nueva dirección
      * @return Perfil actualizado
      */

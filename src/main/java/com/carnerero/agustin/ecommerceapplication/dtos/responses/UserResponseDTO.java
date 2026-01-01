@@ -20,6 +20,12 @@ public class UserResponseDTO {
     private String email;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime updatedAt;
     private UserStatus status;
+    private String statusDescription;
+    // ✅ Relación 1-N Roles
     private Set<RolesDTO> roles;
+    // ✅ Relación 1-N addresses
+    private Set<UserAddressResponseDTO> addresses;
 }
