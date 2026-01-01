@@ -25,20 +25,14 @@ public class OrderProductsEntity {
     @Column(nullable = false)
     private Long quantity;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+   /* @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", insertable = false, updatable = false)
     private OrderEntity order;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_catalog_id", insertable = false, updatable = false)
-    private ProductCatalogEntity productCatalog;
+    private ProductCatalogEntity productCatalog;*/
 
-    public OrderProductsEntity(OrderEntity order, ProductCatalogEntity product, Long quantity) {
-        this.orderId = order.getId();
-        this.productCatalogId = product.getId();
-        this.order = order;
-        this.productCatalog = product;
-        this.quantity = quantity;
-    }
+
 }
 

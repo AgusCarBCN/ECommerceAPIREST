@@ -2,11 +2,13 @@ package com.carnerero.agustin.tech_e_commerce.entities;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.aspectj.weaver.ast.Or;
 import org.hibernate.annotations.CreationTimestamp;
 
+import javax.management.relation.Role;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -17,6 +19,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Builder
 @Table(name = "users")
 public class UserEntity {
 
@@ -38,7 +41,7 @@ public class UserEntity {
     @Column(nullable = false)
     private String password;
     //Reemplaza @PrePersist para que Hibernate se encargue automáticamente de asignar createdAt.
-    @CreationTimestamp
+
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
     //Evita cargar todas las órdenes al traer un usuario, mejor para rendimiento en listas grandes.
@@ -54,5 +57,10 @@ public class UserEntity {
     )
     private Set<RoleEntity> roles = new HashSet<>();
 
+    @PrePersist
+    protected void onCreate() {
+        LocalDateTime now = LocalDateTime.now();
+        createdAt = now;
 
+    }
 }
