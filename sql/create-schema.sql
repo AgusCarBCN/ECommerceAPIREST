@@ -27,7 +27,7 @@ CREATE TABLE users (
                        username VARCHAR(50) UNIQUE NOT NULL,
                        email VARCHAR(100) UNIQUE NOT NULL,
                        password VARCHAR(255) NOT NULL,
-                       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                       created_at DATE ,
                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                        status VARCHAR(30) NOT NULL DEFAULT 'ACTIVE',
                        status_description VARCHAR(255)

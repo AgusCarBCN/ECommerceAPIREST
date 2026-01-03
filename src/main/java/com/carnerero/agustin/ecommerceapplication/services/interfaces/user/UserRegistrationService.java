@@ -2,6 +2,7 @@ package com.carnerero.agustin.ecommerceapplication.services.interfaces.user;
 
 import com.carnerero.agustin.ecommerceapplication.dtos.requests.UserRequestDTO;
 import com.carnerero.agustin.ecommerceapplication.dtos.responses.UserResponseDTO;
+import com.carnerero.agustin.ecommerceapplication.exception.user.UserExistException;
 
 public interface UserRegistrationService {
 
@@ -10,33 +11,18 @@ public interface UserRegistrationService {
      *
      * @param request Datos de registro del usuario
      * @return Respuesta con el usuario creado y token de confirmación
-     //* @throws BusinessException Si el usuario ya existe o hay error de negocio
-     //* @throws ValidationException Si los datos no son válidos
+     * @throws UserExistException Si el usuario ya existe en el sistema
      */
     UserResponseDTO registerUser(UserRequestDTO request);
-
     /**
-     * Verifica si un email puede ser usado para registro
+     * Registra un nuevo usuario administrador en el sistema
      *
-     * @param email Email a verificar
-     * @return true si el email está disponible
+     * @param request Datos de registro del usuario
+     * @return Respuesta con el usuario creado y token de confirmación
+     * @throws UserExistException Si el usuario ya existe en el sistema
      */
-    boolean isEmailAvailable(String email);
+    UserResponseDTO registerAdminUser(UserRequestDTO request);
 
-    /**
-     * Verifica si un username puede ser usado para registro
-     *
-     * @param username Username a verificar
-     * @return true si el username está disponible
-     */
-    boolean isUsernameAvailable(String username);
-
-    /**
-     * Valida los datos de registro antes de procesarlos
-     *
-     * @param request Datos a validar
-     */
-    void validateRegistrationData(UserRequestDTO request);
 
     /**
      * Reenvía el email de verificación

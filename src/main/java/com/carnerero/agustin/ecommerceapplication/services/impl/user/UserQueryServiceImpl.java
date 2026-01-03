@@ -2,15 +2,20 @@ package com.carnerero.agustin.ecommerceapplication.services.impl.user;
 
 import com.carnerero.agustin.ecommerceapplication.dtos.responses.PageResponse;
 import com.carnerero.agustin.ecommerceapplication.dtos.responses.UserResponseDTO;
+import com.carnerero.agustin.ecommerceapplication.model.enums.Roles;
+import com.carnerero.agustin.ecommerceapplication.model.enums.UserStatus;
 import com.carnerero.agustin.ecommerceapplication.repository.UserRepository;
 import com.carnerero.agustin.ecommerceapplication.services.interfaces.user.UserQueryService;
+import com.carnerero.agustin.ecommerceapplication.util.helper.Sort;
+import com.carnerero.agustin.ecommerceapplication.util.mapper.PageResponseMapper;
 import com.carnerero.agustin.ecommerceapplication.util.mapper.UserMapper;
 import lombok.AllArgsConstructor;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.time.*;
+import java.util.Set;
 
 @Service
 @Transactional
@@ -20,7 +25,14 @@ public class UserQueryServiceImpl implements UserQueryService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
-
+    private static final int PAGE_SIZE=5;
+    private final static Set<String> allowedUserFields = Set.of(
+            "userName",
+            "email",
+            "createdAt",
+            "updatedAt",
+            "status"
+    );
 
     @Override
     public UserResponseDTO getUserById(Long userId) {
@@ -32,49 +44,101 @@ public class UserQueryServiceImpl implements UserQueryService {
 
     @Override
     public UserResponseDTO getUserByEmail(String email) {
-        return null;
-    }
-
-    @Override
-    public UserResponseDTO getUserByUsername(String username) {
         var userEntity=userRepository
-                .findByUserNameContainingIgnoreCase(username)
+                .findByEmail(email)
                 .orElseThrow(()-> new RuntimeException("User not found"));
         return userMapper.toUserResponseDTO(userEntity);
     }
 
     @Override
-    public PageResponse<UserResponseDTO> getUsersByRole(String roleName, Pageable pageable) {
-        return null;
+    public UserResponseDTO getUserByUsername(String username) {
+        var userEntity=userRepository
+                .findByUserNameIgnoreCase(username)
+                .orElseThrow(()-> new RuntimeException("User not found"));
+        return userMapper.toUserResponseDTO(userEntity);
     }
 
     @Override
-    public PageResponse<UserResponseDTO> getActiveUsers(Pageable pageable) {
-        return null;
+    public PageResponse<UserResponseDTO> getUsersByRole(String field, Boolean desc, Integer numberOfPages, Roles role) {
+        final var sorting= Sort.getSort(field,desc,allowedUserFields);
+        var page=userRepository.findAllByRoles_Role(role,
+                        PageRequest.of(numberOfPages, PAGE_SIZE, sorting))
+                .map(userMapper::toUserResponseDTO);
+        return PageResponseMapper.mapToPageResponse(page);
     }
 
     @Override
-    public PageResponse<UserResponseDTO> getUsersByRegistrationDate(LocalDateTime startDate, LocalDateTime endDate, Pageable pageable) {
-        return null;
+    public PageResponse<UserResponseDTO> getUsersByStatus(String field, Boolean desc, Integer numberOfPages, UserStatus status) {
+        final var sorting= Sort.getSort(field,desc,allowedUserFields);
+        var page=userRepository.findAllByStatus(status,
+                        PageRequest.of(numberOfPages, PAGE_SIZE, sorting))
+                .map(userMapper::toUserResponseDTO);
+        return PageResponseMapper.mapToPageResponse(page);
     }
 
     @Override
-    public boolean existsByEmail(String email) {
-        return false;
+    public PageResponse<UserResponseDTO> getActiveUsers(String field, Boolean desc, Integer numberOfPages) {
+        final var sorting= Sort.getSort(field,desc,allowedUserFields);
+        var page=userRepository.findAllActive(
+                PageRequest.of(numberOfPages, PAGE_SIZE, sorting))
+                .map(userMapper::toUserResponseDTO);
+        return PageResponseMapper.mapToPageResponse(page);
     }
 
     @Override
-    public boolean existsByUsername(String username) {
-        return false;
+    public PageResponse<UserResponseDTO> getUsersCreatedAfter(LocalDate date, String field, Boolean desc, Integer numberOfPages) {
+        final var sorting= Sort.getSort(field,desc,allowedUserFields);
+        var page=userRepository.findAllByCreatedAtAfter(
+                        PageRequest.of(numberOfPages, PAGE_SIZE, sorting),date)
+                .map(userMapper::toUserResponseDTO);
+        return PageResponseMapper.mapToPageResponse(page);
     }
+
+    @Override
+    public PageResponse<UserResponseDTO> getUsersCreatedBefore(LocalDate date, String field, Boolean desc, Integer numberOfPages) {
+        final var sorting= Sort.getSort(field,desc,allowedUserFields);
+        var page=userRepository.findAllByCreatedAtBefore(date,
+                        PageRequest.of(numberOfPages, PAGE_SIZE, sorting))
+                .map(userMapper::toUserResponseDTO);
+        return PageResponseMapper.mapToPageResponse(page);
+    }
+
+    @Override
+    public PageResponse<UserResponseDTO> getUsersCreatedEquals(LocalDate date, String field, Boolean desc, Integer numberOfPages) {
+        final var sorting= Sort.getSort(field,desc,allowedUserFields);
+
+        var page=userRepository.findByCreatedAt(date,
+                        PageRequest.of(numberOfPages, PAGE_SIZE, sorting))
+                .map(userMapper::toUserResponseDTO);
+        return PageResponseMapper.mapToPageResponse(page);
+    }
+
+    @Override
+    public PageResponse<UserResponseDTO> getUsersCreatedBetween(LocalDate startDate, LocalDate endDate, String field, Boolean desc, Integer numberOfPages) {
+        final var sorting= Sort.getSort(field,desc,allowedUserFields);
+        var page=userRepository.findAllByCreatedAtBetween(
+                        startDate,
+                        endDate,
+                        PageRequest.of(numberOfPages, PAGE_SIZE, sorting))
+                .map(userMapper::toUserResponseDTO);
+        return PageResponseMapper.mapToPageResponse(page);
+    }
+
 
     @Override
     public long countAllUsers() {
-        return 0;
+        return userRepository.count();
     }
 
     @Override
-    public long countUsersByStatus(boolean active) {
-        return 0;
+    public long countUsersByStatus(UserStatus status) {
+        return userRepository.countByStatus(status);
     }
+
+    @Override
+    public String getUserProfileImage(Long userId) {
+        return "";
+    }
+
+
 }

@@ -3,8 +3,9 @@ package com.carnerero.agustin.ecommerceapplication.model.entities;
 import com.carnerero.agustin.ecommerceapplication.model.enums.UserStatus;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.Type;
+import lombok.extern.slf4j.Slf4j;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -15,6 +16,7 @@ import java.util.Set;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
+@Slf4j
 @Entity
 @Builder
 @Table(name = "users")
@@ -40,7 +42,7 @@ public class UserEntity {
     //Reemplaza @PrePersist para que Hibernate se encargue automáticamente de asignar createdAt.
 
     @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
+    private LocalDate createdAt;
     @Column(name = "updated_at", updatable = false)
     private LocalDateTime updatedAt;
 
@@ -75,11 +77,20 @@ public class UserEntity {
 
     @PrePersist
     protected void onCreate() {
-        LocalDateTime now = LocalDateTime.now();
+        LocalDate now = LocalDate.now();
+        LocalDateTime nowTime = LocalDateTime.now();
         status = UserStatus.ACTIVE;
         statusDescription="User active";
         createdAt = now;
-        updatedAt=now;
+        updatedAt=nowTime;
+    }
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
+    @PostUpdate
+    protected void afterUpdate() {
+        log.info("Order Status updated with status: {}", status);
     }
     public void addAddressSafe(UserAddressEntity address) {
         if (!addresses.contains(address)) {
