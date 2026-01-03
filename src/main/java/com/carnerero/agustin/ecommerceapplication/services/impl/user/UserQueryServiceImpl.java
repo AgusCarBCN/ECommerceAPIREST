@@ -18,7 +18,7 @@ import java.time.*;
 import java.util.Set;
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 @AllArgsConstructor
 
 public class UserQueryServiceImpl implements UserQueryService {

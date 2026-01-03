@@ -19,7 +19,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Service
-@Transactional(readOnly = true)
+@Transactional()
 @AllArgsConstructor
 public class UserUpdateServiceImpl implements UserUpdateService {
 
@@ -59,7 +59,7 @@ public class UserUpdateServiceImpl implements UserUpdateService {
         address.setIsDefault(request.getIsDefault());
         address.setUpdatedAt(LocalDateTime.now());
 
-        // 6️⃣ Guardar dirección
+        // ️⃣ Guardar cambios en direccion
         userAddressRespository.save(address);
 
         return userMapper.toUserResponseDTO(user);
