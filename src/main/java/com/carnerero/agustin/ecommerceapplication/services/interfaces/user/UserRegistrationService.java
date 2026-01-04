@@ -7,37 +7,36 @@ import com.carnerero.agustin.ecommerceapplication.exception.user.UserExistExcept
 public interface UserRegistrationService {
 
     /**
-     * Registra un nuevo usuario en el sistema
+     * Registers a new user in the system.
      *
-     * @param request Datos de registro del usuario
-     * @return Respuesta con el usuario creado y token de confirmación
-     * @throws UserExistException Si el usuario ya existe en el sistema
+     * @param request the user registration data
+     * @return the created user information
+     * @throws UserExistException if the user already exists in the system
      */
     UserResponseDTO registerUser(UserRequestDTO request);
+
     /**
-     * Registra un nuevo usuario administrador en el sistema
+     * Registers a new administrator user in the system.
      *
-     * @param request Datos de registro del usuario
-     * @return Respuesta con el usuario creado y token de confirmación
-     * @throws UserExistException Si el usuario ya existe en el sistema
+     * @param request the admin user registration data
+     * @return the created admin user information
+     * @throws UserExistException if the user already exists in the system
      */
     UserResponseDTO registerAdminUser(UserRequestDTO request);
 
-
     /**
-     * Reenvía el email de verificación
+     * Resends the account verification email.
      *
-     * @param email Email del usuario
-     * @return true si se reenvió correctamente
+     * @param email the user's email address
+     * @return true if the verification email was successfully resent
      */
     boolean resendVerificationEmail(String email);
 
     /**
-     * Confirma la cuenta del usuario mediante token
+     * Confirms a user account using a verification token.
      *
-     * @param verificationToken Token de verificación
-     * @return true si la cuenta fue confirmada
+     * @param verificationToken the verification token
+     * @return true if the account was successfully confirmed
      */
     boolean confirmUserAccount(String verificationToken);
-
 }

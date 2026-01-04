@@ -4,10 +4,10 @@ package com.carnerero.agustin.ecommerceapplication.util.helper;
 import java.util.Set;
 
 public final class Sort {
-
+    public static final int PAGE_SIZE=5;
     private Sort() {} // evita instanciación
 
-    public static final int PAGE_SIZE = 5;
+
 
     private static Set<String> allowedUserFields = Set.of(
             "userName",

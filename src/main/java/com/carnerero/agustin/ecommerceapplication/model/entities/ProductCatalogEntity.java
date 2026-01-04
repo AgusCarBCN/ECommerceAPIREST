@@ -29,15 +29,13 @@ public class ProductCatalogEntity {
     @Column(nullable = false)
     private BigDecimal price = BigDecimal.ZERO;
 
-    @Column(nullable = false)
-    private Integer quantity = 0;
+    @Column(name="stock_quantity",nullable = false)
+    private Long stockQuantity;
 
-    @CreationTimestamp
     private LocalDateTime createdAt;
 
-
     @ManyToMany(fetch = FetchType.LAZY,
-            cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+            cascade = {CascadeType.MERGE, CascadeType.REFRESH})
     @JoinTable(name = "product_categories",
             joinColumns = @JoinColumn(name = "product_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id"))
@@ -45,12 +43,21 @@ public class ProductCatalogEntity {
 
     // Métodos de dominio para sincronizar Many-to-Many
     public void addCategory(CategoryEntity category) {
-        categories.add(category);
-        category.getProducts().add(this);
+        if (!categories.contains(category)) {
+            categories.add(category);
+        }
+        if (!category.getProducts().contains(this)) {
+            category.getProducts().add(this);
+        }
     }
 
     public void removeCategory(CategoryEntity category) {
         categories.remove(category);
         category.getProducts().remove(this);
+    }
+
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = LocalDateTime.now();
     }
 }

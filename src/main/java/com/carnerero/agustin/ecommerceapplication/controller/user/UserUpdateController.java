@@ -1,4 +1,4 @@
-package com.carnerero.agustin.ecommerceapplication.controller;
+package com.carnerero.agustin.ecommerceapplication.controller.user;
 
 
 import com.carnerero.agustin.ecommerceapplication.dtos.requests.UpdateUserRequestDTO;
@@ -20,30 +20,67 @@ public class UserUpdateController {
 
     private final UserUpdateService userUpdateService;
 
-    // 🔹 Actualizar cualquier campo del usuario
+    /**
+     * Updates any user fields based on the provided request.
+     * <p>
+     * Supports partial updates for fields included in {@link UpdateUserRequestDTO}.
+     *
+     * Example request: PATCH /users/{userId}
+     *
+     * @param userId the identifier of the user to update
+     * @param request the fields to update wrapped in {@link UpdateUserRequestDTO}
+     * @return a {@link ResponseEntity} containing the updated user and HTTP status 200 (OK)
+     */
     @PatchMapping("/{userId}")
     public ResponseEntity<UserResponseDTO> updateUser(
             @PathVariable Long userId,
-            @RequestBody UpdateUserRequestDTO request) {
+            @RequestBody UpdateUserRequestDTO request
+    ) {
         UserResponseDTO updatedUser = userUpdateService.updateUserFields(userId, request);
         return ResponseEntity.ok(updatedUser);
     }
 
-    // 🔹 Actualizar dirección (puede seguir siendo PUT)
+    /**
+     * Updates a specific address of the user.
+     * <p>
+     * This endpoint replaces the address details for the given address ID.
+     * PUT is used since the update replaces the resource.
+     *
+     * Example request: PUT /users/{userId}/addresses/{addressId}
+     *
+     * @param userId the identifier of the user
+     * @param addressId the identifier of the address to update
+     * @param request the new address data wrapped in {@link UserAddressRequestDTO}
+     * @return a {@link ResponseEntity} containing the updated user and HTTP status 200 (OK)
+     */
     @PutMapping("/{userId}/addresses/{addressId}")
     public ResponseEntity<UserResponseDTO> updateUserAddress(
             @PathVariable Long userId,
             @PathVariable Long addressId,
-            @RequestBody UserAddressRequestDTO request) {
+            @RequestBody UserAddressRequestDTO request
+    ) {
         UserResponseDTO updatedUser = userUpdateService.updateUserAddress(userId, addressId, request);
         return ResponseEntity.ok(updatedUser);
     }
 
-    // 🔹 Actualizar imagen de perfil
+    /**
+     * Updates the user's profile image.
+     * <p>
+     * Accepts a multipart file upload and updates the user's profile image.
+     * Returns the URL of the new image upon success.
+     *
+     * Example request: PUT /users/{userId}/profile-image
+     *
+     * @param userId the identifier of the user
+     * @param file the profile image file to upload
+     * @return a {@link ResponseEntity} containing the URL of the updated profile image
+     *         and HTTP status 200 (OK), or 500 if the upload fails
+     */
     @PutMapping("/{userId}/profile-image")
     public ResponseEntity<String> updateProfileImage(
             @PathVariable Long userId,
-            @RequestParam("image") MultipartFile file) {
+            @RequestParam("image") MultipartFile file
+    ) {
         try {
             byte[] imageData = file.getBytes();
             String imageType = file.getContentType();
@@ -54,4 +91,5 @@ public class UserUpdateController {
                     .body("Failed to upload image");
         }
     }
+
 }

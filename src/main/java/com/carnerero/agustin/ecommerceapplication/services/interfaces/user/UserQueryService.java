@@ -4,92 +4,92 @@ import com.carnerero.agustin.ecommerceapplication.dtos.responses.PageResponse;
 import com.carnerero.agustin.ecommerceapplication.dtos.responses.UserResponseDTO;
 import com.carnerero.agustin.ecommerceapplication.model.enums.Roles;
 import com.carnerero.agustin.ecommerceapplication.model.enums.UserStatus;
-import org.springframework.data.domain.Pageable;
-
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 /**
- * Servicio para consultas y búsquedas de usuarios.
- * Solo operaciones de lectura sin efectos secundarios.
+ * Service responsible for user queries and searches.
+ * Read-only operations with no side effects.
  */
-
-
 public interface UserQueryService {
 
     /**
-     * Obtiene un usuario por ID
+     * Retrieves a user by ID.
      *
-     * @param userId ID del usuario
-     * @return Usuario encontrado
+     * @param userId the user identifier
+     * @return the found user
      */
     UserResponseDTO getUserById(Long userId);
 
     /**
-     * Obtiene un usuario por email
+     * Retrieves a user by email address.
      *
-     * @param email Email del usuario
-     * @return Usuario encontrado
+     * @param email the user's email
+     * @return the found user
      */
     UserResponseDTO getUserByEmail(String email);
 
     /**
-     * Obtiene un usuario por username
+     * Retrieves a user by username.
      *
-     * @param username Nombre de usuario
-     * @return Usuario encontrado
+     * @param username the user's username
+     * @return the found user
      */
     UserResponseDTO getUserByUsername(String username);
 
     /**
-     * Busca usuarios por rol
+     * Retrieves a paginated list of users by role.
      *
-     * @param field Ordenación por campo field
-     * @param desc tipo de ordenación ,desc true descendente, false ascendente
-     * @param numberOfPages número de páginas
-     * @param role Nombre del rol
-     * @return Página de usuarios con ese rol
+     * @param field the field used for sorting
+     * @param desc sorting order: true for descending, false for ascending
+     * @param numberOfPages the page number to retrieve
+     * @param role the user role
+     * @return a paginated response containing users with the specified role
      */
-    PageResponse<UserResponseDTO> getUsersByRole(String field,
-                                                 Boolean desc,
-                                                 Integer numberOfPages,
-                                                 Roles role);
+    PageResponse<UserResponseDTO> getUsersByRole(
+            String field,
+            Boolean desc,
+            Integer numberOfPages,
+            Roles role
+    );
 
     /**
-     * Busca usuarios por status
+     * Retrieves a paginated list of users by account status.
      *
-     * @param field Ordenación por campo field
-     * @param desc tipo de ordenación ,desc true descendente, false ascendente
-     * @param numberOfPages número de páginas
-     * @param status Nombre del rol
-     * @return Página de usuarios con ese status
+     * @param field the field used for sorting
+     * @param desc sorting order: true for descending, false for ascending
+     * @param numberOfPages the page number to retrieve
+     * @param status the user account status
+     * @return a paginated response containing users with the specified status
      */
-
-    PageResponse<UserResponseDTO> getUsersByStatus(String field,
-                                                   Boolean desc,
-                                                   Integer numberOfPages,
-                                                   UserStatus status);
-
+    PageResponse<UserResponseDTO> getUsersByStatus(
+            String field,
+            Boolean desc,
+            Integer numberOfPages,
+            UserStatus status
+    );
 
     /**
-     * Obtiene usuarios activos
-     * @param field Ordenación por campo field
-     * @param desc tipo de ordenación ,desc true descendente, false ascendente
-     * @param numberOfPages número de páginas
-     * @return Página de usuarios activos
+     * Retrieves a paginated list of active users.
+     *
+     * @param field the field used for sorting
+     * @param desc sorting order: true for descending, false for ascending
+     * @param numberOfPages the page number to retrieve
+     * @return a paginated response containing active users
      */
-    PageResponse<UserResponseDTO> getActiveUsers(String field,
-                                                 Boolean desc,
-                                                 Integer numberOfPages);
+    PageResponse<UserResponseDTO> getActiveUsers(
+            String field,
+            Boolean desc,
+            Integer numberOfPages
+    );
 
     /**
-     * Obtiene usuarios registrados después de una fecha
+     * Retrieves a paginated list of users created after the specified date.
      *
-     * @param date fecha
-     * @param field Ordenación por campo field
-     * @param desc tipo de ordenación ,desc true descendente, false ascendente
-     * @param numberOfPages número de páginas
-     * @return Página de usuarios
+     * @param date the reference date
+     * @param field the field used for sorting
+     * @param desc sorting order: true for descending, false for ascending
+     * @param numberOfPages the page number to retrieve
+     * @return a paginated response containing users
      */
     PageResponse<UserResponseDTO> getUsersCreatedAfter(
             LocalDate date,
@@ -97,14 +97,15 @@ public interface UserQueryService {
             Boolean desc,
             Integer numberOfPages
     );
+
     /**
-     * Obtiene usuarios registrados antes de una fecha
+     * Retrieves a paginated list of users created before the specified date.
      *
-     * @param date fecha
-     * @param field Ordenación por campo field
-     * @param desc tipo de ordenación ,desc true descendente, false ascendente
-     * @param numberOfPages número de páginas
-     * @return Página de usuarios
+     * @param date the reference date
+     * @param field the field used for sorting
+     * @param desc sorting order: true for descending, false for ascending
+     * @param numberOfPages the page number to retrieve
+     * @return a paginated response containing users
      */
     PageResponse<UserResponseDTO> getUsersCreatedBefore(
             LocalDate date,
@@ -112,14 +113,15 @@ public interface UserQueryService {
             Boolean desc,
             Integer numberOfPages
     );
+
     /**
-     * Obtiene usuarios registrados antes de una fecha
+     * Retrieves a paginated list of users created on the specified date.
      *
-     * @param date fecha
-     * @param field Ordenación por campo field
-     * @param desc tipo de ordenación ,desc true descendente, false ascendente
-     * @param numberOfPages número de páginas
-     * @return Página de usuarios
+     * @param date the reference date
+     * @param field the field used for sorting
+     * @param desc sorting order: true for descending, false for ascending
+     * @param numberOfPages the page number to retrieve
+     * @return a paginated response containing users
      */
     PageResponse<UserResponseDTO> getUsersCreatedEquals(
             LocalDate date,
@@ -129,16 +131,15 @@ public interface UserQueryService {
     );
 
     /**
-     * Obtiene usuarios registrados entre dos fechas
+     * Retrieves a paginated list of users created between two dates.
      *
-     * @param startDate fecha
-     * @param endDate fecha
-     * @param field Ordenación por campo field
-     * @param desc tipo de ordenación ,desc true descendente, false ascendente
-     * @param numberOfPages número de páginas
-     * @return Página de usuarios
+     * @param startDate the start date
+     * @param endDate the end date
+     * @param field the field used for sorting
+     * @param desc sorting order: true for descending, false for ascending
+     * @param numberOfPages the page number to retrieve
+     * @return a paginated response containing users
      */
-
     PageResponse<UserResponseDTO> getUsersCreatedBetween(
             LocalDate startDate,
             LocalDate endDate,
@@ -148,26 +149,25 @@ public interface UserQueryService {
     );
 
     /**
-     * Obtiene el conteo total de usuarios
+     * Returns the total number of users.
      *
-     * @return Número total de usuarios
+     * @return the total user count
      */
     long countAllUsers();
 
     /**
-     * Obtiene el conteo de usuarios por estado
+     * Returns the number of users by account status.
      *
-     * @param status Estado de actividad
-     * @return Número de usuarios con ese estado
+     * @param status the user account status
+     * @return the number of users with the given status
      */
     long countUsersByStatus(UserStatus status);
 
     /**
-     * Obtiene el avatar/foto de perfil del usuario
+     * Retrieves the user's profile image (avatar).
      *
-     * @param userId ID del usuario
-     * @return URL o path de la imagen de perfil
+     * @param userId the user identifier
+     * @return the URL or path of the user's profile image
      */
     String getUserProfileImage(Long userId);
-
 }

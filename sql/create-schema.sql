@@ -9,8 +9,6 @@ CREATE SEQUENCE categories_seq START 1;
 CREATE SEQUENCE orders_seq START 1;
 CREATE SEQUENCE payments_seq START 1;
 
-
-
 -- ==============================================
 -- ROLES
 -- ==============================================

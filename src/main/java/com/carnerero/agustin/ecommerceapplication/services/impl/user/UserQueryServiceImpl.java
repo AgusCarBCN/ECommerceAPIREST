@@ -25,7 +25,6 @@ public class UserQueryServiceImpl implements UserQueryService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
-    private static final int PAGE_SIZE=5;
     private final static Set<String> allowedUserFields = Set.of(
             "userName",
             "email",
@@ -62,7 +61,7 @@ public class UserQueryServiceImpl implements UserQueryService {
     public PageResponse<UserResponseDTO> getUsersByRole(String field, Boolean desc, Integer numberOfPages, Roles role) {
         final var sorting= Sort.getSort(field,desc,allowedUserFields);
         var page=userRepository.findAllByRoles_Role(role,
-                        PageRequest.of(numberOfPages, PAGE_SIZE, sorting))
+                        PageRequest.of(numberOfPages, Sort.PAGE_SIZE, sorting))
                 .map(userMapper::toUserResponseDTO);
         return PageResponseMapper.mapToPageResponse(page);
     }
@@ -71,7 +70,7 @@ public class UserQueryServiceImpl implements UserQueryService {
     public PageResponse<UserResponseDTO> getUsersByStatus(String field, Boolean desc, Integer numberOfPages, UserStatus status) {
         final var sorting= Sort.getSort(field,desc,allowedUserFields);
         var page=userRepository.findAllByStatus(status,
-                        PageRequest.of(numberOfPages, PAGE_SIZE, sorting))
+                        PageRequest.of(numberOfPages, Sort.PAGE_SIZE, sorting))
                 .map(userMapper::toUserResponseDTO);
         return PageResponseMapper.mapToPageResponse(page);
     }
@@ -80,7 +79,7 @@ public class UserQueryServiceImpl implements UserQueryService {
     public PageResponse<UserResponseDTO> getActiveUsers(String field, Boolean desc, Integer numberOfPages) {
         final var sorting= Sort.getSort(field,desc,allowedUserFields);
         var page=userRepository.findAllActive(
-                PageRequest.of(numberOfPages, PAGE_SIZE, sorting))
+                PageRequest.of(numberOfPages, Sort.PAGE_SIZE, sorting))
                 .map(userMapper::toUserResponseDTO);
         return PageResponseMapper.mapToPageResponse(page);
     }
@@ -89,7 +88,7 @@ public class UserQueryServiceImpl implements UserQueryService {
     public PageResponse<UserResponseDTO> getUsersCreatedAfter(LocalDate date, String field, Boolean desc, Integer numberOfPages) {
         final var sorting= Sort.getSort(field,desc,allowedUserFields);
         var page=userRepository.findAllByCreatedAtAfter(
-                        PageRequest.of(numberOfPages, PAGE_SIZE, sorting),date)
+                        PageRequest.of(numberOfPages, Sort.PAGE_SIZE, sorting),date)
                 .map(userMapper::toUserResponseDTO);
         return PageResponseMapper.mapToPageResponse(page);
     }
@@ -98,7 +97,7 @@ public class UserQueryServiceImpl implements UserQueryService {
     public PageResponse<UserResponseDTO> getUsersCreatedBefore(LocalDate date, String field, Boolean desc, Integer numberOfPages) {
         final var sorting= Sort.getSort(field,desc,allowedUserFields);
         var page=userRepository.findAllByCreatedAtBefore(date,
-                        PageRequest.of(numberOfPages, PAGE_SIZE, sorting))
+                        PageRequest.of(numberOfPages, Sort.PAGE_SIZE, sorting))
                 .map(userMapper::toUserResponseDTO);
         return PageResponseMapper.mapToPageResponse(page);
     }
@@ -108,7 +107,7 @@ public class UserQueryServiceImpl implements UserQueryService {
         final var sorting= Sort.getSort(field,desc,allowedUserFields);
 
         var page=userRepository.findByCreatedAt(date,
-                        PageRequest.of(numberOfPages, PAGE_SIZE, sorting))
+                        PageRequest.of(numberOfPages, Sort.PAGE_SIZE, sorting))
                 .map(userMapper::toUserResponseDTO);
         return PageResponseMapper.mapToPageResponse(page);
     }
@@ -119,7 +118,7 @@ public class UserQueryServiceImpl implements UserQueryService {
         var page=userRepository.findAllByCreatedAtBetween(
                         startDate,
                         endDate,
-                        PageRequest.of(numberOfPages, PAGE_SIZE, sorting))
+                        PageRequest.of(numberOfPages, Sort.PAGE_SIZE, sorting))
                 .map(userMapper::toUserResponseDTO);
         return PageResponseMapper.mapToPageResponse(page);
     }

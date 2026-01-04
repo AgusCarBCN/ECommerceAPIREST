@@ -2,50 +2,50 @@ package com.carnerero.agustin.ecommerceapplication.services.interfaces.user;
 
 import com.carnerero.agustin.ecommerceapplication.dtos.requests.UpdateUserRequestDTO;
 import com.carnerero.agustin.ecommerceapplication.dtos.requests.UserAddressRequestDTO;
-import com.carnerero.agustin.ecommerceapplication.dtos.requests.UserRequestDTO;
 import com.carnerero.agustin.ecommerceapplication.dtos.responses.UserResponseDTO;
 
 /**
- * Servicio para actualizar datos de usuario
+ * Service responsible for updating user data.
  */
 public interface UserUpdateService {
 
+    /**
+     * Updates a user's address.
+     *
+     * @param userId the user identifier
+     * @param addressId the identifier of the address to update
+     * @param request the new address data
+     * @return the updated user profile
+     */
+    UserResponseDTO updateUserAddress(
+            Long userId,
+            Long addressId,
+            UserAddressRequestDTO request
+    );
 
     /**
-     * Actualiza dirección de usuario
+     * Updates user profile fields (contact and personal information).
      *
-     * @param userId ID del usuario
-     * @param addressId ID de la dirección a cambiar
-     * @param  request dirección
-     * @return Perfil actualizado
+     * @param userId the user identifier
+     * @param request the fields to be updated
+     * @return the updated user profile
      */
-
-    UserResponseDTO updateUserAddress(Long userId,
-                                      Long addressId,
-                                      UserAddressRequestDTO request);
+    UserResponseDTO updateUserFields(
+            Long userId,
+            UpdateUserRequestDTO request
+    );
 
     /**
-     * Actualiza información de contacto del usuario
+     * Updates the user's profile image.
      *
-     * @param userId ID del usuario
-     * @param request datos a actualizar
-     * @return Perfil actualizado
+     * @param userId the user identifier
+     * @param imageData the image data (bytes or Base64-decoded bytes)
+     * @param imageType the image type (jpg, png, etc.)
+     * @return the URL of the updated profile image
      */
-
-    UserResponseDTO updateUserFields(Long userId, UpdateUserRequestDTO request);
-
-
-    /**
-     * Actualiza la imagen de perfil del usuario
-     *
-     * @param userId ID del usuario
-     * @param imageData Datos de la imagen (base64 o bytes)
-     * @param imageType Tipo de imagen (jpg, png, etc.)
-     * @return URL de la nueva imagen
-     */
-    String updateProfileImage(Long userId, byte[] imageData, String imageType);
-
-
-
-
+    String updateProfileImage(
+            Long userId,
+            byte[] imageData,
+            String imageType
+    );
 }

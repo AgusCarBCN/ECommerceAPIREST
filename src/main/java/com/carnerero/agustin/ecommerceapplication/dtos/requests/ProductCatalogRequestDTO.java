@@ -18,11 +18,11 @@ public class ProductCatalogRequestDTO {
     @DecimalMin(value = "0.0", inclusive = false, message = "Price must be greater than 0")
     @Digits(integer = 10, fraction = 2, message = "Price must have up to 2 decimal places")
     private BigDecimal price;
-    @NotBlank(message = "Quantity is required")
+    @NotNull(message = "Quantity is required")
     @Min(value = 1, message = "Quantity must be at least 1")
-    private Integer quantity;
+    private Long stockQuantity;
     @NotNull(message = "Categories are required")
     @Size(min = 1, message = "At least one category must be assigned")
-    private Set<CategoryDTO> categories;
+    private Set<CategoryRequestDTO> categories;
 
 }
