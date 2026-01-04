@@ -5,6 +5,7 @@ import com.carnerero.agustin.ecommerceapplication.dtos.requests.CreateCategoryRe
 import com.carnerero.agustin.ecommerceapplication.dtos.requests.ProductCatalogRequestDTO;
 import com.carnerero.agustin.ecommerceapplication.dtos.responses.CategoryResponseDTO;
 import com.carnerero.agustin.ecommerceapplication.dtos.responses.ProductCatalogResponseDTO;
+import com.carnerero.agustin.ecommerceapplication.exception.productCatalog.ProductNotFoundException;
 import com.carnerero.agustin.ecommerceapplication.model.entities.CategoryEntity;
 import com.carnerero.agustin.ecommerceapplication.model.entities.ProductCatalogEntity;
 import com.carnerero.agustin.ecommerceapplication.repository.CategoryRepository;
@@ -88,6 +89,7 @@ public class ProductCatalogServiceAdminImpl implements ProductCatalogServiceAdmi
 
     @Override
     public ProductCatalogResponseDTO updateProductCatalog(ProductCatalogRequestDTO request, UUID productId) {
+        //Find product by id
         var product = findProductById(productId);
 
         Optional.ofNullable(request.getProductName()).ifPresent(product::setProductName);
