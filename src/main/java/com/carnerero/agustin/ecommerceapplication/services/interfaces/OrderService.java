@@ -17,17 +17,20 @@ public interface OrderService {
 
     /**
      * Retrieve an order by its ID.
-     * @param orderId the ID of the order
+     * @param  id of the order
      * @return OrderResponseDTO with details
      */
-    OrderResponseDTO getOrderById(Long orderId);
+    OrderResponseDTO getOrderById(Long id);
 
     /**
      * Retrieve all orders for a specific user.
-     * @param userId the ID of the user
+     * @param userId the id of the user
+     * @param numberOfPages the page number to retrieve
+     *
      * @return PageResponse of OrderResponseDTOs
      */
-    PageResponse<OrderResponseDTO> getOrdersByUser(Long userId);
+    PageResponse<OrderResponseDTO> getOrdersByUser(Integer numberOfPages,
+                                                   Long userId);
 
     /**
      * Update the status of an order.
@@ -35,13 +38,19 @@ public interface OrderService {
      * @param newStatus new status to set (enum OrderStatus)
      * @return updated OrderResponseDTO
      */
-    OrderResponseDTO updateOrderStatus(Long orderId, OrderStatus newStatus);
+    OrderResponseDTO changeOrderStatus(Long orderId, OrderStatus newStatus);
 
     /**
      * Cancel an order.
      * This should handle stock restoration and payment reversal if needed.
      * @param orderId the ID of the order
      */
-    void cancelOrder(Long orderId);
+    OrderResponseDTO cancelOrder(Long orderId);
+    /**
+     * Delete an order.
+     * This should handle stock restoration and payment reversal if needed.
+     * @param orderId the ID of the order
+     */
+    void deleteOrder(Long orderId);
 }
 

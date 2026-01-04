@@ -1,13 +1,32 @@
 package com.carnerero.agustin.ecommerceapplication.repository;
 
 import com.carnerero.agustin.ecommerceapplication.model.entities.OrderEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
-
-import java.util.List;
 
 
+/**
+ * Repository interface for accessing Order entities from the database.
+ * Extends JpaRepository to provide CRUD operations.
+ */
 public interface OrderRepository extends JpaRepository<OrderEntity, Long> {
-    List<OrderEntity> findByUserId(Long userId);
+
+    /**
+     * Retrieve a paginated list of orders for a specific user.
+     *
+     * @param userId the ID of the user whose orders are being retrieved
+     * @param pageable pagination and sorting information
+     * @return a Page of OrderEntity objects belonging to the user
+     */
+    Page<OrderEntity> findByUserId(Long userId, Pageable pageable);
+
+    /**
+     * Check if a user has any existing orders.
+     *
+     * @param userId the ID of the user
+     * @return true if the user has at least one order, false otherwise
+     */
     boolean existsByUserId(Long userId);
+
 }

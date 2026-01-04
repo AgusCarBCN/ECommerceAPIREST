@@ -11,18 +11,18 @@ import com.carnerero.agustin.ecommerceapplication.repository.OrderRepository;
 import com.carnerero.agustin.ecommerceapplication.repository.ProductCatalogRepository;
 import com.carnerero.agustin.ecommerceapplication.repository.UserRepository;
 import com.carnerero.agustin.ecommerceapplication.services.interfaces.OrderService;
+import com.carnerero.agustin.ecommerceapplication.util.helper.Sort;
 import com.carnerero.agustin.ecommerceapplication.util.mapper.OrderMapper;
-import com.carnerero.agustin.ecommerceapplication.util.mapper.OrderProductMapper;
+import com.carnerero.agustin.ecommerceapplication.util.mapper.PageResponseMapper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @Transactional
@@ -31,10 +31,9 @@ import java.util.UUID;
 public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
+    private final UserRepository userRepository;
     private final ProductCatalogRepository productCatalogRepository;
     private final OrderMapper orderMapper;
-    private final OrderProductMapper orderProductMapper;
-    private final UserRepository userRepository;
 
     @Transactional
     public OrderResponseDTO createOrder(OrderRequestDTO request) {
@@ -107,21 +106,38 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderResponseDTO getOrderById(Long orderId) {
-        return null;
+        var order=orderRepository.findById(orderId).orElseThrow(()->new EntityNotFoundException("Order not found"));
+        return orderMapper.toOrderResponseDTO(order);
     }
 
     @Override
-    public PageResponse<OrderResponseDTO> getOrdersByUser(Long userId) {
-        return null;
+    public PageResponse<OrderResponseDTO> getOrdersByUser(Integer numberOfPages, Long userId) {
+
+        var page=orderRepository.findByUserId(userId,PageRequest.of(numberOfPages,Sort.PAGE_SIZE))
+                .map(orderMapper::toOrderResponseDTO);
+
+        return PageResponseMapper.mapToPageResponse(page);
     }
 
+    // Only admin
     @Override
-    public OrderResponseDTO updateOrderStatus(Long orderId, OrderStatus newStatus) {
-        return null;
+    public OrderResponseDTO changeOrderStatus(Long orderId, OrderStatus newStatus) {
+        var order=orderRepository.findById(orderId).orElseThrow(()->new EntityNotFoundException("Order not found"));
+        order.setStatus(newStatus);
+        return orderMapper.toOrderResponseDTO(order);
     }
 
-    @Override
-    public void cancelOrder(Long orderId) {
 
+    @Override
+    public OrderResponseDTO cancelOrder(Long orderId) {
+        var order=orderRepository.findById(orderId).orElseThrow(()->new EntityNotFoundException("Order not found"));
+        order.setStatus(OrderStatus.CANCELLED);
+        return orderMapper.toOrderResponseDTO(order);
+    }
+    @Transactional
+    @Override
+    public void deleteOrder(Long orderId) {
+        var order=orderRepository.findById(orderId).orElseThrow(()->new EntityNotFoundException("Order not found"));
+        orderRepository.delete(order);
     }
 }

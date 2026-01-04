@@ -21,7 +21,7 @@ public class PaymentEntity {
     @SequenceGenerator(name = "payments_seq", sequenceName = "payments_seq", allocationSize = 1)
     private Long id;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
     @JoinColumn(name = "order_id", unique = true, nullable = false)
     private OrderEntity order;
 

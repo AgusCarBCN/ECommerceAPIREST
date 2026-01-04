@@ -3,14 +3,14 @@ package com.carnerero.agustin.ecommerceapplication.controller.order;
 
 import com.carnerero.agustin.ecommerceapplication.dtos.requests.OrderRequestDTO;
 import com.carnerero.agustin.ecommerceapplication.dtos.responses.OrderResponseDTO;
+import com.carnerero.agustin.ecommerceapplication.dtos.responses.PageResponse;
+import com.carnerero.agustin.ecommerceapplication.model.enums.OrderStatus;
 import com.carnerero.agustin.ecommerceapplication.services.interfaces.OrderService;
 import com.carnerero.agustin.ecommerceapplication.services.interfaces.productcatalog.ProductCatalogServiceAdmin;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @AllArgsConstructor
@@ -23,6 +23,30 @@ public class OrderController {
     public ResponseEntity<OrderResponseDTO> createOrder(@RequestBody OrderRequestDTO orderRequestDTO) {
 
         var response=orderService.createOrder(orderRequestDTO);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(response);
+    }
+    @GetMapping("/by-user")
+    public ResponseEntity<PageResponse<OrderResponseDTO>> getOrdersByUser(@RequestParam Integer page, @RequestParam Long userId) {
+        var response=orderService.getOrdersByUser(page, userId);
+        return ResponseEntity.status(HttpStatus.ACCEPTED)
+                .body(response);
+    }
+    @PatchMapping("/change-status")
+    public ResponseEntity<OrderResponseDTO> changeOrderStatus(@RequestParam Long orderId, @RequestParam OrderStatus newStatus) {
+        var response=orderService.changeOrderStatus(orderId, newStatus);
+        return  ResponseEntity.status(HttpStatus.ACCEPTED)
+                .body(response);
+    }
+    @PatchMapping("/cancel")
+    public ResponseEntity<OrderResponseDTO> cancelOrder(@RequestParam Long orderId) {
+        var response=orderService.cancelOrder(orderId);
+        return ResponseEntity.status(HttpStatus.ACCEPTED)
+                .body(response);
+    }
+    @DeleteMapping("/remove")
+    public ResponseEntity<OrderResponseDTO> removeOrder(@RequestParam Long orderId) {
+        orderService.deleteOrder(orderId);
+        return ResponseEntity.noContent().build();
     }
 }
