@@ -1,12 +1,11 @@
 package com.carnerero.agustin.ecommerceapplication.dtos.requests;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
+@Builder
 @AllArgsConstructor
-@Getter
-@Setter
+@NoArgsConstructor
+@Data
 public class SuspensionRequestDTO {
     private String reason;
 }

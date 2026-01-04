@@ -1,6 +1,8 @@
 package com.carnerero.agustin.ecommerceapplication.services.impl.user;
 
+import com.carnerero.agustin.ecommerceapplication.dtos.requests.LoginRequestDTO;
 import com.carnerero.agustin.ecommerceapplication.dtos.requests.UserRequestDTO;
+import com.carnerero.agustin.ecommerceapplication.dtos.responses.LoginResponseDTO;
 import com.carnerero.agustin.ecommerceapplication.dtos.responses.UserResponseDTO;
 import com.carnerero.agustin.ecommerceapplication.exception.user.BusinessException;
 import com.carnerero.agustin.ecommerceapplication.model.entities.RoleEntity;
@@ -9,13 +11,13 @@ import com.carnerero.agustin.ecommerceapplication.model.enums.Roles;
 import com.carnerero.agustin.ecommerceapplication.repository.UserAddressRepository;
 import com.carnerero.agustin.ecommerceapplication.repository.UserRepository;
 import com.carnerero.agustin.ecommerceapplication.services.interfaces.user.UserRegistrationService;
+import com.carnerero.agustin.ecommerceapplication.util.mapper.LoginMapper;
 import com.carnerero.agustin.ecommerceapplication.util.mapper.UserMapper;
+
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.HashSet;
-import java.util.Set;
 
 @Service
 @Transactional
@@ -25,6 +27,7 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
     private final UserRepository userRepository;
     private final UserAddressRepository userAddressRespository;
     private final UserMapper userMapper;
+    private final LoginMapper loginMapper;
 
     @Override
     public UserResponseDTO registerUser(UserRequestDTO request) {
@@ -34,6 +37,19 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
     @Override
     public UserResponseDTO registerAdminUser(UserRequestDTO request) {
         return registerUser(request,true);
+    }
+
+    @Override
+    public void login(LoginRequestDTO loginRequest) {
+        // Find user by username or email
+        UserEntity user = userRepository.findByEmail(
+                loginRequest.getEmail()).orElseThrow(() -> new BusinessException("User not found"));
+
+        // Verify password
+        if(!user.getPassword().equals(loginRequest.getPassword())) {
+            throw  new BusinessException("Wrong Password");
+        }
+
     }
 
     @Override

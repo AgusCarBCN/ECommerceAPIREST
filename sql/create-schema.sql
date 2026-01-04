@@ -8,6 +8,7 @@ CREATE SEQUENCE users_seq START 1;
 CREATE SEQUENCE categories_seq START 1;
 CREATE SEQUENCE orders_seq START 1;
 CREATE SEQUENCE payments_seq START 1;
+CREATE SEQUENCE product_seq START 1;
 
 -- ==============================================
 -- ROLES
@@ -122,15 +123,17 @@ CREATE TABLE orders (
 );
 
 -- ==============================================
--- ORDER PRODUCTS
+-- PRODUCTS
 -- ==============================================
-CREATE TABLE order_products (
-                                order_id BIGINT REFERENCES orders(id) ON DELETE CASCADE,
-                                product_catalog_id UUID REFERENCES products_catalog(id),
-                                quantity BIGINT NOT NULL,
-                                PRIMARY KEY(order_id, product_catalog_id)
-);
 
+CREATE TABLE products (
+                          id BIGINT PRIMARY KEY DEFAULT nextval('product_seq'),
+                          quantity INT DEFAULT 1,
+                          id_product_catalog UUID,
+                          id_order BIGINT,
+                          FOREIGN KEY (id_order) REFERENCES orders(id) ON DELETE CASCADE,
+                          FOREIGN KEY (id_product_catalog) REFERENCES products_catalog(id) ON DELETE CASCADE
+);
 
 -- ==============================================
 -- PAYMENTS

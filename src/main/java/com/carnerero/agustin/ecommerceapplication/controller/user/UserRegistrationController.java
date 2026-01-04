@@ -1,9 +1,12 @@
 package com.carnerero.agustin.ecommerceapplication.controller.user;
 
 
+import com.carnerero.agustin.ecommerceapplication.dtos.requests.LoginRequestDTO;
 import com.carnerero.agustin.ecommerceapplication.dtos.requests.UserRequestDTO;
+import com.carnerero.agustin.ecommerceapplication.dtos.responses.LoginResponseDTO;
 import com.carnerero.agustin.ecommerceapplication.dtos.responses.UserResponseDTO;
 import com.carnerero.agustin.ecommerceapplication.services.interfaces.user.UserRegistrationService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/register")
+@RequestMapping
 public class UserRegistrationController {
 
     private UserRegistrationService useCase;
@@ -27,7 +30,7 @@ public class UserRegistrationController {
      * @param userRequestDTO the registration data for the user
      * @return a {@link ResponseEntity} containing the created user and HTTP status 201 (Created)
      */
-    @PostMapping("/user")
+    @PostMapping("/register/user")
     public ResponseEntity<UserResponseDTO> registerUser(
             @RequestBody UserRequestDTO userRequestDTO
     ) {
@@ -36,6 +39,21 @@ public class UserRegistrationController {
                 .status(HttpStatus.CREATED)
                 .body(response);
     }
+
+       /**
+       * POST /api/auth/login
+       * Authenticate a user and return user info (optionally token)
+       * @param loginRequest DTO containing username/email and password
+       * @return AuthResponseDTO with user info and optional token
+       */
+      @PostMapping("/login")
+      public ResponseEntity<Void> login(@RequestBody @Valid LoginRequestDTO loginRequest) {
+          useCase.login(loginRequest);
+          return ResponseEntity.noContent().build();
+      }
+
+
+
 
     /**
      * Registers a new admin user in the system.
@@ -48,7 +66,7 @@ public class UserRegistrationController {
      * @param userRequestDTO the registration data for the admin user
      * @return a {@link ResponseEntity} containing the created admin user and HTTP status 201 (Created)
      */
-    @PostMapping("/admin")
+    @PostMapping("/register/admin")
     public ResponseEntity<UserResponseDTO> registerAdmin(
             @RequestBody UserRequestDTO userRequestDTO
     ) {

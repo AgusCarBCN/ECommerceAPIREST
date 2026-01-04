@@ -7,9 +7,12 @@ import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
-@Setter
+import java.util.ArrayList;
+import java.util.List;
+
+@Builder
 @Getter
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)// builder privado
 @NoArgsConstructor
 @Slf4j
 @Entity
@@ -21,24 +24,34 @@ public class OrderEntity {
     @SequenceGenerator(name = "orders_seq", sequenceName = "orders_seq", allocationSize = 1)
     private Long id;
 
+    @Setter
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 
+    @Setter
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "id_bill", unique = true, nullable = false)
     private BillEntity bill;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "order_status", nullable = false)
-    private OrderStatus orderStatus;
+    @Setter
+    @OneToMany(mappedBy = "order",
+            fetch =  FetchType.EAGER,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
+    private List<ProductEntity> products=new ArrayList<>();
 
+    @Setter
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private OrderStatus status;
+    @Setter
     @Enumerated(EnumType.STRING)
     @Column(name = "shipping_method", nullable = false)
     private ShippingMethod shippingMethod;
-
+    @Setter
     private LocalDateTime createdAt;
-
+    @Setter
     private LocalDateTime updatedAt;
 
     @PrePersist
@@ -47,7 +60,7 @@ public class OrderEntity {
         createdAt = now;
         updatedAt = now;
 
-        if (orderStatus == null) orderStatus = OrderStatus.CREATED;
+        if (status == null) status = OrderStatus.CREATED;
         if (shippingMethod == null) shippingMethod = ShippingMethod.STANDARD;
     }
 
@@ -58,14 +71,14 @@ public class OrderEntity {
 
     @PostUpdate
     protected void afterUpdate() {
-        log.info("Order Status updated with status: {}", orderStatus);
+        log.info("Order Status updated with status: {}", status);
     }
 
-    // Método de conveniencia para enlazar con Bill
-    /*public void setBill(BillEntity bill) {
+    // --------- Builder sin id ---------
+    @Builder(builderMethodName = "orderBuilder")
+    private OrderEntity(UserEntity user,
+                        BillEntity bill) {
+        this.user = user;
         this.bill = bill;
-        if (bill.getOrder() != this) {
-            bill.setOrder(this);
-        }
-    }*/
+    }
 }

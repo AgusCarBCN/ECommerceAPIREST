@@ -39,7 +39,7 @@ public class UserEntity {
 
     @Column(nullable = false)
     private String password;
-    //Reemplaza @PrePersist para que Hibernate se encargue automáticamente de asignar createdAt.
+
 
     @Column(name = "created_at", updatable = false)
     private LocalDate createdAt;

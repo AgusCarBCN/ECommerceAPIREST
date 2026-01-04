@@ -1,12 +1,18 @@
 package com.carnerero.agustin.ecommerceapplication.dtos.requests;
 
 import jakarta.validation.constraints.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.util.Set;
 
 //Sólo usado por el administrador para introducir un nuevo producto o modificar catálogo
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Data
 public class ProductCatalogRequestDTO {
     @NotBlank(message = "Product name is required")

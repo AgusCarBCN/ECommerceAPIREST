@@ -1,14 +1,18 @@
 package com.carnerero.agustin.ecommerceapplication.dtos.responses;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.domain.Sort;
 
 
 import java.util.List;
 
-@Data
+@Builder
 @AllArgsConstructor
+@NoArgsConstructor
+@Data
 public class PageResponse<T> {
 
     private List<T> content;

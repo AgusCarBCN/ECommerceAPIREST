@@ -1,19 +1,25 @@
 package com.carnerero.agustin.ecommerceapplication.dtos.requests;
 
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+import java.math.BigInteger;
 import java.util.UUID;
 
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Data
-public class OrderProductRequestDTO {
+public class ProductRequestDTO {
 
     @NotNull(message="Product catalog id is required")
     private UUID productCatalogId;
     @NotNull(message="Quantity is required")
     @Min(value = 1, message = "Quantity must be at least 1")
-    private Long quantity;
+    private BigInteger quantity;
 
-}
+  }

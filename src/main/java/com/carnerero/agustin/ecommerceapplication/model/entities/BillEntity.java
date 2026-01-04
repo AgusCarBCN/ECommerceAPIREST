@@ -28,7 +28,7 @@ public class BillEntity {
     private String taxId;
 
     @Column(nullable = false)
-    private BigDecimal totalAmount;
+    private BigDecimal  totalAmount;
 
     private LocalDateTime createdAt;
 
