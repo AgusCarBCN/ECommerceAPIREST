@@ -19,6 +19,8 @@ public class UserRequestDTO {
     @NotBlank(message = "Username is required")
     @Size(min = 3, max = 20, message = "Username must be between 3 and 20 characters")
     private String userName;
+    @Size(min = 10, max = 100, message = "Surname must be between 3 and 20 characters")
+    private String surname;
     @NotBlank(message = "Email is required")
     @Email(message = "Email must be a valid email address")
     private String email;

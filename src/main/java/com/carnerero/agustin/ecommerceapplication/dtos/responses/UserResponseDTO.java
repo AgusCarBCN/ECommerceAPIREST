@@ -18,6 +18,7 @@ import java.util.Set;
 public class UserResponseDTO {
     private Long id;
     private String userName;
+    private String surname;
     private String email;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate createdAt;

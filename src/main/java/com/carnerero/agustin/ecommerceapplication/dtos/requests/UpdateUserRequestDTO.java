@@ -9,6 +9,7 @@ import lombok.*;
 @Data
 public class UpdateUserRequestDTO {
     private String name;
+    private String surname;
     private String email;
     private String password;
     @JsonIgnore

@@ -26,6 +26,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -153,11 +155,17 @@ public class OrderServiceImpl implements OrderService {
             List<ProductRequestDTO> products,
             boolean isAdd
     ) {
+        // 1️⃣ Cargar la orden
         OrderEntity order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new EntityNotFoundException("Order not found"));
 
+        // 2️⃣ Validar estado de la orden
+        if (order.getStatus() != OrderStatus.CREATED) {
+            throw new IllegalStateException("Cannot modify order in status: " + order.getStatus());
+        }
+
         BillEntity bill = order.getBill();
-        BigDecimal totalAmount = bill.getTotalAmount();
+        BigDecimal totalAmount = BigDecimal.ZERO; // vamos a recalcular al final
 
         for (ProductRequestDTO p : products) {
 
@@ -165,12 +173,19 @@ public class OrderServiceImpl implements OrderService {
                     .findById(p.getProductCatalogId())
                     .orElseThrow(() -> new EntityNotFoundException("Product not found"));
 
-            BigDecimal price = catalog.getPrice()
-                    .multiply(BigDecimal.valueOf(p.getQuantity().longValue()));
+            Long qty = p.getQuantity().longValue();
+            BigDecimal priceChange = catalog.getPrice().multiply(BigDecimal.valueOf(qty));
 
             if (isAdd) {
+                // 3️⃣ Validar stock
+                if (catalog.getStockQuantity() < qty) {
+                    throw new IllegalStateException("Insufficient stock for product: " + catalog.getProductName());
+                }
 
-                // ✅ buscar si ya existe en la orden
+                // 4️⃣ Reducir stock
+                catalog.setStockQuantity(catalog.getStockQuantity() - qty);
+
+                // 5️⃣ Buscar si ya existe en la orden
                 ProductEntity product = order.getProducts().stream()
                         .filter(pr -> pr.getProductCatalog().getId().equals(catalog.getId()))
                         .findFirst()
@@ -180,47 +195,43 @@ public class OrderServiceImpl implements OrderService {
                     product = ProductEntity.builder()
                             .order(order)
                             .productCatalog(catalog)
-                            .quantity(p.getQuantity())
+                            .quantity(BigInteger.valueOf(qty))
                             .build();
                     order.addProduct(product);
                 } else {
-                    product.setQuantity(
-                            product.getQuantity().add(p.getQuantity())
-                    );
+                    product.setQuantity(product.getQuantity().add(BigInteger.valueOf(qty)));
                 }
 
-                totalAmount = totalAmount.add(price);
-
             } else {
-                // 🔻 REMOVE
+                // 6️⃣ REMOVE
                 ProductEntity product = order.getProducts().stream()
                         .filter(pr -> pr.getProductCatalog().getId().equals(catalog.getId()))
                         .findFirst()
                         .orElseThrow(() ->
                                 new IllegalStateException("Product not found in order"));
 
-                if (product.getQuantity().compareTo(p.getQuantity()) < 0) {
+                if (product.getQuantity().compareTo(BigInteger.valueOf(qty)) < 0) {
                     throw new IllegalStateException("Cannot remove more items than ordered");
                 }
 
-                product.setQuantity(
-                        product.getQuantity().subtract(p.getQuantity())
-                );
-
+                // 7️⃣ Ajustar cantidad o eliminar
+                product.setQuantity(product.getQuantity().subtract(BigInteger.valueOf(qty)));
                 if (product.getQuantity().signum() == 0) {
-                    order.removeProduct(product); // orphanRemoval hace el delete
+                    order.removeProduct(product); // orphanRemoval hace delete
                 }
 
-                if (totalAmount.compareTo(price) < 0) {
-                    throw new IllegalStateException("Total amount cannot be negative");
-                }
-
-                totalAmount = totalAmount.subtract(price);
+                // 8️⃣ Restaurar stock
+                catalog.setStockQuantity(catalog.getStockQuantity() + qty);
             }
         }
+
+        // 9️⃣ Recalcular totalAmount desde cero (robusto)
+        totalAmount = order.getProducts().stream()
+                .map(pr -> pr.getProductCatalog().getPrice()
+                        .multiply(new BigDecimal(pr.getQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         bill.setTotalAmount(totalAmount);
     }
 
 }
-
