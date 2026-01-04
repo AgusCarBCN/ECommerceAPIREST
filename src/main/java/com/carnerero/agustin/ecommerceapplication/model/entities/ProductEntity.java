@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.UUID;
-
+@Builder
 @Setter
 @Getter
 @AllArgsConstructor
@@ -23,13 +23,13 @@ public class OrderProductsEntity {
     @Column(nullable = false)
     private Long quantity;
 
-   /* @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id", insertable = false, updatable = false)
+    @ManyToOne()
+    @JoinColumn(name="id_order")
     private OrderEntity order;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_catalog_id", insertable = false, updatable = false)
-    private ProductCatalogEntity productCatalog;*/
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name="id_product_catalog",unique = true, nullable = false)
+    private ProductCatalogEntity productCatalog;
 
 
 }

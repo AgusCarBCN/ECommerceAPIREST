@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class OrderProductResponseDTO {
 
-    private Integer quantity;
+    private Long quantity;
     //Product detail
     private ProductCatalogResponseDTO productDetail;
 }
