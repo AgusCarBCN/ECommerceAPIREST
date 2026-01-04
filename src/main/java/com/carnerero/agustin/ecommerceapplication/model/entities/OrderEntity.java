@@ -21,11 +21,11 @@ public class OrderEntity {
     @SequenceGenerator(name = "orders_seq", sequenceName = "orders_seq", allocationSize = 1)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "id_bill", unique = true, nullable = false)
     private BillEntity bill;
 
@@ -38,6 +38,7 @@ public class OrderEntity {
     private ShippingMethod shippingMethod;
 
     private LocalDateTime createdAt;
+
     private LocalDateTime updatedAt;
 
     @PrePersist
@@ -61,10 +62,10 @@ public class OrderEntity {
     }
 
     // Método de conveniencia para enlazar con Bill
-    public void setBill(BillEntity bill) {
+    /*public void setBill(BillEntity bill) {
         this.bill = bill;
         if (bill.getOrder() != this) {
             bill.setOrder(this);
         }
-    }
+    }*/
 }

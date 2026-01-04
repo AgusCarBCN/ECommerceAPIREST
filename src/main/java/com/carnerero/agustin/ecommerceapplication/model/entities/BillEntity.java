@@ -21,7 +21,7 @@ public class BillEntity {
     private UUID id;  // ID renombrado correctamente
 
     @ToString.Exclude
-    @OneToOne(mappedBy = "bill", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "bill", cascade = CascadeType.ALL)
     private OrderEntity order;
 
     @Column(nullable = false, length = 50)
