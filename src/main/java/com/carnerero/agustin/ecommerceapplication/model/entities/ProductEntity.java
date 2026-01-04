@@ -24,12 +24,17 @@ public class ProductEntity {
     @SequenceGenerator(name = "product_seq", sequenceName = "product_seq", allocationSize = 1)
     private Long id;
     private BigInteger quantity;
-    @ManyToOne()
-    @JoinColumn(name="id_order")
+
+    // Reference to the order (parent)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="id_order", nullable = false)
     private OrderEntity order;
 
-    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinColumn(name="id_product_catalog",unique = true, nullable = false)
+    // Reference to the catalog product (master data)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="id_product_catalog", nullable = false)
     private ProductCatalogEntity productCatalog;
+
+
 }
 

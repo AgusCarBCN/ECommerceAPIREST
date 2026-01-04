@@ -1,9 +1,12 @@
 package com.carnerero.agustin.ecommerceapplication.services.interfaces;
 
 import com.carnerero.agustin.ecommerceapplication.dtos.requests.OrderRequestDTO;
+import com.carnerero.agustin.ecommerceapplication.dtos.requests.ProductRequestDTO;
 import com.carnerero.agustin.ecommerceapplication.dtos.responses.OrderResponseDTO;
 import com.carnerero.agustin.ecommerceapplication.dtos.responses.PageResponse;
 import com.carnerero.agustin.ecommerceapplication.model.enums.OrderStatus;
+
+import java.util.List;
 
 public interface OrderService {
 
@@ -52,5 +55,16 @@ public interface OrderService {
      * @param orderId the ID of the order
      */
     void deleteOrder(Long orderId);
+
+    /**
+     * Add a product to an existing order.
+     * @param orderId the ID of the order
+     * @param products the requests of the product to add to order
+     */
+    void modifyOrder(Long orderId, List<ProductRequestDTO> products, boolean isAdd);
+
+
+
+
 }
 

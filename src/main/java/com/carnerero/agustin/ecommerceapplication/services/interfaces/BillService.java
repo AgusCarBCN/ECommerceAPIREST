@@ -20,12 +20,7 @@ public interface BillService {
      */
     BillResponseDTO getBillByOrderId(Long orderId);
 
-    /**
-     * Optionally generate a bill for a completed order.
-     * @param orderId ID of the order
-     * @return created BillDTO
-     */
-    BillResponseDTO generateBillForOrder(Long orderId);
+
 
 }
 

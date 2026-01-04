@@ -25,21 +25,24 @@ public class OrderEntity {
     private Long id;
 
     @Setter
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 
     @Setter
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "id_bill", unique = true, nullable = false)
     private BillEntity bill;
 
+    // Items of the order
     @Setter
-    @OneToMany(mappedBy = "order",
-            fetch =  FetchType.EAGER,
-            cascade = CascadeType.ALL,
-            orphanRemoval = true)
-    private List<ProductEntity> products=new ArrayList<>();
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductEntity> products = new ArrayList<>();
+
+    // Payments
+    /*@Setter
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PaymentEntity> payments = new ArrayList<>();*/
 
     @Setter
     @Enumerated(EnumType.STRING)
@@ -80,5 +83,11 @@ public class OrderEntity {
                         BillEntity bill) {
         this.user = user;
         this.bill = bill;
+    }
+    public void addProduct(ProductEntity product) {
+        products.add(product);
+    }
+    public void removeProduct(ProductEntity product) {
+        products.remove(product);
     }
 }

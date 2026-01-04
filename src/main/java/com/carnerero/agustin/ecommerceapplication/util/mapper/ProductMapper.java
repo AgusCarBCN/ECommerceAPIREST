@@ -8,7 +8,7 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring",uses={
         ProductCatalogMapper.class
 })
-public interface OrderProductMapper {
+public interface ProductMapper {
     ProductResponseDTO toOrderProductResponse(ProductEntity orderProductsEntity);
     ProductEntity toOrderProductsEntity(ProductRequestDTO orderProductRequestDTO);
 }

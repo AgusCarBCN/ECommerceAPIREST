@@ -34,12 +34,12 @@ public class ProductCatalogEntity {
 
     private LocalDateTime createdAt;
 
-    @ManyToMany(fetch = FetchType.LAZY,
-            cascade = {CascadeType.MERGE, CascadeType.REFRESH})
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "product_categories",
             joinColumns = @JoinColumn(name = "product_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id"))
     private Set<CategoryEntity> categories = new HashSet<>();
+
 
     // Métodos de dominio para sincronizar Many-to-Many
     public void addCategory(CategoryEntity category) {

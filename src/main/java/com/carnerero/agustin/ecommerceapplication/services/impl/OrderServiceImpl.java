@@ -14,15 +14,18 @@ import com.carnerero.agustin.ecommerceapplication.services.interfaces.OrderServi
 import com.carnerero.agustin.ecommerceapplication.util.helper.Sort;
 import com.carnerero.agustin.ecommerceapplication.util.mapper.OrderMapper;
 import com.carnerero.agustin.ecommerceapplication.util.mapper.PageResponseMapper;
+import com.carnerero.agustin.ecommerceapplication.util.mapper.ProductCatalogMapper;
+import com.carnerero.agustin.ecommerceapplication.util.mapper.ProductMapper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
+import java.math.BigInteger;
+import java.util.*;
 
 @Service
 @Transactional
@@ -34,18 +37,19 @@ public class OrderServiceImpl implements OrderService {
     private final UserRepository userRepository;
     private final ProductCatalogRepository productCatalogRepository;
     private final OrderMapper orderMapper;
+    private final ProductMapper productMapper;
 
     @Transactional
     public OrderResponseDTO createOrder(OrderRequestDTO request) {
 
         // Find user by username or email
-        var loginRequest=request.getUser();
+        var loginRequest = request.getUser();
         UserEntity user = userRepository.findByEmail(
                 loginRequest.getEmail()).orElseThrow(() -> new BusinessException("User not found"));
 
         // Verify password
-        if(!user.getPassword().equals(loginRequest.getPassword())) {
-            throw  new BusinessException("Wrong Password");
+        if (!user.getPassword().equals(loginRequest.getPassword())) {
+            throw new BusinessException("Wrong Password");
         }
 
         // 1️⃣ Crear Order
@@ -106,14 +110,14 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderResponseDTO getOrderById(Long orderId) {
-        var order=orderRepository.findById(orderId).orElseThrow(()->new EntityNotFoundException("Order not found"));
+        var order = orderRepository.findById(orderId).orElseThrow(() -> new EntityNotFoundException("Order not found"));
         return orderMapper.toOrderResponseDTO(order);
     }
 
     @Override
     public PageResponse<OrderResponseDTO> getOrdersByUser(Integer numberOfPages, Long userId) {
 
-        var page=orderRepository.findByUserId(userId,PageRequest.of(numberOfPages,Sort.PAGE_SIZE))
+        var page = orderRepository.findByUserId(userId, PageRequest.of(numberOfPages, Sort.PAGE_SIZE))
                 .map(orderMapper::toOrderResponseDTO);
 
         return PageResponseMapper.mapToPageResponse(page);
@@ -122,7 +126,7 @@ public class OrderServiceImpl implements OrderService {
     // Only admin
     @Override
     public OrderResponseDTO changeOrderStatus(Long orderId, OrderStatus newStatus) {
-        var order=orderRepository.findById(orderId).orElseThrow(()->new EntityNotFoundException("Order not found"));
+        var order = orderRepository.findById(orderId).orElseThrow(() -> new EntityNotFoundException("Order not found"));
         order.setStatus(newStatus);
         return orderMapper.toOrderResponseDTO(order);
     }
@@ -130,14 +134,93 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderResponseDTO cancelOrder(Long orderId) {
-        var order=orderRepository.findById(orderId).orElseThrow(()->new EntityNotFoundException("Order not found"));
+        var order = orderRepository.findById(orderId).orElseThrow(() -> new EntityNotFoundException("Order not found"));
         order.setStatus(OrderStatus.CANCELLED);
         return orderMapper.toOrderResponseDTO(order);
     }
+
     @Transactional
     @Override
     public void deleteOrder(Long orderId) {
-        var order=orderRepository.findById(orderId).orElseThrow(()->new EntityNotFoundException("Order not found"));
+        var order = orderRepository.findById(orderId).orElseThrow(() -> new EntityNotFoundException("Order not found"));
         orderRepository.delete(order);
     }
+
+    @Transactional
+    @Override
+    public void modifyOrder(
+            Long orderId,
+            List<ProductRequestDTO> products,
+            boolean isAdd
+    ) {
+        OrderEntity order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new EntityNotFoundException("Order not found"));
+
+        BillEntity bill = order.getBill();
+        BigDecimal totalAmount = bill.getTotalAmount();
+
+        for (ProductRequestDTO p : products) {
+
+            ProductCatalogEntity catalog = productCatalogRepository
+                    .findById(p.getProductCatalogId())
+                    .orElseThrow(() -> new EntityNotFoundException("Product not found"));
+
+            BigDecimal price = catalog.getPrice()
+                    .multiply(BigDecimal.valueOf(p.getQuantity().longValue()));
+
+            if (isAdd) {
+
+                // ✅ buscar si ya existe en la orden
+                ProductEntity product = order.getProducts().stream()
+                        .filter(pr -> pr.getProductCatalog().getId().equals(catalog.getId()))
+                        .findFirst()
+                        .orElse(null);
+
+                if (product == null) {
+                    product = ProductEntity.builder()
+                            .order(order)
+                            .productCatalog(catalog)
+                            .quantity(p.getQuantity())
+                            .build();
+                    order.addProduct(product);
+                } else {
+                    product.setQuantity(
+                            product.getQuantity().add(p.getQuantity())
+                    );
+                }
+
+                totalAmount = totalAmount.add(price);
+
+            } else {
+                // 🔻 REMOVE
+                ProductEntity product = order.getProducts().stream()
+                        .filter(pr -> pr.getProductCatalog().getId().equals(catalog.getId()))
+                        .findFirst()
+                        .orElseThrow(() ->
+                                new IllegalStateException("Product not found in order"));
+
+                if (product.getQuantity().compareTo(p.getQuantity()) < 0) {
+                    throw new IllegalStateException("Cannot remove more items than ordered");
+                }
+
+                product.setQuantity(
+                        product.getQuantity().subtract(p.getQuantity())
+                );
+
+                if (product.getQuantity().signum() == 0) {
+                    order.removeProduct(product); // orphanRemoval hace el delete
+                }
+
+                if (totalAmount.compareTo(price) < 0) {
+                    throw new IllegalStateException("Total amount cannot be negative");
+                }
+
+                totalAmount = totalAmount.subtract(price);
+            }
+        }
+
+        bill.setTotalAmount(totalAmount);
+    }
+
 }
+
