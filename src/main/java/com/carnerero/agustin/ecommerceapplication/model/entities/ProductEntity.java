@@ -23,7 +23,7 @@ public class ProductEntity {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "product_seq")
     @SequenceGenerator(name = "product_seq", sequenceName = "product_seq", allocationSize = 1)
     private Long id;
-    private BigInteger quantity;
+    private Integer quantity;
 
     // Reference to the order (parent)
     @ManyToOne(fetch = FetchType.LAZY)

@@ -4,6 +4,7 @@ import com.carnerero.agustin.ecommerceapplication.dtos.requests.OrderRequestDTO;
 import com.carnerero.agustin.ecommerceapplication.dtos.requests.ProductRequestDTO;
 import com.carnerero.agustin.ecommerceapplication.dtos.responses.OrderResponseDTO;
 import com.carnerero.agustin.ecommerceapplication.dtos.responses.PageResponse;
+import com.carnerero.agustin.ecommerceapplication.dtos.responses.ProductCatalogResponseDTO;
 import com.carnerero.agustin.ecommerceapplication.exception.user.BusinessException;
 import com.carnerero.agustin.ecommerceapplication.model.entities.*;
 import com.carnerero.agustin.ecommerceapplication.model.enums.OrderStatus;
@@ -39,7 +40,7 @@ public class OrderServiceImpl implements OrderService {
     private final UserRepository userRepository;
     private final ProductCatalogRepository productCatalogRepository;
     private final OrderMapper orderMapper;
-    private final ProductMapper productMapper;
+
 
     @Transactional
     public OrderResponseDTO createOrder(OrderRequestDTO request) {
@@ -86,7 +87,10 @@ public class OrderServiceImpl implements OrderService {
 
 
             products.add(product);
-
+            //Update stock
+            Integer newQuantity=catalog.getStockQuantity()-p.getQuantity();
+            catalog.setStockQuantity(newQuantity);
+            //Calculate amount
             BigDecimal price = catalog.getPrice()
                     .multiply(BigDecimal.valueOf(p.getQuantity().longValue()));
 
@@ -112,8 +116,11 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderResponseDTO getOrderById(Long orderId) {
-        var order = orderRepository.findById(orderId).orElseThrow(() -> new EntityNotFoundException("Order not found"));
-        return orderMapper.toOrderResponseDTO(order);
+        OrderEntity order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new EntityNotFoundException("Order not found"));
+
+       return orderMapper.toOrderResponseDTO(order);
+
     }
 
     @Override
@@ -173,7 +180,7 @@ public class OrderServiceImpl implements OrderService {
                     .findById(p.getProductCatalogId())
                     .orElseThrow(() -> new EntityNotFoundException("Product not found"));
 
-            Long qty = p.getQuantity().longValue();
+            Integer qty = p.getQuantity();
             BigDecimal priceChange = catalog.getPrice().multiply(BigDecimal.valueOf(qty));
 
             if (isAdd) {
@@ -195,11 +202,11 @@ public class OrderServiceImpl implements OrderService {
                     product = ProductEntity.builder()
                             .order(order)
                             .productCatalog(catalog)
-                            .quantity(BigInteger.valueOf(qty))
+                            .quantity(qty)
                             .build();
                     order.addProduct(product);
                 } else {
-                    product.setQuantity(product.getQuantity().add(BigInteger.valueOf(qty)));
+                    product.setQuantity(product.getQuantity()+qty);
                 }
 
             } else {
@@ -210,13 +217,13 @@ public class OrderServiceImpl implements OrderService {
                         .orElseThrow(() ->
                                 new IllegalStateException("Product not found in order"));
 
-                if (product.getQuantity().compareTo(BigInteger.valueOf(qty)) < 0) {
+                if (product.getQuantity().compareTo(qty) < 0) {
                     throw new IllegalStateException("Cannot remove more items than ordered");
                 }
 
                 // 7️⃣ Ajustar cantidad o eliminar
-                product.setQuantity(product.getQuantity().subtract(BigInteger.valueOf(qty)));
-                if (product.getQuantity().signum() == 0) {
+                product.setQuantity(product.getQuantity()-qty);
+                if (product.getQuantity() == 0) {
                     order.removeProduct(product); // orphanRemoval hace delete
                 }
 

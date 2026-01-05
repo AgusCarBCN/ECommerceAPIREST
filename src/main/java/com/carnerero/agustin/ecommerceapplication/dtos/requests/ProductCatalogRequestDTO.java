@@ -26,7 +26,7 @@ public class ProductCatalogRequestDTO {
     private BigDecimal price;
     @NotNull(message = "Quantity is required")
     @Min(value = 1, message = "Quantity must be at least 1")
-    private Long stockQuantity;
+    private Integer stockQuantity;
     @NotNull(message = "Categories are required")
     @Size(min = 1, message = "At least one category must be assigned")
     private Set<CategoryRequestDTO> categories;

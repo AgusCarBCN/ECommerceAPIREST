@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Builder
 @AllArgsConstructor
@@ -19,6 +20,7 @@ public class OrderResponseDTO {
     private BillResponseDTO bill;
     private OrderStatus status;
     private ShippingMethod shippingMethod;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private List<ProductCatalogResponseDTO> products;
+    //private LocalDateTime createdAt;
+    //private LocalDateTime updatedAt;
 }

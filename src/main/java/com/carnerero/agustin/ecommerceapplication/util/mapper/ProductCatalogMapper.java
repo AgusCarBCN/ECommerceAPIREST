@@ -5,9 +5,13 @@ import com.carnerero.agustin.ecommerceapplication.dtos.responses.ProductCatalogR
 import com.carnerero.agustin.ecommerceapplication.model.entities.ProductCatalogEntity;
 import org.mapstruct.Mapper;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring",uses = CategoryMapper.class)
 public interface ProductCatalogMapper {
 
     ProductCatalogResponseDTO toProductCatalogResponseDTO(ProductCatalogEntity productCatalogEntity);
     ProductCatalogEntity toProductCatalogEntity(ProductCatalogRequestDTO productCatalogRequestDTO);
+
+
 }

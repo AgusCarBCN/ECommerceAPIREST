@@ -17,6 +17,6 @@ public class ProductCatalogResponseDTO {
     private String productName;
     private String description;
     private BigDecimal price;
-    private Long stockQuantity;
-    private LocalDateTime createdAt;
+    //private Integer stockQuantity;
+    //private LocalDateTime createdAt;
 }

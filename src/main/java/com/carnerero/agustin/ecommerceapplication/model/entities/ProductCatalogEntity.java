@@ -30,7 +30,7 @@ public class ProductCatalogEntity {
     private BigDecimal price = BigDecimal.ZERO;
 
     @Column(name="stock_quantity",nullable = false)
-    private Long stockQuantity;
+    private Integer stockQuantity;
 
     private LocalDateTime createdAt;
 

@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ProductResponseDTO {
 
-    private Long quantity;
+    private Integer quantity;
     //Product detail
     private ProductCatalogResponseDTO productDetail;
 
