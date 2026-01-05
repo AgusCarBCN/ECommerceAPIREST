@@ -1,5 +1,6 @@
 package com.carnerero.agustin.ecommerceapplication.services.interfaces;
 
+import com.carnerero.agustin.ecommerceapplication.dtos.requests.ListOfProductsRequestsDTO;
 import com.carnerero.agustin.ecommerceapplication.dtos.requests.OrderRequestDTO;
 import com.carnerero.agustin.ecommerceapplication.dtos.requests.ProductRequestDTO;
 import com.carnerero.agustin.ecommerceapplication.dtos.responses.OrderResponseDTO;
@@ -59,9 +60,9 @@ public interface OrderService {
     /**
      * Add a product to an existing order.
      * @param orderId the ID of the order
-     * @param products the requests of the product to add to order
+     * @param requestsDTO the requests of the product to add to order
      */
-    void modifyOrder(Long orderId, List<ProductRequestDTO> products, boolean isAdd);
+    OrderResponseDTO modifyOrder(Long orderId, ListOfProductsRequestsDTO requestsDTO, boolean isAdd);
 
 
 

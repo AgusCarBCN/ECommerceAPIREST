@@ -1,6 +1,7 @@
 package com.carnerero.agustin.ecommerceapplication.controller.order;
 
 
+import com.carnerero.agustin.ecommerceapplication.dtos.requests.ListOfProductsRequestsDTO;
 import com.carnerero.agustin.ecommerceapplication.dtos.requests.OrderRequestDTO;
 import com.carnerero.agustin.ecommerceapplication.dtos.responses.OrderResponseDTO;
 import com.carnerero.agustin.ecommerceapplication.dtos.responses.PageResponse;
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/order")
+@RequestMapping("/orders")
 public class OrderController {
 
     private final OrderService orderService;
@@ -48,5 +49,13 @@ public class OrderController {
     public ResponseEntity<OrderResponseDTO> removeOrder(@RequestParam Long orderId) {
         orderService.deleteOrder(orderId);
         return ResponseEntity.noContent().build();
+    }
+    @PutMapping("/update")
+    public ResponseEntity<OrderResponseDTO> updateOrder(@RequestParam Long orderId,
+                                                        @RequestParam boolean isAdd,
+                                                        @RequestBody ListOfProductsRequestsDTO requestDTO) {
+        var response=orderService.modifyOrder(orderId,requestDTO,isAdd);
+        return ResponseEntity.status(HttpStatus.ACCEPTED)
+                .body(response);
     }
 }

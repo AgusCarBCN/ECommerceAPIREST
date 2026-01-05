@@ -1,5 +1,6 @@
 package com.carnerero.agustin.ecommerceapplication.services.impl;
 
+import com.carnerero.agustin.ecommerceapplication.dtos.requests.ListOfProductsRequestsDTO;
 import com.carnerero.agustin.ecommerceapplication.dtos.requests.OrderRequestDTO;
 import com.carnerero.agustin.ecommerceapplication.dtos.requests.ProductRequestDTO;
 import com.carnerero.agustin.ecommerceapplication.dtos.responses.OrderResponseDTO;
@@ -169,15 +170,16 @@ public class OrderServiceImpl implements OrderService {
 
     @Transactional
     @Override
-    public void modifyOrder(
+    public OrderResponseDTO modifyOrder(
             Long orderId,
-            List<ProductRequestDTO> products,
+            ListOfProductsRequestsDTO request,
             boolean isAdd
     ) {
         // 1️⃣ Cargar la orden
         OrderEntity order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new EntityNotFoundException("Order not found"));
-
+        //Get products
+        var products = request.getProducts();
         // 2️⃣ Validar estado de la orden
         if (order.getStatus() != OrderStatus.CREATED) {
             throw new IllegalStateException("Cannot modify order in status: " + order.getStatus());
@@ -251,6 +253,7 @@ public class OrderServiceImpl implements OrderService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         bill.setTotalAmount(totalAmount);
+        return orderMapper.toOrderResponseDTO(order);
     }
 
 }
