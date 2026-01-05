@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @Entity
 @Table(name = "payments")
 public class PaymentEntity {
@@ -29,11 +30,11 @@ public class PaymentEntity {
     private BigDecimal amount;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "payment_method", nullable = false)
+    @Column(name = "method", nullable = false)
     private PaymentMethod paymentMethod;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "payment_status", nullable = false)
+    @Column(name = "status", nullable = false)
     private PaymentStatus paymentStatus;
 
     private LocalDateTime createdAt;

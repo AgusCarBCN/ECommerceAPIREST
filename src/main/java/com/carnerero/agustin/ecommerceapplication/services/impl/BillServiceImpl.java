@@ -32,6 +32,4 @@ public class BillServiceImpl implements BillService {
         var bill=order.getBill();
         return billMapper.toBillResponseDTO(bill);
     }
-
-
 }

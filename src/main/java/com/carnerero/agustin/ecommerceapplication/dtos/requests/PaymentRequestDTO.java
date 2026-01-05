@@ -12,6 +12,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class PaymentRequestDTO {
+    @NotNull(message = "Order is required")
+    private Long id;
     @NotNull(message = "Payment method is required")
     private PaymentMethod paymentMethod;
 

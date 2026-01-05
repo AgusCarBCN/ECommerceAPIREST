@@ -29,6 +29,6 @@ public class OrderRequestDTO {
     private Set<ProductRequestDTO> products;
 
     @NotNull(message = "Payment method is required")
-    private PaymentMethod paymentMethod;
+    private PaymentRequestDTO paymentMethod;
 
 }

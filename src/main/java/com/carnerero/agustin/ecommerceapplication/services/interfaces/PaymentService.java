@@ -9,11 +9,11 @@ public interface PaymentService {
 
     /**
      * Create a payment record for an order.
-     * @param orderId ID of the order
+     *
      * @param paymentRequest DTO with amount, method, etc.
      * @return PaymentResponseDTO
      */
-    PaymentResponseDTO createPayment(Long orderId, PaymentRequestDTO paymentRequest);
+    PaymentResponseDTO createPayment(PaymentRequestDTO paymentRequest);
 
     /**
      * Update the status of a payment (e.g., PENDING → PAID, FAILED, REFUNDED)
@@ -28,5 +28,5 @@ public interface PaymentService {
      * @param orderId ID of the order
      * @return PageResponse of PaymentResponseDTO
      */
-    PageResponse<PaymentResponseDTO> getPaymentsByOrder(Long orderId);
+    PaymentResponseDTO getPaymentsByOrder(Long orderId);
 }

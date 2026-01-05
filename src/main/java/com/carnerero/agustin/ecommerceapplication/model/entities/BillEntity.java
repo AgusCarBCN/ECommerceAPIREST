@@ -37,6 +37,7 @@ public class BillEntity {
         createdAt = LocalDateTime.now();
     }
 
+
     // Método de conveniencia para enlazar con una orden
     public void setOrder(OrderEntity order) {
         this.order = order;

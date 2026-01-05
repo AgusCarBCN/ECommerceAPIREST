@@ -29,6 +29,7 @@ public class OrderEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 
+    // Bill
     @Setter
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "id_bill", unique = true, nullable = false)
@@ -40,9 +41,9 @@ public class OrderEntity {
     private List<ProductEntity> products = new ArrayList<>();
 
     // Payments
-    /*@Setter
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PaymentEntity> payments = new ArrayList<>();*/
+    @Setter
+    @OneToOne(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private PaymentEntity payment;
 
     @Setter
     @Enumerated(EnumType.STRING)
