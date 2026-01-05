@@ -28,7 +28,6 @@ public class OrderRequestDTO {
     @NotEmpty(message = "Order must contain at least one product")
     private Set<ProductRequestDTO> products;
 
-    @NotNull(message = "Payment method is required")
-    private PaymentRequestDTO paymentMethod;
+
 
 }

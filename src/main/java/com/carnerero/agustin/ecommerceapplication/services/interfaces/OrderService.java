@@ -50,12 +50,6 @@ public interface OrderService {
      * @param orderId the ID of the order
      */
     OrderResponseDTO cancelOrder(Long orderId);
-    /**
-     * Delete an order.
-     * This should handle stock restoration and payment reversal if needed.
-     * @param orderId the ID of the order
-     */
-    void deleteOrder(Long orderId);
 
     /**
      * Add a product to an existing order.

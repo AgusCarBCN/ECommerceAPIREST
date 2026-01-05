@@ -28,7 +28,9 @@ public class OrderController {
                 .body(response);
     }
     @GetMapping("/by-user")
-    public ResponseEntity<PageResponse<OrderResponseDTO>> getOrdersByUser(@RequestParam Integer page, @RequestParam Long userId) {
+    public ResponseEntity<PageResponse<OrderResponseDTO>> getOrdersByUser(@RequestParam Integer page,
+                                                                          @RequestParam Long userId)
+    {
         var response=orderService.getOrdersByUser(page, userId);
         return ResponseEntity.status(HttpStatus.ACCEPTED)
                 .body(response);
@@ -44,11 +46,6 @@ public class OrderController {
         var response=orderService.cancelOrder(orderId);
         return ResponseEntity.status(HttpStatus.ACCEPTED)
                 .body(response);
-    }
-    @DeleteMapping("/remove")
-    public ResponseEntity<OrderResponseDTO> removeOrder(@RequestParam Long orderId) {
-        orderService.deleteOrder(orderId);
-        return ResponseEntity.noContent().build();
     }
     @PutMapping("/update")
     public ResponseEntity<OrderResponseDTO> updateOrder(@RequestParam Long orderId,

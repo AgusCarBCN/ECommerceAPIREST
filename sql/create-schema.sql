@@ -106,12 +106,15 @@ CREATE TABLE bills (
                        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
                        tax_id VARCHAR(50),
                        total_amount NUMERIC(10,2) NOT NULL,
-                       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                       status VARCHAR(30) NOT NULL DEFAULT 'ACTIVE',
+                       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- ==============================================
 -- ORDERS
 -- ==============================================
+
 CREATE TABLE orders (
                         id BIGINT PRIMARY KEY DEFAULT nextval('orders_seq'),
                         user_id BIGINT REFERENCES users(id),
@@ -119,8 +122,8 @@ CREATE TABLE orders (
                         status VARCHAR(30) NOT NULL DEFAULT 'CREATED',
                         shipping_method VARCHAR(30) DEFAULT 'STANDARD',
                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                        updated_at TIMESTAMP,
-                        FOREIGN KEY (id_bill) REFERENCES bills(id) ON DELETE CASCADE
+                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        FOREIGN KEY (id_bill) REFERENCES bills(id) ON DELETE RESTRICT
 );
 
 -- ==============================================
@@ -145,7 +148,8 @@ CREATE TABLE payments (
                           amount NUMERIC(10,2) NOT NULL,
                           method VARCHAR(30) NOT NULL,
                           status VARCHAR(30) NOT NULL DEFAULT 'PENDING',
-                          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- ==============================================

@@ -36,7 +36,6 @@ public class PaymentServiceImpl implements PaymentService {
         BillEntity bill = order.getBill();
 
         PaymentEntity payment = PaymentEntity.builder()
-                .paymentStatus(PaymentStatus.COMPLETED)
                 .paymentMethod(paymentRequest.getPaymentMethod())
                 .amount(bill.getTotalAmount())
                 .order(order)
@@ -50,9 +49,9 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public PaymentResponseDTO updatePaymentStatus(Long paymentId, PaymentStatus newStatus) {
         var payment=paymentRepository.findById(paymentId).orElseThrow(()->new RuntimeException("Payment not found"));
-        payment.setPaymentStatus(newStatus);
-        //Guardar cambios
-        paymentRepository.save(payment);
+        payment.setPaymentStatus(newStatus);       //Guardar cambios
+
+        //paymentRepository.save(payment);
         return paymentMapper.toPaymentResponseDTO(payment);
     }
 

@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -150,6 +151,7 @@ public class OrderServiceImpl implements OrderService {
     public OrderResponseDTO changeOrderStatus(Long orderId, OrderStatus newStatus) {
         var order = orderRepository.findById(orderId).orElseThrow(() -> new EntityNotFoundException("Order not found"));
         order.setStatus(newStatus);
+        order.setUpdatedAt(LocalDateTime.now());
         return orderMapper.toOrderResponseDTO(order);
     }
 
@@ -158,15 +160,10 @@ public class OrderServiceImpl implements OrderService {
     public OrderResponseDTO cancelOrder(Long orderId) {
         var order = orderRepository.findById(orderId).orElseThrow(() -> new EntityNotFoundException("Order not found"));
         order.setStatus(OrderStatus.CANCELLED);
+        order.setUpdatedAt(LocalDateTime.now());
         return orderMapper.toOrderResponseDTO(order);
     }
 
-    @Transactional
-    @Override
-    public void deleteOrder(Long orderId) {
-        var order = orderRepository.findById(orderId).orElseThrow(() -> new EntityNotFoundException("Order not found"));
-        orderRepository.delete(order);
-    }
 
     @Transactional
     @Override
@@ -253,6 +250,7 @@ public class OrderServiceImpl implements OrderService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         bill.setTotalAmount(totalAmount);
+        order.setUpdatedAt(LocalDateTime.now());
         return orderMapper.toOrderResponseDTO(order);
     }
 
