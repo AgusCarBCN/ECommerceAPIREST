@@ -55,21 +55,32 @@ public class OrderServiceImpl implements OrderService {
             throw new BusinessException("Wrong Password");
         }
 
-        // 1️⃣ Crear Order
+        // 1️⃣ Create OrderEntity
         OrderEntity order = orderMapper.toOrderEntity(request);
 
-        // 2️⃣ Crear Bill
+        // 2️⃣ Create BillEntity
+
         BillEntity bill = BillEntity.builder()
                 .taxId(request.getTaxId())
                 .totalAmount(BigDecimal.ZERO)
                 .build();
 
+        //Add bill and user to order
         order.setBill(bill);
         order.setUser(user);
+
+        //Set Status to order as CREATED
         order.setStatus(OrderStatus.CREATED);
-        // 3️⃣ Productos
+
+        // 3️⃣ Validate products
+        if (request.getProducts() == null || request.getProducts().isEmpty()) {
+            throw new BusinessException("Order must contain at least one product");
+        }
+
+        // 3️⃣ List of products to add to order
         List<ProductEntity> products = new ArrayList<>();
 
+        // Init bill's amount
         BigDecimal total = BigDecimal.ZERO;
 
         for (ProductRequestDTO p : request.getProducts()) {
@@ -78,39 +89,40 @@ public class OrderServiceImpl implements OrderService {
                     .orElseThrow(() -> new EntityNotFoundException(
                             "Product catalog not found: " + p.getProductCatalogId()
                     ));
+            // Verificate stock
+            int newStock = catalog.getStockQuantity() - p.getQuantity();
+            if (newStock < 0) {
+                throw new BusinessException("Insufficient stock for product: " + catalog.getProductName());
+            }
+            //Update stock
+            catalog.setStockQuantity(newStock);
 
+            //Calculate partial price
+            BigDecimal price = catalog.getPrice()
+                    .multiply(BigDecimal.valueOf(p.getQuantity().longValue()));
+
+            // Sum to total
+            total = total.add(price);
+            // Create Product entity
             ProductEntity product = ProductEntity.builder()
                     .quantity(p.getQuantity())
                     .order(order)
                     .productCatalog(catalog)
                     .build();
-
-
+            //Add to products
             products.add(product);
-            //Update stock
-            Integer newQuantity=catalog.getStockQuantity()-p.getQuantity();
-            catalog.setStockQuantity(newQuantity);
-            //Calculate amount
-            BigDecimal price = catalog.getPrice()
-                    .multiply(BigDecimal.valueOf(p.getQuantity().longValue()));
-
-            total = total.add(price);
         }
-        if (products.isEmpty()) {
-            throw new EntityNotFoundException("Products not found. Orders must contain products ");
-        } else {
+            // Add products to order
             order.setProducts(products);
-
-            // 4️⃣ Total bill
+            // 4️⃣ Set amount to bill
             bill.setTotalAmount(total);
-
-            // 5️⃣ Guardar (cascade hace el resto)
+            // 5️⃣ Save
             OrderEntity savedOrder = orderRepository.save(order);
 
-            // 6️⃣ Devolver DTO
+            // 6️⃣ Return DTO
             return orderMapper.toOrderResponseDTO(savedOrder);
 
-        }
+
     }
 
 

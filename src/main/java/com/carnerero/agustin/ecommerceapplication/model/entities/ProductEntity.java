@@ -1,6 +1,7 @@
 package com.carnerero.agustin.ecommerceapplication.model.entities;
 
 import jakarta.persistence.*;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.*;
 
 import java.math.BigInteger;

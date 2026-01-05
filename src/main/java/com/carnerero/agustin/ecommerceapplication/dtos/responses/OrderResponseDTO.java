@@ -20,7 +20,5 @@ public class OrderResponseDTO {
     private BillResponseDTO bill;
     private OrderStatus status;
     private ShippingMethod shippingMethod;
-    private List<ProductCatalogResponseDTO> products;
-    //private LocalDateTime createdAt;
-    //private LocalDateTime updatedAt;
+    private List<ProductResponseDTO> products;
 }

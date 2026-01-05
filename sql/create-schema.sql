@@ -23,8 +23,8 @@ CREATE TABLE roles (
 -- ==============================================
 CREATE TABLE users (
                        id BIGINT PRIMARY KEY DEFAULT nextval('users_seq'),
-                       username VARCHAR(50) UNIQUE NOT NULL,
-                       surname VARCHAR(200) UNIQUE NOT NULL,
+                       username VARCHAR(50) NOT NULL,
+                       surname VARCHAR(200) NOT NULL,
                        email VARCHAR(100) UNIQUE NOT NULL,
                        password VARCHAR(255) NOT NULL,
                        created_at DATE ,

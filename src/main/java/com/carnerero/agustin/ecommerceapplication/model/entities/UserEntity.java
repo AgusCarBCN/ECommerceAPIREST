@@ -31,9 +31,9 @@ public class UserEntity {
     )
     private Long id;
 
-    @Column(name = "username", unique = true, nullable = false, length = 50)
+    @Column(name = "username",  nullable = false, length = 50)
     private String userName;
-    @Column(name = "surname", unique = true, nullable = false, length = 200)
+    @Column(name = "surname",  nullable = false, length = 200)
     private String surname;
     @Column(unique = true, nullable = false, length = 100)
     private String email;
