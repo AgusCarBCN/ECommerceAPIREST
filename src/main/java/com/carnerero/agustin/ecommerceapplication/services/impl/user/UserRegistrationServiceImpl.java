@@ -2,7 +2,6 @@ package com.carnerero.agustin.ecommerceapplication.services.impl.user;
 
 import com.carnerero.agustin.ecommerceapplication.dtos.requests.LoginRequestDTO;
 import com.carnerero.agustin.ecommerceapplication.dtos.requests.UserRequestDTO;
-import com.carnerero.agustin.ecommerceapplication.dtos.responses.LoginResponseDTO;
 import com.carnerero.agustin.ecommerceapplication.dtos.responses.UserResponseDTO;
 import com.carnerero.agustin.ecommerceapplication.exception.user.BusinessException;
 import com.carnerero.agustin.ecommerceapplication.model.entities.RoleEntity;
@@ -77,13 +76,13 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
         if(isAdmin){
             roles.add(RoleEntity.builder()
                     .id(2L)
-                    .role(Roles.ADMIN)
+                    .role(Roles.ROLE_ADMIN)
                     .build());
         }
         //Asignar rol de usuario
         RoleEntity rol=RoleEntity.builder()
                 .id(1L)
-                .role(Roles.USER)
+                .role(Roles.ROLE_USER)
                 .build();
         roles.add(rol);
         userEntity.setRoles(roles);

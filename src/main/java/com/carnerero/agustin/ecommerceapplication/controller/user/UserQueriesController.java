@@ -14,7 +14,7 @@ import java.time.LocalDate;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/search/users")
+@RequestMapping(path="/search/users")
 public class UserQueriesController {
     private final UserQueryService useCase;
 
