@@ -21,6 +21,9 @@ public class UserRequestDTO {
     private String userName;
     @Size(min = 10, max = 100, message = "Surname must be between 3 and 20 characters")
     private String surname;
+    @NotBlank(message = "Tax ID is required")
+    @Size(min = 5, max = 20, message = "Tax ID must be between 5 and 20 characters")
+    private String taxId;
     @NotBlank(message = "Email is required")
     @Email(message = "Email must be a valid email address")
     private String email;

@@ -5,6 +5,7 @@ import com.carnerero.agustin.ecommerceapplication.dtos.responses.PaymentResponse
 import com.carnerero.agustin.ecommerceapplication.exception.user.BusinessException;
 import com.carnerero.agustin.ecommerceapplication.model.entities.BillEntity;
 import com.carnerero.agustin.ecommerceapplication.model.entities.OrderEntity;
+import com.carnerero.agustin.ecommerceapplication.model.enums.OrderStatus;
 import com.carnerero.agustin.ecommerceapplication.model.enums.PaymentStatus;
 import com.carnerero.agustin.ecommerceapplication.repository.OrderRepository;
 import com.carnerero.agustin.ecommerceapplication.repository.PaymentRepository;
@@ -33,14 +34,16 @@ public class PaymentServiceImpl implements PaymentService {
             throw new BusinessException("Order already paid");
         }
 
-        BillEntity bill = order.getBill();
-
         PaymentEntity payment = PaymentEntity.builder()
                 .paymentMethod(paymentRequest.getPaymentMethod())
-                .amount(bill.getTotalAmount())
+                .amount(order.getTotalAmount())
                 .order(order)
                 .build();
-
+        //Order is waiting for payment
+        order.setStatus(OrderStatus.PENDING_PAYMENT);
+        //Se añade pago a la order
+        order.setPayment(payment);
+        //Save payment
         paymentRepository.save(payment);
 
         return paymentMapper.toPaymentResponseDTO(payment);

@@ -22,9 +22,6 @@ public class OrderRequestDTO {
     @NotNull(message="Shipping method is required")
     private ShippingMethod shippingMethod;
 
-    @NotNull(message="Tax id is required")
-    private String taxId;
-
     @NotEmpty(message = "Order must contain at least one product")
     private Set<ProductRequestDTO> products;
 

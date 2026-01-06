@@ -60,19 +60,7 @@ public class OrderServiceImpl implements OrderService {
         // 1️⃣ Create OrderEntity
         OrderEntity order = orderMapper.toOrderEntity(request);
 
-        // 2️⃣ Create BillEntity
-
-        BillEntity bill = BillEntity.builder()
-                .taxId(request.getTaxId())
-                .totalAmount(BigDecimal.ZERO)
-                .build();
-
-        //Add bill and user to order
-        order.setBill(bill);
-        order.setUser(user);
-
-        //Set Status to order as CREATED
-        order.setStatus(OrderStatus.CREATED);
+         order.setUser(user);
 
         // 3️⃣ Validate products
         if (request.getProducts() == null || request.getProducts().isEmpty()) {
@@ -82,7 +70,7 @@ public class OrderServiceImpl implements OrderService {
         // 3️⃣ List of products to add to order
         List<ProductEntity> products = new ArrayList<>();
 
-        // Init bill's amount
+        // Init order amount
         BigDecimal total = BigDecimal.ZERO;
 
         for (ProductRequestDTO p : request.getProducts()) {
@@ -116,14 +104,14 @@ public class OrderServiceImpl implements OrderService {
         }
             // Add products to order
             order.setProducts(products);
-            // 4️⃣ Set amount to bill
-            bill.setTotalAmount(total);
+            // 4️⃣ Set amount to order
+            order.setTotalAmount(total);
+
             // 5️⃣ Save
             OrderEntity savedOrder = orderRepository.save(order);
 
             // 6️⃣ Return DTO
             return orderMapper.toOrderResponseDTO(savedOrder);
-
 
     }
 

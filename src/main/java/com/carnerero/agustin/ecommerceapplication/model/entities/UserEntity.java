@@ -4,70 +4,87 @@ import com.carnerero.agustin.ecommerceapplication.model.enums.UserStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import jakarta.persistence.*;
+import lombok.*;
+import java.util.*;
 
 @Setter
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @Slf4j
 @Entity
-@Builder
 @Table(name = "users")
 public class UserEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_seq")
     @SequenceGenerator(
-            name = "user_seq",        // Alias interno en JPA
-            sequenceName = "users_seq", // Nombre de la secuencia real en la DB
-            allocationSize = 1         // Incremento de la secuencia
+            name = "user_seq",
+            sequenceName = "users_seq",
+            allocationSize = 1
     )
     private Long id;
 
-    @Column(name = "username",  nullable = false, length = 50)
+    @Column(name = "username", nullable = false, length = 50)
     private String userName;
-    @Column(name = "surname",  nullable = false, length = 200)
+
+    @Column(name = "surname", nullable = false, length = 200)
     private String surname;
+
+    @Column(name = "tax_id", unique = true, nullable = false, length = 20)
+    private String taxId;
+
     @Column(unique = true, nullable = false, length = 100)
     private String email;
 
     @Column(nullable = false)
     private String password;
 
-
     @Column(name = "created_at", updatable = false)
     private LocalDate createdAt;
-    @Column(name = "updated_at", updatable = false)
+
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    //Evita cargar todas las órdenes al traer un usuario, mejor para rendimiento en listas grandes.
-    //Inicializa lista para evitar NullPointerException.
+    // ---------------------------
+    // Status for soft delete / audit
+    // ---------------------------
     @Enumerated(EnumType.STRING)
-    @Column(name ="status", nullable = false)
+    @Column(name = "status", nullable = false)
     private UserStatus status;
-    @Column(name ="status_description", nullable = false)
+
+    @Column(name = "status_description", nullable = false)
     private String statusDescription;
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+
+    // ---------------------------
+    // Orders (1 user -> many orders)
+    // ---------------------------
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<OrderEntity> orders = new ArrayList<>();
 
-    // 📍 Direcciones (1 usuario → muchas direcciones)
-    @EqualsAndHashCode.Exclude// Evita que la lista genere recursión infinita
+    // ---------------------------
+    // Addresses (1 user -> many addresses)
+    // ---------------------------
+    @EqualsAndHashCode.Exclude
     @OneToMany(
             mappedBy = "user",
             fetch = FetchType.LAZY,
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
-
     private Set<UserAddressEntity> addresses = new HashSet<>();
 
+    // ---------------------------
+    // Roles (ManyToMany)
+    // ---------------------------
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "user_roles",
@@ -76,31 +93,45 @@ public class UserEntity {
     )
     private Set<RoleEntity> roles = new HashSet<>();
 
+    // ---------------------------
+    // Lifecycle callbacks
+    // ---------------------------
     @PrePersist
     protected void onCreate() {
-        LocalDate now = LocalDate.now();
+        LocalDate nowDate = LocalDate.now();
         LocalDateTime nowTime = LocalDateTime.now();
+        createdAt = nowDate;
+        updatedAt = nowTime;
+
+        // Default status = ACTIVE
         status = UserStatus.ACTIVE;
-        statusDescription="User active";
-        createdAt = now;
-        updatedAt=nowTime;
+        statusDescription = "User active";
     }
+
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
+
     @PostUpdate
     protected void afterUpdate() {
-        log.info("Order Status updated with status: {}", status);
+        log.info("User status updated: {}", status);
     }
+
+    // ---------------------------
+    // Utility methods
+    // ---------------------------
     public void addAddressSafe(UserAddressEntity address) {
         if (!addresses.contains(address)) {
             addresses.add(address);
         }
         if (address.getUser() != this) {
-            address.setUser(this); // asigna el lado dueño sin llamar recursivamente
+            address.setUser(this); // asigna el lado dueño
         }
     }
 
-
+    public void deactivateUser() {
+        status = UserStatus.DEACTIVATED;
+        statusDescription = "User deactivated";
+    }
 }

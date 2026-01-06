@@ -21,6 +21,7 @@ public class UserResponseDTO {
     private Long id;
     private String userName;
     private String surname;
+    private String taxId;
     private String email;
     //@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     @JsonIgnore

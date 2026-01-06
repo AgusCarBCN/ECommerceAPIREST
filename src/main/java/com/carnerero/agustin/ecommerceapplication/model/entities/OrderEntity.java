@@ -1,18 +1,28 @@
 package com.carnerero.agustin.ecommerceapplication.model.entities;
 
+import com.carnerero.agustin.ecommerceapplication.model.enums.BillStatus;
 import com.carnerero.agustin.ecommerceapplication.model.enums.OrderStatus;
+import com.carnerero.agustin.ecommerceapplication.model.enums.PaymentStatus;
 import com.carnerero.agustin.ecommerceapplication.model.enums.ShippingMethod;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+import jakarta.persistence.*;
+import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Builder
 @Getter
-@AllArgsConstructor(access = AccessLevel.PRIVATE)// builder privado
+@AllArgsConstructor(access = AccessLevel.PRIVATE) // builder privado
 @NoArgsConstructor
 @Slf4j
 @Entity
@@ -24,47 +34,72 @@ public class OrderEntity {
     @SequenceGenerator(name = "orders_seq", sequenceName = "orders_seq", allocationSize = 1)
     private Long id;
 
+    // ---------------------------
+    // Relation to User
+    // ---------------------------
     @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 
-    // Bill
+    // ---------------------------
+    // Bill (Invoice)
+    // ---------------------------
     @Setter
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinColumn(name = "id_bill", unique = true, nullable = false)
-    private BillEntity bill;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_bill", unique = true, nullable = true)
+    private BillEntity bill; // Created manually after successful payment
 
-    // Items of the order
+    // ---------------------------
+    // Products of the order
+    // ---------------------------
     @Setter
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductEntity> products = new ArrayList<>();
 
-    // Payments
+    // ---------------------------
+    // Payment (OneToOne)
+    // ---------------------------
     @Setter
-    @OneToOne(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    private PaymentEntity payment;
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "order")
+    private PaymentEntity payment; // Created manually when payment starts
 
+    // ---------------------------
+    // Order Status and Shipping
+    // ---------------------------
     @Setter
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private OrderStatus status;
+
     @Setter
     @Enumerated(EnumType.STRING)
     @Column(name = "shipping_method", nullable = false)
     private ShippingMethod shippingMethod;
-    @Setter
-    private LocalDateTime createdAt;
-    @Setter
-    private LocalDateTime updatedAt;
 
+    // ---------------------------
+    // Timestamps
+    // ---------------------------
+    @Setter
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+
+    @Setter
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+    @Setter
+    @Column(name = "total_amount", nullable = false)
+    private BigDecimal totalAmount;
+
+    // ---------------------------
+    // Lifecycle callbacks
+    // ---------------------------
     @PrePersist
     protected void onCreate() {
         LocalDateTime now = LocalDateTime.now();
         createdAt = now;
         updatedAt = now;
-
-        if (status == null) status = OrderStatus.CREATED;
+        status=OrderStatus.CREATED;
         if (shippingMethod == null) shippingMethod = ShippingMethod.STANDARD;
     }
 
@@ -75,20 +110,48 @@ public class OrderEntity {
 
     @PostUpdate
     protected void afterUpdate() {
-        log.info("Order Status updated with status: {}", status);
+        log.info("Order Status updated: {}", status);
     }
 
-    // --------- Builder sin id ---------
+    // ---------------------------
+    // Builder without ID
+    // ---------------------------
     @Builder(builderMethodName = "orderBuilder")
-    private OrderEntity(UserEntity user,
-                        BillEntity bill) {
+    private OrderEntity(UserEntity user) {
         this.user = user;
-        this.bill = bill;
     }
+
+    // ---------------------------
+    // Helper methods for products
+    // ---------------------------
     public void addProduct(ProductEntity product) {
-        products.add(product);
+        if (!products.contains(product)) {
+            products.add(product);
+            product.setOrder(this); // Ensure bidirectional consistency
+        }
     }
+
     public void removeProduct(ProductEntity product) {
-        products.remove(product);
+        if (products.contains(product)) {
+            products.remove(product);
+            product.setOrder(null);
+        }
+    }
+
+    // ---------------------------
+    // Cancel order safely
+    // ---------------------------
+    public void cancelOrder() {
+        this.status = OrderStatus.CANCELLED;
+
+        // Optionally update payment
+        if (payment != null) {
+            payment.setPaymentStatus(PaymentStatus.CANCELLED);
+        }
+
+        // Optionally cancel invoice
+        if (bill != null) {
+            bill.setStatus(BillStatus.CANCELLED);
+        }
     }
 }

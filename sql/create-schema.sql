@@ -25,6 +25,7 @@ CREATE TABLE users (
                        id BIGINT PRIMARY KEY DEFAULT nextval('users_seq'),
                        username VARCHAR(50) NOT NULL,
                        surname VARCHAR(200) NOT NULL,
+                       tax_id VARCHAR(20),
                        email VARCHAR(100) UNIQUE NOT NULL,
                        password VARCHAR(255) NOT NULL,
                        created_at DATE ,
@@ -104,7 +105,6 @@ CREATE TABLE product_categories (
 -- ==============================================
 CREATE TABLE bills (
                        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-                       tax_id VARCHAR(50),
                        total_amount NUMERIC(10,2) NOT NULL,
                        status VARCHAR(30) NOT NULL DEFAULT 'ACTIVE',
                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -118,11 +118,12 @@ CREATE TABLE bills (
 CREATE TABLE orders (
                         id BIGINT PRIMARY KEY DEFAULT nextval('orders_seq'),
                         user_id BIGINT REFERENCES users(id),
-                        id_bill UUID UNIQUE NOT NULL,
+                        id_bill UUID UNIQUE,
                         status VARCHAR(30) NOT NULL DEFAULT 'CREATED',
                         shipping_method VARCHAR(30) DEFAULT 'STANDARD',
                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        total_amount NUMERIC(10,2) NOT NULL DEFAULT 0,
                         FOREIGN KEY (id_bill) REFERENCES bills(id) ON DELETE RESTRICT
 );
 

@@ -25,9 +25,6 @@ public class BillEntity {
     @OneToOne(mappedBy = "bill", cascade = CascadeType.ALL)
     private OrderEntity order;
 
-    @Column(nullable = false, length = 50)
-    private String taxId;
-
     @Column(nullable = false)
     private BigDecimal  totalAmount;
 
