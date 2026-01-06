@@ -5,7 +5,10 @@ import com.carnerero.agustin.ecommerceapplication.dtos.requests.SuspensionReques
 import com.carnerero.agustin.ecommerceapplication.services.interfaces.user.UserAccountSettingService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Objects;
 
 @RestController
 @AllArgsConstructor
@@ -22,16 +25,14 @@ public class UserAccountSettingController {
      *
      * Example request: PATCH /users/{userId}/deactivate
      *
-     * @param userId the identifier of the user performing the deactivation
+
      * @param reason the reason for deactivation wrapped in {@link SuspensionRequestDTO}
      * @return a {@link ResponseEntity} with HTTP status 204 (No Content)
      */
-    @PatchMapping("/{userId}/deactivate")
-    public ResponseEntity<Void> deactivateUserById(
-            @PathVariable Long userId,
-            @RequestBody SuspensionRequestDTO reason
-    ) {
-        useAccountSetting.deactivateAccount(userId, reason.getReason());
+    @PatchMapping("/deactivate")
+    public ResponseEntity<Void> deactivateUser(@RequestBody SuspensionRequestDTO reason) {
+        String email = Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName();
+        useAccountSetting.deactivateAccount(email, reason.getReason());
         return ResponseEntity.noContent().build();
     }
 
@@ -42,12 +43,12 @@ public class UserAccountSettingController {
      *
      * Example request: PATCH /users/{userId}/activate
      *
-     * @param userId the identifier of the user performing the activation
      * @return a {@link ResponseEntity} with HTTP status 204 (No Content)
      */
-    @PatchMapping("/{userId}/activate")
-    public ResponseEntity<Void> activatedUserById(@PathVariable Long userId) {
-        useAccountSetting.activateAccount(userId);
+    @PatchMapping("/activate")
+    public ResponseEntity<Void> activatedUserById() {
+        String email = Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName();
+        useAccountSetting.activateAccount(email);
         return ResponseEntity.noContent().build();
     }
 

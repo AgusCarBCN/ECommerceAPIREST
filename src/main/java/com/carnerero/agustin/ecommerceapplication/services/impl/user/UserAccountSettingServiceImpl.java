@@ -25,38 +25,21 @@ public class UserAccountSettingServiceImpl implements UserAccountSettingService 
     private final UserMapper userMapper;
 
     @Override
-    public UserResponseDTO activateAccount(Long userId) {
-        return changeUserStatus(userId,UserStatus.ACTIVE,"User active.","");
+    public void activateAccount(String email) {
+        changeUserStatus(email,UserStatus.ACTIVE,"User active.","");
     }
     @Override
-    public UserResponseDTO deactivateAccount(Long userId,
+    public void deactivateAccount(String email,
                                              String reason) {
-        return changeUserStatus(userId,UserStatus.DEACTIVATED,"User deactivated.",reason);
+        changeUserStatus(email,UserStatus.DEACTIVATED,"User deactivated.",reason);
     }
 
     @Override
-    public UserResponseDTO suspendAccount(Long userId, String reason) {
-        return changeUserStatus(userId, UserStatus.SUSPENDED, "User suspended.", reason);
+    public void suspendAccount(String email, String reason) {
+         changeUserStatus(email, UserStatus.SUSPENDED, "User suspended.", reason);
     }
 
 
-    @Override
-    public void deleteAccount(Long userId) {
-        // Verificar si el usuario existe
-        if (!userRepository.existsById(userId)) {
-            throw new UserNotFoundException("User not found with ID " + userId);
-        }
-        // Verificar si tiene órdenes
-        boolean hasOrders = orderRepository.existsByUserId(userId);
-
-        if (hasOrders) {
-            // Hibernate borrará con cascade si existen órdenes
-            userRepository.deleteById(userId);
-        } else {
-            // Borrar directamente sin cargar colecciones
-            userRepository.deleteByIdDirect(userId);
-        }
-    }
 
     @Override
     public boolean isAccountActive(Long userId) {
@@ -73,13 +56,13 @@ public class UserAccountSettingServiceImpl implements UserAccountSettingService 
     public void deleteProfileImage(Long userId) {
 
     }
-    private  UserResponseDTO changeUserStatus(Long userId,
+    private  void changeUserStatus(String email,
                                               UserStatus status,
                                               String description,
                                               String reason){
         //Search user by id
         var updatedAt= LocalDateTime.now();
-        var user=userRepository.findById(userId).orElseThrow(()->new UserNotFoundException("User not found"));
+        var user=userRepository.findByEmail(email).orElseThrow(()->new UserNotFoundException("User not found"));
         var message=description;
         //Activate status
         user.setStatus(status);
@@ -91,6 +74,6 @@ public class UserAccountSettingServiceImpl implements UserAccountSettingService 
 
         // Guardar cambios
         UserEntity updatedUser = userRepository.save(user);
-        return userMapper.toUserResponseDTO(updatedUser);
+
     }
 }

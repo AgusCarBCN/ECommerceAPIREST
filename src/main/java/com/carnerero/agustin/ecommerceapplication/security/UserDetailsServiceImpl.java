@@ -22,11 +22,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) {
 
-        UserEntity user = userRepo.findByEmail(email)
+        return  userRepo.findByEmail(email)
                 .orElseThrow(() ->
                         new UsernameNotFoundException("User not found with email: " + email)
                 );
 
-        return new UserDetailsImpl(user);
     }
 }

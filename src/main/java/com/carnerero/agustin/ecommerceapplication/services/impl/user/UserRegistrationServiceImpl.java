@@ -14,6 +14,7 @@ import com.carnerero.agustin.ecommerceapplication.util.mapper.LoginMapper;
 import com.carnerero.agustin.ecommerceapplication.util.mapper.UserMapper;
 
 import lombok.AllArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.HashSet;
@@ -24,9 +25,8 @@ import java.util.HashSet;
 public class UserRegistrationServiceImpl implements UserRegistrationService {
 
     private final UserRepository userRepository;
-    private final UserAddressRepository userAddressRespository;
     private final UserMapper userMapper;
-    private final LoginMapper loginMapper;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public UserResponseDTO registerUser(UserRequestDTO request) {
@@ -76,16 +76,17 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
         if(isAdmin){
             roles.add(RoleEntity.builder()
                     .id(2L)
-                    .role(Roles.ROLE_ADMIN)
+                    .role(Roles.ADMIN)
                     .build());
         }
         //Asignar rol de usuario
         RoleEntity rol=RoleEntity.builder()
                 .id(1L)
-                .role(Roles.ROLE_USER)
+                .role(Roles.USER)
                 .build();
         roles.add(rol);
         userEntity.setRoles(roles);
+        userEntity.setPassword(passwordEncoder.encode(request.getPassword()));
         // Lado dueño de la relación: asigna el usuario a cada dirección
         addresses.forEach(userEntity::addAddressSafe);
         UserEntity savedUser = userRepository.save(userEntity);

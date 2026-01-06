@@ -4,44 +4,33 @@ import com.carnerero.agustin.ecommerceapplication.dtos.requests.SuspensionReques
 import com.carnerero.agustin.ecommerceapplication.services.interfaces.user.UserAccountSettingService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Objects;
 
 @RestController
 @AllArgsConstructor
 @RequestMapping("/admin")
 public class AdminAccountSettingController {
 
-    private final UserAccountSettingService useCase;
+    private final UserAccountSettingService userAccountSettingService;
 
-    /**
-     * Permanently deletes a user account from the database (hard delete).
-     * <p>
-     * Only admin users should have access to this operation.
-     *
-     * @param userId the identifier of the user to delete
-     * @return a {@link ResponseEntity} with HTTP status 204 (No Content)
-     */
-    @DeleteMapping("/{userId}/delete")
-    public ResponseEntity<Void> deleteUserById(@PathVariable Long userId) {
-        useCase.deleteAccount(userId);
-        return ResponseEntity.noContent().build();
-    }
 
     /**
      * Suspends a user account temporarily or permanently based on admin decision.
      * <p>
      * The suspension reason is provided in the request body.
      *
-     * @param userId the identifier of the user to suspend
      * @param reason the suspension reason wrapped in {@link SuspensionRequestDTO}
      * @return a {@link ResponseEntity} with HTTP status 204 (No Content)
      */
-    @PatchMapping("/{userId}/suspend")
+    @PatchMapping("/suspend")
     public ResponseEntity<Void> suspendUserById(
-            @PathVariable Long userId,
             @RequestBody SuspensionRequestDTO reason
     ) {
-        useCase.suspendAccount(userId, reason.getReason());
+        String email = Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName();
+        userAccountSettingService.deactivateAccount(email, reason.getReason());
         return ResponseEntity.noContent().build();
     }
 
@@ -49,13 +38,12 @@ public class AdminAccountSettingController {
      * Activates a previously deactivated or suspended user account.
      * <p>
      * Only admin users should perform this action.
-     *
-     * @param userId the identifier of the user to activate
      * @return a {@link ResponseEntity} with HTTP status 204 (No Content)
      */
-    @PatchMapping("/{userId}/activate")
-    public ResponseEntity<Void> activatedUserById(@PathVariable Long userId) {
-        useCase.activateAccount(userId);
+    @PatchMapping("/activate")
+    public ResponseEntity<Void> activatedUserById() {
+        String email = Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName();
+        userAccountSettingService.activateAccount(email);
         return ResponseEntity.noContent().build();
     }
 

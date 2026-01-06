@@ -12,6 +12,10 @@ import java.util.List;
 import java.util.Set;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import java.util.*;
 
 @Setter
@@ -22,7 +26,7 @@ import java.util.*;
 @Slf4j
 @Entity
 @Table(name = "users")
-public class UserEntity {
+public class UserEntity implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_seq")
@@ -85,7 +89,7 @@ public class UserEntity {
     // ---------------------------
     // Roles (ManyToMany)
     // ---------------------------
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_roles",
             joinColumns = @JoinColumn(name = "user_id"),
@@ -133,5 +137,25 @@ public class UserEntity {
     public void deactivateUser() {
         status = UserStatus.DEACTIVATED;
         statusDescription = "User deactivated";
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+
+        Collection<? extends GrantedAuthority> authorities =
+                getRoles().stream()
+                        .map(role -> new SimpleGrantedAuthority(role.getRole().toString())) // USER, ADMIN
+                        .toList();
+
+        // Debug usando log
+        authorities.forEach(a -> log.info("ROL CARGADO: {}", a.getAuthority()));
+
+        return authorities;
+
+    }
+
+    @Override
+    public String getUsername() {
+        return this.email;
     }
 }

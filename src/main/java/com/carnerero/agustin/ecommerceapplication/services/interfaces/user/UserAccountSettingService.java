@@ -12,35 +12,27 @@ public interface UserAccountSettingService {
     /**
      * Activates a user's account.
      *
-     * @param userId the user identifier
-     * @return the updated user information after activation
+     * @param email the user email
      */
-    UserResponseDTO activateAccount(Long userId);
+    void activateAccount(String email);
 
     /**
      * Temporarily deactivates a user's account.
      *
-     * @param userId the user identifier
+     * @param email the user identifier
      * @param reason the reason for deactivation
-     * @return the updated user information after deactivation
+     *
      */
-    UserResponseDTO deactivateAccount(Long userId, String reason);
+    void deactivateAccount(String email, String reason);
 
     /**
      * Permanently suspends a user's account.
      *
-     * @param userId the user identifier
+     * @param email the user identifier
      * @param reason the reason for suspension
-     * @return the updated user information after suspension
      */
-    UserResponseDTO suspendAccount(Long userId, String reason);
+    void suspendAccount(String email, String reason);
 
-    /**
-     * Permanently deletes a user's account (hard delete – admin only).
-     *
-     * @param userId the user identifier
-     */
-    void deleteAccount(Long userId);
 
     /**
      * Checks whether the user's account is currently active.
