@@ -5,7 +5,6 @@ import com.carnerero.agustin.ecommerceapplication.dtos.requests.OrderRequestDTO;
 import com.carnerero.agustin.ecommerceapplication.dtos.requests.ProductRequestDTO;
 import com.carnerero.agustin.ecommerceapplication.dtos.responses.OrderResponseDTO;
 import com.carnerero.agustin.ecommerceapplication.dtos.responses.PageResponse;
-import com.carnerero.agustin.ecommerceapplication.dtos.responses.ProductCatalogResponseDTO;
 import com.carnerero.agustin.ecommerceapplication.exception.user.BusinessException;
 import com.carnerero.agustin.ecommerceapplication.model.entities.*;
 import com.carnerero.agustin.ecommerceapplication.model.enums.OrderStatus;
@@ -16,21 +15,17 @@ import com.carnerero.agustin.ecommerceapplication.services.interfaces.OrderServi
 import com.carnerero.agustin.ecommerceapplication.util.helper.Sort;
 import com.carnerero.agustin.ecommerceapplication.util.mapper.OrderMapper;
 import com.carnerero.agustin.ecommerceapplication.util.mapper.PageResponseMapper;
-import com.carnerero.agustin.ecommerceapplication.util.mapper.ProductCatalogMapper;
-import com.carnerero.agustin.ecommerceapplication.util.mapper.ProductMapper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -45,22 +40,17 @@ public class OrderServiceImpl implements OrderService {
 
 
     @Transactional
-    public OrderResponseDTO createOrder(OrderRequestDTO request) {
+    @Override
+    public OrderResponseDTO createOrder(OrderRequestDTO request, String email) {
 
-        // Find user by username or email
-        var loginRequest = request.getUser();
         UserEntity user = userRepository.findByEmail(
-                loginRequest.getEmail()).orElseThrow(() -> new BusinessException("User not found"));
-
-        // Verify password
-        if (!user.getPassword().equals(loginRequest.getPassword())) {
-            throw new BusinessException("Wrong Password");
-        }
+                email).orElseThrow(() -> new BusinessException("User not found"));
 
         // 1️⃣ Create OrderEntity
         OrderEntity order = orderMapper.toOrderEntity(request);
 
-         order.setUser(user);
+        // 2️⃣ Set user
+        order.setUser(user);
 
         // 3️⃣ Validate products
         if (request.getProducts() == null || request.getProducts().isEmpty()) {
@@ -85,7 +75,7 @@ public class OrderServiceImpl implements OrderService {
                 throw new BusinessException("Insufficient stock for product: " + catalog.getProductName());
             }
             //Update stock
-            catalog.setStockQuantity(newStock);
+            catalog.reduceStock(p.getQuantity());
 
             //Calculate partial price
             BigDecimal price = catalog.getPrice()
@@ -101,11 +91,13 @@ public class OrderServiceImpl implements OrderService {
                     .build();
             //Add to products
             products.add(product);
+
         }
             // Add products to order
             order.setProducts(products);
             // 4️⃣ Set amount to order
-            order.setTotalAmount(total);
+            order.addToTotalAmount(total);
+            //order.setTotalAmount(total);
 
             // 5️⃣ Save
             OrderEntity savedOrder = orderRepository.save(order);
@@ -126,31 +118,43 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public PageResponse<OrderResponseDTO> getOrdersByUser(Integer numberOfPages, Long userId) {
+    public PageResponse<OrderResponseDTO> getOrdersByUser(Integer numberOfPages, String email) {
 
-        var page = orderRepository.findByUserId(userId, PageRequest.of(numberOfPages, Sort.PAGE_SIZE))
+        var page = orderRepository.findByUserEmail(email, PageRequest.of(numberOfPages, Sort.PAGE_SIZE))
                 .map(orderMapper::toOrderResponseDTO);
 
         return PageResponseMapper.mapToPageResponse(page);
     }
 
-    // Only admin
     @Override
-    public OrderResponseDTO changeOrderStatus(Long orderId, OrderStatus newStatus) {
-        var order = orderRepository.findById(orderId).orElseThrow(() -> new EntityNotFoundException("Order not found"));
-        order.setStatus(newStatus);
-        order.setUpdatedAt(LocalDateTime.now());
+    @Transactional
+    public OrderResponseDTO cancelOrder(Long orderId, String email) {
+
+        OrderEntity order = orderRepository.findByIdWithProducts(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        // 1️⃣ Ownership
+        if (!order.getUser().getEmail().equals(email)) {
+            throw new AccessDeniedException("You cannot cancel this order");
+        }
+
+        // 2️⃣ Validación de estado
+        if (!order.isCancelableByClient()) {
+            throw new IllegalStateException("Order cannot be canceled");
+        }
+
+        // 3️⃣ Restaurar stock
+        for (ProductEntity product : order.getProducts()) {
+            var productCatalog=product.getProductCatalog();
+                productCatalog.restoreStock(product.getQuantity());
+        }
+
+        // 4️⃣ Cambiar estado
+        order.cancelByClient();
+
         return orderMapper.toOrderResponseDTO(order);
     }
 
-
-    @Override
-    public OrderResponseDTO cancelOrder(Long orderId) {
-        var order = orderRepository.findById(orderId).orElseThrow(() -> new EntityNotFoundException("Order not found"));
-        order.setStatus(OrderStatus.CANCELLED);
-        order.setUpdatedAt(LocalDateTime.now());
-        return orderMapper.toOrderResponseDTO(order);
-    }
 
 
     @Transactional
@@ -180,7 +184,6 @@ public class OrderServiceImpl implements OrderService {
                     .orElseThrow(() -> new EntityNotFoundException("Product not found"));
 
             Integer qty = p.getQuantity();
-            BigDecimal priceChange = catalog.getPrice().multiply(BigDecimal.valueOf(qty));
 
             if (isAdd) {
                 // 3️⃣ Validar stock
@@ -189,7 +192,8 @@ public class OrderServiceImpl implements OrderService {
                 }
 
                 // 4️⃣ Reducir stock
-                catalog.setStockQuantity(catalog.getStockQuantity() - qty);
+                catalog.reduceStock(qty);
+                //catalog.setStockQuantity(catalog.getStockQuantity() - qty);
 
                 // 5️⃣ Buscar si ya existe en la orden
                 ProductEntity product = order.getProducts().stream()
@@ -205,7 +209,8 @@ public class OrderServiceImpl implements OrderService {
                             .build();
                     order.addProduct(product);
                 } else {
-                    product.setQuantity(product.getQuantity()+qty);
+                    product.addQuantity(qty);
+                    //product.setQuantity(product.getQuantity()+qty);
                 }
 
             } else {
@@ -221,13 +226,15 @@ public class OrderServiceImpl implements OrderService {
                 }
 
                 // 7️⃣ Ajustar cantidad o eliminar
-                product.setQuantity(product.getQuantity()-qty);
+                //product.setQuantity(product.getQuantity()-qty);
+                product.reduceQuantity(qty);
                 if (product.getQuantity() == 0) {
                     order.removeProduct(product); // orphanRemoval hace delete
                 }
 
                 // 8️⃣ Restaurar stock
-                catalog.setStockQuantity(catalog.getStockQuantity() + qty);
+                //catalog.setStockQuantity(catalog.getStockQuantity() + qty);
+                catalog.restoreStock(qty);
             }
         }
 

@@ -4,6 +4,9 @@ import com.carnerero.agustin.ecommerceapplication.model.entities.OrderEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
+import java.util.Optional;
 
 
 /**
@@ -29,4 +32,26 @@ public interface OrderRepository extends JpaRepository<OrderEntity, Long> {
      */
     boolean existsByUserId(Long userId);
 
+    /**
+     * Retrieve a paginated list of orders for a specific user by their email.
+     *
+     * @param email the email of the user whose orders are being retrieved
+     * @param pageable pagination and sorting information
+     * @return a Page of OrderEntity objects belonging to the user
+     */
+    Page<OrderEntity> findByUserEmail(String email, Pageable pageable);
+
+    /**
+     * Find an order by its ID, including its associated products and their catalog details.
+     *
+     * @param orderId the ID of the order to retrieve
+     * @return an Optional containing the OrderEntity if found, or empty if not found
+     */
+    @Query("""
+    select o from OrderEntity o
+    join fetch o.products p
+    join fetch p.productCatalog
+    where o.id = :orderId
+""")
+    Optional<OrderEntity> findByIdWithProducts(Long orderId);
 }

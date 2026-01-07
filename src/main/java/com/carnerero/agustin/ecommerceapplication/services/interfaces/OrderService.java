@@ -17,7 +17,7 @@ public interface OrderService {
      * @param orderRequest DTO containing userId, product list and quantities, payment info
      * @return OrdeResponseDTO with full order details
      */
-    OrderResponseDTO createOrder(OrderRequestDTO orderRequest);
+    OrderResponseDTO createOrder(OrderRequestDTO orderRequest,String email);
 
     /**
      * Retrieve an order by its ID.
@@ -28,28 +28,22 @@ public interface OrderService {
 
     /**
      * Retrieve all orders for a specific user.
-     * @param userId the id of the user
+     * @param email the email of the user
      * @param numberOfPages the page number to retrieve
      *
      * @return PageResponse of OrderResponseDTOs
      */
     PageResponse<OrderResponseDTO> getOrdersByUser(Integer numberOfPages,
-                                                   Long userId);
+                                                   String email);
 
-    /**
-     * Update the status of an order.
-     * @param orderId the ID of the order
-     * @param newStatus new status to set (enum OrderStatus)
-     * @return updated OrderResponseDTO
-     */
-    OrderResponseDTO changeOrderStatus(Long orderId, OrderStatus newStatus);
+
 
     /**
      * Cancel an order.
      * This should handle stock restoration and payment reversal if needed.
      * @param orderId the ID of the order
      */
-    OrderResponseDTO cancelOrder(Long orderId);
+    OrderResponseDTO cancelOrder(Long orderId,String email);
 
     /**
      * Add a product to an existing order.

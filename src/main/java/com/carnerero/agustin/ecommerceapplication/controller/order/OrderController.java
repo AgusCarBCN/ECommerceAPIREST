@@ -10,7 +10,10 @@ import com.carnerero.agustin.ecommerceapplication.services.interfaces.OrderServi
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import java.security.Principal;
 
 @RestController
 @AllArgsConstructor
@@ -20,29 +23,27 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping
-    public ResponseEntity<OrderResponseDTO> createOrder(@RequestBody OrderRequestDTO orderRequestDTO) {
+    public ResponseEntity<OrderResponseDTO> createOrder(@RequestBody OrderRequestDTO orderRequestDTO,
+                                                        Authentication authentication) {
 
-        var response=orderService.createOrder(orderRequestDTO);
+        var response=orderService.createOrder(orderRequestDTO,authentication.getName());
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(response);
     }
     @GetMapping("/by-user")
     public ResponseEntity<PageResponse<OrderResponseDTO>> getOrdersByUser(@RequestParam Integer page,
-                                                                          @RequestParam Long userId)
+                                                                          Authentication authentication   )
     {
-        var response=orderService.getOrdersByUser(page, userId);
+        var response=orderService.getOrdersByUser(page, authentication.getName());
         return ResponseEntity.status(HttpStatus.ACCEPTED)
                 .body(response);
     }
-    @PatchMapping("/change-status")
-    public ResponseEntity<OrderResponseDTO> changeOrderStatus(@RequestParam Long orderId, @RequestParam OrderStatus newStatus) {
-        var response=orderService.changeOrderStatus(orderId, newStatus);
-        return  ResponseEntity.status(HttpStatus.ACCEPTED)
-                .body(response);
-    }
+
     @PatchMapping("/cancel")
-    public ResponseEntity<OrderResponseDTO> cancelOrder(@RequestParam Long orderId) {
-        var response=orderService.cancelOrder(orderId);
+    public ResponseEntity<OrderResponseDTO> cancelOrder(@RequestParam Long orderId,
+                                                        Authentication authentication
+    )  {
+        var response=orderService.cancelOrder(orderId, authentication.getName());
         return ResponseEntity.status(HttpStatus.ACCEPTED)
                 .body(response);
     }

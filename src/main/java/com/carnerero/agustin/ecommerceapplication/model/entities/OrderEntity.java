@@ -154,4 +154,29 @@ public class OrderEntity {
             bill.setStatus(BillStatus.CANCELLED);
         }
     }
+    // OrderEntity
+    public boolean isCancelableByClient() {
+        return status == OrderStatus.CREATED || status == OrderStatus.PENDING_PAYMENT;
+    }
+
+    public void cancelByClient() {
+        this.status = OrderStatus.CANCELLED;
+    }
+
+    public void addToTotalAmount(BigDecimal amount) {
+        if (amount == null) throw new IllegalArgumentException("amount cannot be null");
+        if (this.totalAmount == null) this.totalAmount = BigDecimal.ZERO;
+        this.totalAmount = this.totalAmount.add(amount);
+    }
+
+    public void subtractFromTotalAmount(BigDecimal amount) {
+        if (amount == null) throw new IllegalArgumentException("amount cannot be null");
+        if (this.totalAmount == null) this.totalAmount = BigDecimal.ZERO;
+        if (this.totalAmount.compareTo(amount) < 0)
+            throw new IllegalStateException("Cannot subtract more than total amount");
+        this.totalAmount = this.totalAmount.subtract(amount);
+    }
+
+
+
 }

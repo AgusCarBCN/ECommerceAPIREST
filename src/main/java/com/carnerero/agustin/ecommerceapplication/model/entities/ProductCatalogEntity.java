@@ -60,4 +60,14 @@ public class ProductCatalogEntity {
     public void prePersist() {
         this.createdAt = LocalDateTime.now();
     }
+
+    public void restoreStock(int quantity) {
+        this.stockQuantity += quantity;
+    }
+    public void reduceStock(int quantity) {
+        if (this.stockQuantity < quantity) {
+            throw new IllegalArgumentException("Insufficient stock for product: " + this.productName);
+        }
+        this.stockQuantity -= quantity;
+    }
 }

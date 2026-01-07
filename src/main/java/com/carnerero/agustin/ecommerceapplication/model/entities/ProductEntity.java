@@ -1,11 +1,8 @@
 package com.carnerero.agustin.ecommerceapplication.model.entities;
 
 import jakarta.persistence.*;
-import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.*;
 
-import java.math.BigInteger;
-import java.util.UUID;
 /*
  * Mapear en Hibernate es hacer que un objeto en memoria represente un registro de la tabla y
  *  viceversa, para que la persistencia sea transparente.
@@ -36,6 +33,15 @@ public class ProductEntity {
     @JoinColumn(name="id_product_catalog", nullable = false)
     private ProductCatalogEntity productCatalog;
 
+    public void addQuantity(int quantity) {
+        this.quantity += quantity;
+    }
+    public void reduceQuantity(int quantity) {
+        if (this.quantity < quantity) {
+            throw new IllegalArgumentException("Insufficient stock for product: " + productCatalog.getProductName());
+        }
+        this.quantity -= quantity;
+    }
 
 }
 
