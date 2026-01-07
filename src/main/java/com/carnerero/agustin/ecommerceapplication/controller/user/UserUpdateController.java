@@ -15,7 +15,7 @@ import java.io.IOException;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/update/users")
+@RequestMapping("/user/update")
 public class UserUpdateController {
 
     private final UserUpdateService userUpdateService;

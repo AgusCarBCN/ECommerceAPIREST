@@ -13,7 +13,7 @@ import java.util.UUID;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/products/admin")
+@RequestMapping("/admin/products")
 public class ProductCatalogAdminController {
 
     private final ProductCatalogServiceAdmin productCatalogServiceAdmin;

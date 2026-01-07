@@ -1,6 +1,7 @@
 package com.carnerero.agustin.ecommerceapplication.model.entities;
 
 import com.carnerero.agustin.ecommerceapplication.model.enums.UserStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
@@ -18,11 +19,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.*;
 
-@Setter
-@Getter
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Data
 @Slf4j
 @Entity
 @Table(name = "users")
@@ -35,10 +36,11 @@ public class UserEntity implements UserDetails {
             sequenceName = "users_seq",
             allocationSize = 1
     )
+
     private Long id;
 
     @Column(name = "username", nullable = false, length = 50)
-    private String userName;
+    private String name;
 
     @Column(name = "surname", nullable = false, length = 200)
     private String surname;
@@ -61,6 +63,7 @@ public class UserEntity implements UserDetails {
     // ---------------------------
     // Status for soft delete / audit
     // ---------------------------
+
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private UserStatus status;
@@ -153,9 +156,12 @@ public class UserEntity implements UserDetails {
         return authorities;
 
     }
-
+    @Transient // evita que JPA lo considere
+    @JsonIgnore // evita que MapStruct y Jackson lo usen
     @Override
     public String getUsername() {
         return this.email;
     }
+
+
 }

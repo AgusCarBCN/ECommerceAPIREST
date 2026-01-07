@@ -26,7 +26,8 @@ public class UserQueryServiceImpl implements UserQueryService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final static Set<String> allowedUserFields = Set.of(
-            "userName",
+            "name",
+            "surname",
             "email",
             "createdAt",
             "updatedAt",
@@ -52,7 +53,7 @@ public class UserQueryServiceImpl implements UserQueryService {
     @Override
     public UserResponseDTO getUserByUsername(String username) {
         var userEntity=userRepository
-                .findByUserNameIgnoreCase(username)
+                .findByNameIgnoreCase(username)
                 .orElseThrow(()-> new RuntimeException("User not found"));
         return userMapper.toUserResponseDTO(userEntity);
     }

@@ -7,10 +7,8 @@ import com.carnerero.agustin.ecommerceapplication.exception.user.BusinessExcepti
 import com.carnerero.agustin.ecommerceapplication.model.entities.RoleEntity;
 import com.carnerero.agustin.ecommerceapplication.model.entities.UserEntity;
 import com.carnerero.agustin.ecommerceapplication.model.enums.Roles;
-import com.carnerero.agustin.ecommerceapplication.repository.UserAddressRepository;
 import com.carnerero.agustin.ecommerceapplication.repository.UserRepository;
 import com.carnerero.agustin.ecommerceapplication.services.interfaces.user.UserRegistrationService;
-import com.carnerero.agustin.ecommerceapplication.util.mapper.LoginMapper;
 import com.carnerero.agustin.ecommerceapplication.util.mapper.UserMapper;
 
 import lombok.AllArgsConstructor;
@@ -67,7 +65,7 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
         if (!isEmailAvailable(request.getEmail())) {
             throw new BusinessException("Email already exists");
         }
-        if (!isUserNameAvailable(request.getUserName())) {
+        if (!isUserNameAvailable(request.getName())) {
             throw new BusinessException("Username already exists");
         }
         UserEntity userEntity = userMapper.toUserEntity(request);
@@ -98,7 +96,7 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
     }
 
     private boolean isUserNameAvailable(String username) {
-        return !userRepository.existsByUserNameIgnoreCase(username);
+        return !userRepository.existsByNameIgnoreCase(username);
     }
 
 

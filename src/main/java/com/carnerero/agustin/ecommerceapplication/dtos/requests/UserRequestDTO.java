@@ -18,7 +18,7 @@ import java.util.Set;
 public class UserRequestDTO {
     @NotBlank(message = "Username is required")
     @Size(min = 3, max = 20, message = "Username must be between 3 and 20 characters")
-    private String userName;
+    private String name;
     @Size(min = 10, max = 100, message = "Surname must be between 3 and 20 characters")
     private String surname;
     @NotBlank(message = "Tax ID is required")

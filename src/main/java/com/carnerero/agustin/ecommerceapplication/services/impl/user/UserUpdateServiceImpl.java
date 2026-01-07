@@ -77,7 +77,7 @@ public class UserUpdateServiceImpl implements UserUpdateService {
         UserEntity user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User not found with ID " + userId));
 
-        if (request.getName() != null) user.setUserName(request.getName());
+        if (request.getName() != null) user.setName(request.getName());
         if (request.getSurname() != null) user.setSurname(request.getSurname());
         if (request.getEmail() != null) user.setEmail(request.getEmail());
         if (request.getPassword() != null) user.setPassword(request.getPassword());

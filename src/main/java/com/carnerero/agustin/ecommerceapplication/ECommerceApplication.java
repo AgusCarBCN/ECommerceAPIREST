@@ -9,28 +9,13 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class ECommerceApplication  implements  CommandLineRunner {
-    @Autowired
-    OrderService orderService;
-    @Autowired
-    OrderMapper orderMapper;
-    @Autowired
-    ProductMapper orderProductMapper;
-    @Autowired
-    UserQueryService userQueryService;
+public class ECommerceApplication   {
+
 
     public static void main(String[] args) {
         SpringApplication.run(ECommerceApplication.class, args);
     }
 
 
-   @Override
-    public void run(String... args) throws Exception {
 
-
-
-
-
-
-    }
 }

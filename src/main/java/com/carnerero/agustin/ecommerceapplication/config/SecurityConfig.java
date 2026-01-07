@@ -26,9 +26,11 @@ public class SecurityConfig {
         return http
                 .csrf(csrf -> csrf.disable()) // APIs REST no necesitan CSRF
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/admin/**"). hasAuthority("ADMIN") // solo rol ADMIN
+                        .requestMatchers("/user/**"). hasAuthority("USER") // solo rol USER
                         .requestMatchers("/products/**").permitAll()   // público
                         .requestMatchers("/register/**").permitAll()   // público
-                        .requestMatchers("/user/**"). hasAuthority("USER") // solo rol USER
+                        .requestMatchers("/login").permitAll()
                         .anyRequest().authenticated()                  // resto requiere login
                 )
                 .httpBasic(Customizer.withDefaults()) // Basic Auth por ahora

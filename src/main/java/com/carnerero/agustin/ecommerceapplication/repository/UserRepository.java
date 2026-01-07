@@ -20,7 +20,7 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
        BÚSQUEDAS
        ========================= */
 
-    Optional<UserEntity> findByUserNameIgnoreCase(String userName);
+    Optional<UserEntity> findByNameIgnoreCase(String userName);
 
     Optional<UserEntity> findByEmail(String email);
 
@@ -50,7 +50,7 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
        VALIDACIONES
        ========================= */
 
-    boolean existsByUserNameIgnoreCase(String userName);
+    boolean existsByNameIgnoreCase(String userName);
 
     boolean existsByEmailIgnoreCase(String email);
 

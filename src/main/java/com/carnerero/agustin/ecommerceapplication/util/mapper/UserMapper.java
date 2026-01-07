@@ -13,9 +13,14 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {
-    @Mapping(target = "status", source = "status")
-    @Mapping(target = "roles", source = "roles")
-    @Mapping(target = "addresses", source = "addresses")
+
+    //@Mapping(target = "status", source = "status")
+    //@Mapping(target = "roles", source = "roles")
+    //@Mapping(target = "addresses", source = "addresses")
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
+    //@Mapping(target = "userName", expression = "java(userEntity.getUserName())")
     UserResponseDTO toUserResponseDTO(UserEntity userEntity);
     UserEntity toUserEntity(UserRequestDTO userRequestDTO);
     //Roles mapper

@@ -19,7 +19,7 @@ import java.util.Set;
 public class UserResponseDTO {
     @JsonIgnore
     private Long id;
-    private String userName;
+    private String name;
     private String surname;
     private String taxId;
     private String email;
