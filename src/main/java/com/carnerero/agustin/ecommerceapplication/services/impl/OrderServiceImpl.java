@@ -59,11 +59,7 @@ public class OrderServiceImpl implements OrderService {
         // Init order amount
         BigDecimal total;
         for (ProductRequestDTO p : request.getProducts()) {
-            ProductCatalogEntity catalog = productCatalogRepository
-                    .findById(p.getProductCatalogId())
-                    .orElseThrow(() -> new EntityNotFoundException(
-                            "Product catalog not found: " + p.getProductCatalogId()
-                    ));
+            ProductCatalogEntity catalog = getProductCatalogById(p);
             order.addProduct(catalog, p.getQuantity());
         }
             // 5️⃣ Save
@@ -132,24 +128,34 @@ public class OrderServiceImpl implements OrderService {
         OrderEntity order = orderRepository.findByIdWithProducts(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
 
-        //Get products
-        var products = request.getProducts();
         // 2️⃣ Validar estado de la orden
         if (order.getStatus() != OrderStatus.CREATED) {
             throw new IllegalStateException("Cannot modify order in status: " + order.getStatus());
         }
 
-        for (ProductRequestDTO p : products) {
-            ProductCatalogEntity catalog = productCatalogRepository
-                    .findById(p.getProductCatalogId())
-                    .orElseThrow(() -> new EntityNotFoundException("Product not found"));
-            if (isAdd) {
-                order.addProduct(catalog, p.getQuantity());
-                }
-             else {
+        // 1️⃣ Primero quitar productos
+        if (request.getProductsToRemove() != null) {
+            for (ProductRequestDTO p : request.getProductsToRemove()) {
+                ProductCatalogEntity catalog = getProductCatalogById(p);
                 order.removeProduct(catalog, p.getQuantity());
             }
         }
+
+        // 2️⃣ Luego añadir productos
+        if (request.getProductsToAdd() != null) {
+            for (ProductRequestDTO p : request.getProductsToAdd()) {
+                ProductCatalogEntity catalog =getProductCatalogById(p);
+                order.addProduct(catalog, p.getQuantity());
+            }
+        }
+
         return orderMapper.toOrderResponseDTO(order);
+    }
+    private ProductCatalogEntity getProductCatalogById(ProductRequestDTO p) {
+        return productCatalogRepository
+                .findById(p.getProductCatalogId())
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Product catalog not found: " + p.getProductCatalogId()
+                ));
     }
 }

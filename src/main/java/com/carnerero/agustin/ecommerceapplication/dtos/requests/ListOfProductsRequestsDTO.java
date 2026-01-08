@@ -14,6 +14,6 @@ import java.util.List;
 @NoArgsConstructor
 @Data
 public class ListOfProductsRequestsDTO {
-    @NotEmpty(message = "Products list cannot be empty")
-    private List<ProductRequestDTO> products;
+    private List<ProductRequestDTO> productsToAdd;
+    private List<ProductRequestDTO> productsToRemove;
 }
