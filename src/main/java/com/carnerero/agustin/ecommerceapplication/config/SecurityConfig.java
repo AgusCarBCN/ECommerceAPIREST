@@ -27,7 +27,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // APIs REST no necesitan CSRF
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/admin/**"). hasAuthority("ADMIN") // solo rol ADMIN
-                        .requestMatchers("/user/**"). hasAuthority("USER") // solo rol USER
+                        .requestMatchers("/user/**"). hasAnyAuthority("USER","ADMIN") // solo rol USER
                         .requestMatchers("/products/**").permitAll()   // público
                         .requestMatchers("/register/**").permitAll()   // público
                         .requestMatchers("/login").permitAll()

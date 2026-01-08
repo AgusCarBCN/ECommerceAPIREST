@@ -61,7 +61,7 @@ public class OrderServiceImpl implements OrderService {
         List<ProductEntity> products = new ArrayList<>();
 
         // Init order amount
-        BigDecimal total = BigDecimal.ZERO;
+        BigDecimal total;
 
         for (ProductRequestDTO p : request.getProducts()) {
             ProductCatalogEntity catalog = productCatalogRepository
@@ -74,30 +74,28 @@ public class OrderServiceImpl implements OrderService {
             if (newStock < 0) {
                 throw new BusinessException("Insufficient stock for product: " + catalog.getProductName());
             }
+
             //Update stock
             catalog.reduceStock(p.getQuantity());
 
-            //Calculate partial price
-            BigDecimal price = catalog.getPrice()
-                    .multiply(BigDecimal.valueOf(p.getQuantity().longValue()));
-
-            // Sum to total
-            total = total.add(price);
             // Create Product entity
             ProductEntity product = ProductEntity.builder()
                     .quantity(p.getQuantity())
                     .order(order)
                     .productCatalog(catalog)
                     .build();
+
             //Add to products
             products.add(product);
-
         }
             // Add products to order
             order.setProducts(products);
+
+            // Calculate total amount
+            total = calculateTotalAmount(order);
+
             // 4️⃣ Set amount to order
             order.addToTotalAmount(total);
-            //order.setTotalAmount(total);
 
             // 5️⃣ Save
             OrderEntity savedOrder = orderRepository.save(order);
@@ -247,6 +245,12 @@ public class OrderServiceImpl implements OrderService {
         bill.setTotalAmount(totalAmount);
         order.setUpdatedAt(LocalDateTime.now());
         return orderMapper.toOrderResponseDTO(order);
+    }
+    private BigDecimal calculateTotalAmount(OrderEntity order) {
+        return order.getProducts().stream()
+                .map(pr -> pr.getProductCatalog().getPrice()
+                        .multiply(new BigDecimal(pr.getQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
 }
