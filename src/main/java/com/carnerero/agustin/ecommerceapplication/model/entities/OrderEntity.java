@@ -1,5 +1,6 @@
 package com.carnerero.agustin.ecommerceapplication.model.entities;
 
+import com.carnerero.agustin.ecommerceapplication.exception.user.BusinessException;
 import com.carnerero.agustin.ecommerceapplication.model.enums.BillStatus;
 import com.carnerero.agustin.ecommerceapplication.model.enums.OrderStatus;
 import com.carnerero.agustin.ecommerceapplication.model.enums.PaymentStatus;
@@ -176,6 +177,77 @@ public class OrderEntity {
             throw new IllegalStateException("Cannot subtract more than total amount");
         this.totalAmount = this.totalAmount.subtract(amount);
     }
+    public void addProduct(ProductCatalogEntity catalog, int quantity) {
+        // 0️⃣ Limpiar productos corruptos
+        this.products.removeIf(p -> p.getProductCatalog() == null);
+
+        // 1️⃣ Reduce stock
+        catalog.reduceStock(quantity);
+
+        // 2️⃣ Buscar si ya existe el producto en la orden
+        ProductEntity product = this.products.stream()
+                .filter(p -> p.getProductCatalog().getId().equals(catalog.getId()))
+                .findFirst()
+                .orElse(null);
+
+        // 3️⃣ Crear nuevo producto o aumentar cantidad
+        if (product == null) {
+            product = ProductEntity.builder()
+                    .order(this)
+                    .productCatalog(catalog)
+                    .quantity(quantity)
+                    .build();
+            this.products.add(product);
+        } else {
+            product.addQuantity(quantity);
+        }
+        // 4️⃣ Recalcular totalAmount
+        this.recalculateTotalAmount();
+    }
+
+    public void removeProduct(ProductCatalogEntity catalog, int quantity) {
+        // 0️⃣ Limpiar productos corruptos
+        this.products.removeIf(p -> p.getProductCatalog() == null);
+
+        // 1️⃣ Buscar si existe el producto en la orden
+        ProductEntity product = this.products.stream()
+                .filter(p -> p.getProductCatalog().getId().equals(catalog.getId()))
+                .findFirst()
+                .orElseThrow(() -> new BusinessException("Product not found in order"));
+
+        // 2️⃣ Validar cantidad a eliminar
+        if (product.getQuantity() < quantity) {
+            throw new BusinessException("Cannot remove more items than ordered");
+        }
+
+        // 3️⃣ Reducir cantidad o eliminar producto
+        product.reduceQuantity(quantity);
+        if (product.getQuantity() == 0) {
+            this.products.remove(product); // orphanRemoval hará delete en DB
+        }
+
+        // 4️⃣ Restaurar stock en catálogo
+        catalog.restoreStock(quantity);
+
+        // 5️⃣ Recalcular totalAmount
+        this.recalculateTotalAmount();
+    }
+    public void recalculateTotalAmount() {
+        // 0️⃣ Limpiar productos corruptos
+        this.products.removeIf(p -> p.getProductCatalog() == null);
+
+        // 1️⃣ Calcular total sumando precio * cantidad de cada producto
+        BigDecimal total = this.products.stream()
+                .map(p -> p.getProductCatalog().getPrice()
+                        .multiply(BigDecimal.valueOf(p.getQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        // 2️⃣ Actualizar totalAmount
+        this.setTotalAmount(total);
+    }
+
+
+
 
 
 

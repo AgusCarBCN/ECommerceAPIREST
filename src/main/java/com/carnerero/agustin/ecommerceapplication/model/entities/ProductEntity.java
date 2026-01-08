@@ -24,12 +24,12 @@ public class ProductEntity {
     private Integer quantity;
 
     // Reference to the order (parent)
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="id_order", nullable = false)
     private OrderEntity order;
 
     // Reference to the catalog product (master data)
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="id_product_catalog", nullable = false)
     private ProductCatalogEntity productCatalog;
 

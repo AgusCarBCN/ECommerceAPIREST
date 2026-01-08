@@ -56,55 +56,22 @@ public class OrderServiceImpl implements OrderService {
         if (request.getProducts() == null || request.getProducts().isEmpty()) {
             throw new BusinessException("Order must contain at least one product");
         }
-
-        // 3️⃣ List of products to add to order
-        List<ProductEntity> products = new ArrayList<>();
-
         // Init order amount
         BigDecimal total;
-
         for (ProductRequestDTO p : request.getProducts()) {
             ProductCatalogEntity catalog = productCatalogRepository
                     .findById(p.getProductCatalogId())
                     .orElseThrow(() -> new EntityNotFoundException(
                             "Product catalog not found: " + p.getProductCatalogId()
                     ));
-            // Verificate stock
-            int newStock = catalog.getStockQuantity() - p.getQuantity();
-            if (newStock < 0) {
-                throw new BusinessException("Insufficient stock for product: " + catalog.getProductName());
-            }
-
-            //Update stock
-            catalog.reduceStock(p.getQuantity());
-
-            // Create Product entity
-            ProductEntity product = ProductEntity.builder()
-                    .quantity(p.getQuantity())
-                    .order(order)
-                    .productCatalog(catalog)
-                    .build();
-
-            //Add to products
-            products.add(product);
+            order.addProduct(catalog, p.getQuantity());
         }
-            // Add products to order
-            order.setProducts(products);
-
-            // Calculate total amount
-            total = calculateTotalAmount(order);
-
-            // 4️⃣ Set amount to order
-            order.addToTotalAmount(total);
-
             // 5️⃣ Save
             OrderEntity savedOrder = orderRepository.save(order);
 
             // 6️⃣ Return DTO
             return orderMapper.toOrderResponseDTO(savedOrder);
-
     }
-
 
     @Override
     public OrderResponseDTO getOrderById(Long orderId) {
@@ -154,7 +121,6 @@ public class OrderServiceImpl implements OrderService {
     }
 
 
-
     @Transactional
     @Override
     public OrderResponseDTO modifyOrder(
@@ -163,8 +129,9 @@ public class OrderServiceImpl implements OrderService {
             boolean isAdd
     ) {
         // 1️⃣ Cargar la orden
-        OrderEntity order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new EntityNotFoundException("Order not found"));
+        OrderEntity order = orderRepository.findByIdWithProducts(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
         //Get products
         var products = request.getProducts();
         // 2️⃣ Validar estado de la orden
@@ -172,85 +139,17 @@ public class OrderServiceImpl implements OrderService {
             throw new IllegalStateException("Cannot modify order in status: " + order.getStatus());
         }
 
-        BillEntity bill = order.getBill();
-        BigDecimal totalAmount = BigDecimal.ZERO; // vamos a recalcular al final
-
         for (ProductRequestDTO p : products) {
-
             ProductCatalogEntity catalog = productCatalogRepository
                     .findById(p.getProductCatalogId())
                     .orElseThrow(() -> new EntityNotFoundException("Product not found"));
-
-            Integer qty = p.getQuantity();
-
             if (isAdd) {
-                // 3️⃣ Validar stock
-                if (catalog.getStockQuantity() < qty) {
-                    throw new IllegalStateException("Insufficient stock for product: " + catalog.getProductName());
+                order.addProduct(catalog, p.getQuantity());
                 }
-
-                // 4️⃣ Reducir stock
-                catalog.reduceStock(qty);
-                //catalog.setStockQuantity(catalog.getStockQuantity() - qty);
-
-                // 5️⃣ Buscar si ya existe en la orden
-                ProductEntity product = order.getProducts().stream()
-                        .filter(pr -> pr.getProductCatalog().getId().equals(catalog.getId()))
-                        .findFirst()
-                        .orElse(null);
-
-                if (product == null) {
-                    product = ProductEntity.builder()
-                            .order(order)
-                            .productCatalog(catalog)
-                            .quantity(qty)
-                            .build();
-                    order.addProduct(product);
-                } else {
-                    product.addQuantity(qty);
-                    //product.setQuantity(product.getQuantity()+qty);
-                }
-
-            } else {
-                // 6️⃣ REMOVE
-                ProductEntity product = order.getProducts().stream()
-                        .filter(pr -> pr.getProductCatalog().getId().equals(catalog.getId()))
-                        .findFirst()
-                        .orElseThrow(() ->
-                                new IllegalStateException("Product not found in order"));
-
-                if (product.getQuantity().compareTo(qty) < 0) {
-                    throw new IllegalStateException("Cannot remove more items than ordered");
-                }
-
-                // 7️⃣ Ajustar cantidad o eliminar
-                //product.setQuantity(product.getQuantity()-qty);
-                product.reduceQuantity(qty);
-                if (product.getQuantity() == 0) {
-                    order.removeProduct(product); // orphanRemoval hace delete
-                }
-
-                // 8️⃣ Restaurar stock
-                //catalog.setStockQuantity(catalog.getStockQuantity() + qty);
-                catalog.restoreStock(qty);
+             else {
+                order.removeProduct(catalog, p.getQuantity());
             }
         }
-
-        // 9️⃣ Recalcular totalAmount desde cero (robusto)
-        totalAmount = order.getProducts().stream()
-                .map(pr -> pr.getProductCatalog().getPrice()
-                        .multiply(new BigDecimal(pr.getQuantity())))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        bill.setTotalAmount(totalAmount);
-        order.setUpdatedAt(LocalDateTime.now());
         return orderMapper.toOrderResponseDTO(order);
     }
-    private BigDecimal calculateTotalAmount(OrderEntity order) {
-        return order.getProducts().stream()
-                .map(pr -> pr.getProductCatalog().getPrice()
-                        .multiply(new BigDecimal(pr.getQuantity())))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-    }
-
 }
