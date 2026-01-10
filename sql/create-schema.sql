@@ -111,15 +111,16 @@ CREATE TABLE product_categories (
 -- ==============================================
 -- BILLS
 -- ==============================================
+
 CREATE TABLE bills (
                        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
                        tax_amount NUMERIC(10,2) NOT NULL DEFAULT 0,
                        shipping_amount NUMERIC(10,2) NOT NULL DEFAULT 0,
                        total_amount NUMERIC(10,2) NOT NULL,
                        status VARCHAR(30) NOT NULL DEFAULT 'ACTIVE',
-                       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                       issued_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
 
 -- ==============================================
 -- ORDERS

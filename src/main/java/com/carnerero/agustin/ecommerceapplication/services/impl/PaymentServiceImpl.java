@@ -5,8 +5,10 @@ import com.carnerero.agustin.ecommerceapplication.dtos.responses.PaymentResponse
 import com.carnerero.agustin.ecommerceapplication.exception.user.BusinessException;
 import com.carnerero.agustin.ecommerceapplication.model.entities.BillEntity;
 import com.carnerero.agustin.ecommerceapplication.model.entities.OrderEntity;
+import com.carnerero.agustin.ecommerceapplication.model.enums.BillStatus;
 import com.carnerero.agustin.ecommerceapplication.model.enums.OrderStatus;
 import com.carnerero.agustin.ecommerceapplication.model.enums.PaymentStatus;
+import com.carnerero.agustin.ecommerceapplication.repository.BillRepository;
 import com.carnerero.agustin.ecommerceapplication.repository.OrderRepository;
 import com.carnerero.agustin.ecommerceapplication.repository.PaymentRepository;
 import com.carnerero.agustin.ecommerceapplication.services.interfaces.PaymentService;
@@ -23,6 +25,7 @@ import com.carnerero.agustin.ecommerceapplication.model.entities.PaymentEntity;
 @Slf4j
 public class PaymentServiceImpl implements PaymentService {
     private final OrderRepository orderRepository;
+    private final BillRepository billRepository;
     private final PaymentRepository paymentRepository;
     private final PaymentMapper paymentMapper;
     private final PaymentSimulationService paymentSimulationService;
@@ -49,6 +52,16 @@ public class PaymentServiceImpl implements PaymentService {
         if (success) {
             payment.completePayment();
             order.setStatus(OrderStatus.PAID);
+            //Crear factura
+            BillEntity bill=BillEntity.builder()
+                    .status(BillStatus.ACTIVE)
+                    .totalAmount(order.getTotalAmount())
+                    .shippingAmount(order.getShippingAmount())
+                    .taxAmount(order.getTaxAmount())
+                    .order(order)
+                    .build();
+            billRepository.save(bill);
+            order.setBill(bill);
         } else {
             payment.failPayment();
             order.setStatus(OrderStatus.PENDING_PAYMENT);

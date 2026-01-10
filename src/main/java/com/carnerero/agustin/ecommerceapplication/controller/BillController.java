@@ -5,6 +5,7 @@ import com.carnerero.agustin.ecommerceapplication.services.interfaces.BillServic
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -14,10 +15,11 @@ public class BillController {
 
     private final BillService billService;
 
-    @PostMapping
-    public ResponseEntity<BillResponseDTO> createBill(@RequestParam Long orderId) {
+    @GetMapping
+    public ResponseEntity<BillResponseDTO> getBillByOrder(@RequestParam Long orderId,
+                                                          Authentication authentication) {
 
-        var response=billService.generateBill(orderId);
+        var response= billService.getBillByOrderId(authentication.getName(),orderId);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(response);
     }

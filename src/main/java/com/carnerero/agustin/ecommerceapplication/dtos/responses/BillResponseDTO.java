@@ -10,19 +10,20 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
+
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 public class BillResponseDTO {
+        private UUID id;
+        private BigDecimal totalAmount;
+        private BigDecimal taxAmount;
+        private BigDecimal shippingAmount;
+        private LocalDateTime issuedAt;
+        private BillStatus status;
+        private List<ProductResponseDTO> products;
 
-    private String taxId;
-    private BigDecimal taxAmount;
-    private BigDecimal shippingAmount;
-    private BigDecimal totalAmount;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime createdAt;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime updatedAt;
-    private BillStatus status;
 }

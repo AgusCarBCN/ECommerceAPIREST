@@ -6,26 +6,16 @@ import java.util.UUID;
 
 public interface BillService {
 
-    /**
-     * Retrieve a bill by its ID.
-     * @param billId UUID of the bill
-     * @return BillResponseDTO with details
-     */
-    BillResponseDTO getBillById(UUID billId);
+
 
     /**
      * Retrieve the bill associated with a specific order.
-     * @param orderId ID of the order
+     * @param email the email of the
      * @return BillResponseDTO
      */
-    BillResponseDTO getBillByOrderId(Long orderId);
+    BillResponseDTO getBillByOrderId(String email,Long orderId);
 
-    /**
-     * Generate the bill associated with a specific order.
-     * @param orderId ID of the order
-     * @return BillResponseDTO
-     */
-    BillResponseDTO generateBill(Long orderId);
+
 
 }
 

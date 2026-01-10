@@ -40,20 +40,15 @@ public class BillEntity {
     @Column(nullable = false)
     private BillStatus status;
 
-    private LocalDateTime createdAt;
+    private LocalDateTime issuedAt;
 
-    private LocalDateTime updatedAt;
+
 
     @PrePersist
     protected void onCreate() {
 
-        createdAt = LocalDateTime.now();
-        updatedAt=LocalDateTime.now();
+        issuedAt = LocalDateTime.now();
         status=BillStatus.ACTIVE;
-    }
-    @PreUpdate
-        protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
     }
 
 
