@@ -14,7 +14,6 @@ import java.math.BigDecimal;
 public class ProductResponseDTO {
 
     private Integer quantity;
-    private BigDecimal price;
-    //Product detail
+    private BigDecimal subtotalAmount;
     private ProductCatalogResponseDTO productCatalog;
 }

@@ -16,9 +16,6 @@ import java.util.Set;
 @Data
 public class OrderRequestDTO {
 
-    @NotNull(message="User is required")
-    private LoginRequestDTO user;
-
     @NotNull(message="Shipping method is required")
     private ShippingMethod shippingMethod;
 

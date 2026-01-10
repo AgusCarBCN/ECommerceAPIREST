@@ -88,9 +88,17 @@ CREATE TABLE products_catalog (
                                   product_name VARCHAR(200) NOT NULL,
                                   description TEXT,
                                   price NUMERIC(10,2) NOT NULL,
+                                  discount_percentage NUMERIC(5,2) DEFAULT 0,
+                                  discount_price NUMERIC(10,2)
+                                      GENERATED ALWAYS AS (
+                                          price - (price * discount_percentage / 100)
+                                          ) STORED,
                                   stock_quantity INTEGER DEFAULT 0,
-                                  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                                  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+
 
 -- ==============================================
 -- PRODUCT-CATEGORIES (Many-to-Many)
@@ -105,6 +113,8 @@ CREATE TABLE product_categories (
 -- ==============================================
 CREATE TABLE bills (
                        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                       tax_amount NUMERIC(10,2) NOT NULL DEFAULT 0,
+                       shipping_amount NUMERIC(10,2) NOT NULL DEFAULT 0,
                        total_amount NUMERIC(10,2) NOT NULL,
                        status VARCHAR(30) NOT NULL DEFAULT 'ACTIVE',
                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -123,6 +133,8 @@ CREATE TABLE orders (
                         shipping_method VARCHAR(30) DEFAULT 'STANDARD',
                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        tax_amount NUMERIC(10,2) NOT NULL DEFAULT 0,
+                        shipping_amount NUMERIC(10,2) NOT NULL DEFAULT 0,
                         total_amount NUMERIC(10,2) NOT NULL DEFAULT 0,
                         FOREIGN KEY (id_bill) REFERENCES bills(id) ON DELETE RESTRICT
 );
@@ -134,6 +146,7 @@ CREATE TABLE orders (
 CREATE TABLE products (
                           id BIGINT PRIMARY KEY DEFAULT nextval('product_seq'),
                           quantity INT DEFAULT 1,
+                          subtotal_amount NUMERIC(10,2) NOT NULL DEFAULT 0,
                           id_product_catalog UUID,
                           id_order BIGINT,
                           FOREIGN KEY (id_order) REFERENCES orders(id) ON DELETE CASCADE,

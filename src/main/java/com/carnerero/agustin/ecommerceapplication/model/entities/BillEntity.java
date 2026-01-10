@@ -25,6 +25,14 @@ public class BillEntity {
     @OneToOne(mappedBy = "bill", cascade = CascadeType.ALL)
     private OrderEntity order;
 
+    @Setter
+    @Column(name = "tax_amount", nullable = false)
+    private BigDecimal taxAmount;
+
+    @Setter
+    @Column(name = "shipping_amount", nullable = false)
+    private BigDecimal shippingAmount;
+
     @Column(nullable = false)
     private BigDecimal  totalAmount;
 

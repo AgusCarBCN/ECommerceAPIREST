@@ -24,6 +24,11 @@ public class ProductCatalogRequestDTO {
     @DecimalMin(value = "0.0", inclusive = false, message = "Price must be greater than 0")
     @Digits(integer = 10, fraction = 2, message = "Price must have up to 2 decimal places")
     private BigDecimal price;
+    @NotNull(message = "Discount percentage is required")
+    @DecimalMin(value = "0.0", inclusive = false, message = "Discount percentage must be greater than 0")
+    @DecimalMax(value = "100.0", message = "Discount percentage must not exceed 100")
+    @Digits(integer = 3, fraction = 2, message = "Discount percentage can have up to 2 decimal places")
+    private BigDecimal discountPercentage;
     @NotNull(message = "Quantity is required")
     @Min(value = 1, message = "Quantity must be at least 1")
     private Integer stockQuantity;

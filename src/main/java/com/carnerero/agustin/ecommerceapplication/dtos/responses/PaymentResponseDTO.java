@@ -19,4 +19,5 @@ public class PaymentResponseDTO {
     private PaymentMethod paymentMethod;
     private PaymentStatus paymentStatus;
     private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

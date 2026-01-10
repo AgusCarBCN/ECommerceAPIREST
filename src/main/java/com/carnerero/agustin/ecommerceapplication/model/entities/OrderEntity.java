@@ -8,18 +8,12 @@ import com.carnerero.agustin.ecommerceapplication.model.enums.ShippingMethod;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
 import jakarta.persistence.*;
 import lombok.*;
-import lombok.extern.slf4j.Slf4j;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Builder
 @Getter
@@ -88,6 +82,15 @@ public class OrderEntity {
     @Setter
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @Setter
+    @Column(name = "tax_amount", nullable = false)
+    private BigDecimal taxAmount;
+
+    @Setter
+    @Column(name = "shipping_amount", nullable = false)
+    private BigDecimal shippingAmount;
+
     @Setter
     @Column(name = "total_amount", nullable = false)
     private BigDecimal totalAmount;
@@ -245,10 +248,5 @@ public class OrderEntity {
         // 2️⃣ Actualizar totalAmount
         this.setTotalAmount(total);
     }
-
-
-
-
-
 
 }

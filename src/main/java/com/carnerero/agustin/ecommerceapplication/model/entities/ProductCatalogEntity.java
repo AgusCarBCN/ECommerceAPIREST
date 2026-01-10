@@ -2,7 +2,7 @@ package com.carnerero.agustin.ecommerceapplication.model.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -29,10 +29,24 @@ public class ProductCatalogEntity {
     @Column(nullable = false)
     private BigDecimal price = BigDecimal.ZERO;
 
+    @Column(
+            name = "discount_price",
+            precision = 10,
+            scale = 2,
+            insertable = false,
+            updatable = false
+    )
+    private BigDecimal discountPrice;
+
+    @Column(nullable = false)
+    private BigDecimal discountPercentage = BigDecimal.ZERO;
+
     @Column(name="stock_quantity",nullable = false)
     private Integer stockQuantity;
 
     private LocalDateTime createdAt;
+
+    private LocalDateTime updatedAt;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "product_categories",
@@ -43,12 +57,8 @@ public class ProductCatalogEntity {
 
     // Métodos de dominio para sincronizar Many-to-Many
     public void addCategory(CategoryEntity category) {
-        if (!categories.contains(category)) {
-            categories.add(category);
-        }
-        if (!category.getProducts().contains(this)) {
-            category.getProducts().add(this);
-        }
+        categories.add(category);
+        category.getProducts().add(this);
     }
 
     public void removeCategory(CategoryEntity category) {
@@ -59,6 +69,11 @@ public class ProductCatalogEntity {
     @PrePersist
     public void prePersist() {
         this.createdAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        this.updatedAt = LocalDateTime.now();
     }
 
     public void restoreStock(int quantity) {

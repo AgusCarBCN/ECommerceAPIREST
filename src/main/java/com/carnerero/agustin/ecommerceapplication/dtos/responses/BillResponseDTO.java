@@ -17,6 +17,8 @@ import java.time.LocalDateTime;
 public class BillResponseDTO {
 
     private String taxId;
+    private BigDecimal taxAmount;
+    private BigDecimal shippingAmount;
     private BigDecimal totalAmount;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;

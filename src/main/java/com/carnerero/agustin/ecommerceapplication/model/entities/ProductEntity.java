@@ -3,6 +3,8 @@ package com.carnerero.agustin.ecommerceapplication.model.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
+
 /*
  * Mapear en Hibernate es hacer que un objeto en memoria represente un registro de la tabla y
  *  viceversa, para que la persistencia sea transparente.
@@ -22,7 +24,7 @@ public class ProductEntity {
     @SequenceGenerator(name = "product_seq", sequenceName = "product_seq", allocationSize = 1)
     private Long id;
     private Integer quantity;
-
+    private BigDecimal subtotalAmount;
     // Reference to the order (parent)
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="id_order", nullable = false)

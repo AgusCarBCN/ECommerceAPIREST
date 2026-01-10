@@ -21,9 +21,10 @@ import java.util.List;
         private LocalDateTime updatedAt;
         private OrderStatus status;
         private ShippingMethod shippingMethod;
-        private BigDecimal totalAmount;// ✅ Aquí va el total
+        private BigDecimal taxAmount;
+        private BigDecimal shippingAmount;
+        private BigDecimal totalAmount;
         private List<ProductResponseDTO> products;
-
 
     }
 
