@@ -3,6 +3,8 @@ package com.carnerero.agustin.ecommerceapplication.dtos.responses;
 
 import com.carnerero.agustin.ecommerceapplication.model.enums.OrderStatus;
 import com.carnerero.agustin.ecommerceapplication.model.enums.ShippingMethod;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -10,7 +12,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 
-    @Getter
+@Getter
     @Setter
     @Builder
     @AllArgsConstructor
@@ -25,6 +27,8 @@ import java.util.List;
         private BigDecimal shippingAmount;
         private BigDecimal totalAmount;
         private List<ProductResponseDTO> products;
+
+
 
     }
 

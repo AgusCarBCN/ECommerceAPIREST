@@ -75,4 +75,8 @@ public class PaymentEntity {
     public void failPayment() {
         this.paymentStatus = PaymentStatus.FAILED;
     }
+
+    public void calculateAmount(){
+
+    }
 }

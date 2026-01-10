@@ -16,5 +16,11 @@ public class PaymentRequestDTO {
     private Long id;
     @NotNull(message = "Payment method is required")
     private PaymentMethod paymentMethod;
+    @NotNull(message = "card number is required")
+    private String cardNumber;
+    @NotNull(message = "expiration is required")
+    private String expiration;
+    @NotNull(message = "cvv is required")
+    private String cvv;
 
 }

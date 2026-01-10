@@ -25,8 +25,10 @@ public class PaymentServiceImpl implements PaymentService {
     private final OrderRepository orderRepository;
     private final PaymentRepository paymentRepository;
     private final PaymentMapper paymentMapper;
+    private final PaymentSimulationService paymentSimulationService;
     @Override
     public PaymentResponseDTO createPayment(PaymentRequestDTO paymentRequest) {
+
         OrderEntity order = orderRepository.findById(paymentRequest.getId())
                 .orElseThrow(() -> new RuntimeException("Order not found"));
 
@@ -39,14 +41,28 @@ public class PaymentServiceImpl implements PaymentService {
                 .amount(order.getTotalAmount())
                 .order(order)
                 .build();
-        //Order is waiting for payment
-        order.setStatus(OrderStatus.PENDING_PAYMENT);
-        //Se añade pago a la order
+
+        // Simular pago
+        boolean success = paymentSimulationService.simulatePayment(paymentRequest);
+
+        // Actualizar estado del pago y de la orden según resultado
+        if (success) {
+            payment.completePayment();
+            order.setStatus(OrderStatus.PAID);
+        } else {
+            payment.failPayment();
+            order.setStatus(OrderStatus.PENDING_PAYMENT);
+        }
+
+        // Asignar pago a la orden
         order.setPayment(payment);
-        //Save payment
+
+        // Guardar pago en DB
         paymentRepository.save(payment);
 
+        // Retornar DTO
         return paymentMapper.toPaymentResponseDTO(payment);
+
     }
 
     @Override

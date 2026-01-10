@@ -58,6 +58,8 @@ public class OrderServiceImpl implements OrderService {
         if (request.getProducts() == null || request.getProducts().isEmpty()) {
             throw new BusinessException("Order must contain at least one product");
         }
+
+
         // Init order amount
 
         for (ProductRequestDTO p : request.getProducts()) {
@@ -67,8 +69,19 @@ public class OrderServiceImpl implements OrderService {
             //Set shipping cost
             order.setShippingCost(request.getShippingMethod());
 
-            //Set tax cost
-            order.calculateTaxAmount();
+            var addCostOfShipping=order.getTotalAmount().add(order.getShippingAmount());
+
+            //Calculate tax amount
+            order.calculateTaxAmount(addCostOfShipping);
+
+            //Calculate total amount
+
+            var total=addCostOfShipping.add(order.getTaxAmount());
+            //Set total amount
+
+            order.setTotalAmount(total);
+
+
             // 5️⃣ Save
             OrderEntity savedOrder = orderRepository.save(order);
 

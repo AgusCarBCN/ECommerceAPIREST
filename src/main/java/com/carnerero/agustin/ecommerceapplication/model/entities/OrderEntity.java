@@ -10,12 +10,9 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import jakarta.persistence.*;
-import lombok.*;
 
 @Builder
 @Getter
@@ -195,7 +192,7 @@ public class OrderEntity {
             product.addQuantity(quantity);
         }
         // 4️⃣ Recalcular totalAmount
-        this.recalculateTotalAmount();
+        this.recalculateSubTotalAmount();
     }
 
     public void removeProduct(ProductCatalogEntity catalog, int quantity) {
@@ -223,9 +220,9 @@ public class OrderEntity {
         catalog.restoreStock(quantity);
 
         // 5️⃣ Recalcular totalAmount
-        this.recalculateTotalAmount();
+        this.recalculateSubTotalAmount();
     }
-    public void recalculateTotalAmount() {
+    public void recalculateSubTotalAmount() {
 
         // 0️⃣ Eliminar productos inválidos
         this.products.removeIf(p -> p.getProductCatalog() == null);
@@ -235,26 +232,16 @@ public class OrderEntity {
                 .map(p -> p.getProductCatalog().getDiscountPrice()
                         .multiply(BigDecimal.valueOf(p.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+        this.totalAmount = subtotal;
 
-        // 2️⃣ Sumar envío e impuestos (null-safe)
-        BigDecimal shipping = this.shippingAmount != null ? this.shippingAmount : BigDecimal.ZERO;
-        BigDecimal tax = this.taxAmount != null ? this.taxAmount : BigDecimal.ZERO;
-
-        BigDecimal total = subtotal
-                .add(shipping)
-                .add(tax)
-                .setScale(2, RoundingMode.HALF_UP);
-
-        // 3️⃣ Actualizar total
-        this.totalAmount = total;
     }
 
 
     public void setShippingCost(ShippingMethod method) {
         this.setShippingAmount(method.getPrice());
     }
-    public void calculateTaxAmount() {
-        BigDecimal tax = this.totalAmount.multiply(AppConstants.TAX_RATE);
+    public void calculateTaxAmount(BigDecimal amount) {
+        BigDecimal tax = amount.multiply(AppConstants.TAX_RATE);
         this.setTaxAmount(tax);
     }
 }
