@@ -31,7 +31,7 @@ public interface OrderMapper {
         return products.stream()
                 .map(p -> ProductResponseDTO.builder()
                         .quantity(p.getQuantity())
-                        .price(p.getProductCatalog().getPrice())
+                        .subtotalAmount(p.getSubtotalAmount())
                         .productCatalog(mapCatalog(p.getProductCatalog()))
                         .build())
                 .toList();

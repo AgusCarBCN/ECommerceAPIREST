@@ -15,6 +15,7 @@ import com.carnerero.agustin.ecommerceapplication.services.interfaces.OrderServi
 import com.carnerero.agustin.ecommerceapplication.util.helper.Sort;
 import com.carnerero.agustin.ecommerceapplication.util.mapper.OrderMapper;
 import com.carnerero.agustin.ecommerceapplication.util.mapper.PageResponseMapper;
+import com.carnerero.agustin.ecommerceapplication.util.mapper.ProductMapper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +38,7 @@ public class OrderServiceImpl implements OrderService {
     private final UserRepository userRepository;
     private final ProductCatalogRepository productCatalogRepository;
     private final OrderMapper orderMapper;
+    private final ProductMapper productMapper;
 
 
     @Transactional
@@ -57,11 +59,16 @@ public class OrderServiceImpl implements OrderService {
             throw new BusinessException("Order must contain at least one product");
         }
         // Init order amount
-        BigDecimal total;
+
         for (ProductRequestDTO p : request.getProducts()) {
             ProductCatalogEntity catalog = getProductCatalogById(p);
             order.addProduct(catalog, p.getQuantity());
         }
+            //Set shipping cost
+            order.setShippingCost(request.getShippingMethod());
+
+            //Set tax cost
+            order.calculateTaxAmount();
             // 5️⃣ Save
             OrderEntity savedOrder = orderRepository.save(order);
 

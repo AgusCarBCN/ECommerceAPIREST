@@ -5,10 +5,12 @@ import com.carnerero.agustin.ecommerceapplication.model.enums.BillStatus;
 import com.carnerero.agustin.ecommerceapplication.model.enums.OrderStatus;
 import com.carnerero.agustin.ecommerceapplication.model.enums.PaymentStatus;
 import com.carnerero.agustin.ecommerceapplication.model.enums.ShippingMethod;
+import com.carnerero.agustin.ecommerceapplication.util.AppConstants;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -167,19 +169,7 @@ public class OrderEntity {
         this.status = OrderStatus.CANCELLED;
     }
 
-    public void addToTotalAmount(BigDecimal amount) {
-        if (amount == null) throw new IllegalArgumentException("amount cannot be null");
-        if (this.totalAmount == null) this.totalAmount = BigDecimal.ZERO;
-        this.totalAmount = this.totalAmount.add(amount);
-    }
 
-    public void subtractFromTotalAmount(BigDecimal amount) {
-        if (amount == null) throw new IllegalArgumentException("amount cannot be null");
-        if (this.totalAmount == null) this.totalAmount = BigDecimal.ZERO;
-        if (this.totalAmount.compareTo(amount) < 0)
-            throw new IllegalStateException("Cannot subtract more than total amount");
-        this.totalAmount = this.totalAmount.subtract(amount);
-    }
     public void addProduct(ProductCatalogEntity catalog, int quantity) {
         // 0️⃣ Limpiar productos corruptos
         this.products.removeIf(p -> p.getProductCatalog() == null);
@@ -236,17 +226,35 @@ public class OrderEntity {
         this.recalculateTotalAmount();
     }
     public void recalculateTotalAmount() {
-        // 0️⃣ Limpiar productos corruptos
+
+        // 0️⃣ Eliminar productos inválidos
         this.products.removeIf(p -> p.getProductCatalog() == null);
 
-        // 1️⃣ Calcular total sumando precio * cantidad de cada producto
-        BigDecimal total = this.products.stream()
-                .map(p -> p.getProductCatalog().getPrice()
+        // 1️⃣ Calcular subtotal (precio con descuento * cantidad)
+        BigDecimal subtotal = this.products.stream()
+                .map(p -> p.getProductCatalog().getDiscountPrice()
                         .multiply(BigDecimal.valueOf(p.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        // 2️⃣ Actualizar totalAmount
-        this.setTotalAmount(total);
+        // 2️⃣ Sumar envío e impuestos (null-safe)
+        BigDecimal shipping = this.shippingAmount != null ? this.shippingAmount : BigDecimal.ZERO;
+        BigDecimal tax = this.taxAmount != null ? this.taxAmount : BigDecimal.ZERO;
+
+        BigDecimal total = subtotal
+                .add(shipping)
+                .add(tax)
+                .setScale(2, RoundingMode.HALF_UP);
+
+        // 3️⃣ Actualizar total
+        this.totalAmount = total;
     }
 
+
+    public void setShippingCost(ShippingMethod method) {
+        this.setShippingAmount(method.getPrice());
+    }
+    public void calculateTaxAmount() {
+        BigDecimal tax = this.totalAmount.multiply(AppConstants.TAX_RATE);
+        this.setTaxAmount(tax);
+    }
 }

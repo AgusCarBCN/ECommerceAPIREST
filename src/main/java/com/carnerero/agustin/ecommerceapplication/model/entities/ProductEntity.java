@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 /*
  * Mapear en Hibernate es hacer que un objeto en memoria represente un registro de la tabla y
@@ -43,6 +44,21 @@ public class ProductEntity {
             throw new IllegalArgumentException("Insufficient stock for product: " + productCatalog.getProductName());
         }
         this.quantity -= quantity;
+    }
+    public void recalculateSubtotal() {
+        if (productCatalog == null || productCatalog.getDiscountPrice() == null) {
+            this.subtotalAmount = BigDecimal.ZERO;
+            return;
+        }
+
+        this.subtotalAmount = productCatalog.getDiscountPrice()
+                .multiply(BigDecimal.valueOf(this.quantity))
+                .setScale(2, RoundingMode.HALF_UP);
+    }
+    @PrePersist
+    @PreUpdate
+    private void onSave() {
+        recalculateSubtotal();
     }
 
 }
