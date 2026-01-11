@@ -23,9 +23,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -66,21 +63,6 @@ public class OrderServiceImpl implements OrderService {
             ProductCatalogEntity catalog = getProductCatalogById(p);
             order.addProduct(catalog, p.getQuantity());
         }
-            //Set shipping cost
-            order.setShippingCost(request.getShippingMethod());
-
-            var addCostOfShipping=order.getTotalAmount().add(order.getShippingAmount());
-
-            //Calculate tax amount
-            order.calculateTaxAmount(addCostOfShipping);
-
-            //Calculate total amount
-
-            var total=addCostOfShipping.add(order.getTaxAmount());
-            //Set total amount
-
-            order.setTotalAmount(total);
-
 
             // 5️⃣ Save
             OrderEntity savedOrder = orderRepository.save(order);

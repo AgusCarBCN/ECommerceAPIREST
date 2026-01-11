@@ -5,5 +5,6 @@ public enum OrderStatus {
     PENDING_PAYMENT,// Order is waiting for payment
     PAID,           // Payment has been successfully completed
     CANCELLED,      // Order has been cancelled by user or due to timeout
-    EXPIRED         // Order was not paid within the allowed time
+    EXPIRED,         // Order was not paid within the allowed time
+    REFUNDED
 }

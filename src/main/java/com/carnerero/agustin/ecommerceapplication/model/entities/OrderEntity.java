@@ -192,7 +192,7 @@ public class OrderEntity {
             product.addQuantity(quantity);
         }
         // 4️⃣ Recalcular totalAmount
-        this.recalculateSubTotalAmount();
+        this.recalculateTotalAmount();
     }
 
     public void removeProduct(ProductCatalogEntity catalog, int quantity) {
@@ -220,9 +220,10 @@ public class OrderEntity {
         catalog.restoreStock(quantity);
 
         // 5️⃣ Recalcular totalAmount
-        this.recalculateSubTotalAmount();
+        this.recalculateTotalAmount();
+
     }
-    public void recalculateSubTotalAmount() {
+    public void recalculateTotalAmount() {
 
         // 0️⃣ Eliminar productos inválidos
         this.products.removeIf(p -> p.getProductCatalog() == null);
@@ -232,8 +233,14 @@ public class OrderEntity {
                 .map(p -> p.getProductCatalog().getDiscountPrice()
                         .multiply(BigDecimal.valueOf(p.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-        this.totalAmount = subtotal;
 
+        //Add shipping cost to subtotal
+        this.setShippingCost(shippingMethod);
+        var addCostOfShipping=subtotal.add(this.shippingAmount);
+        //Calculate tax amount
+        this.calculateTaxAmount(addCostOfShipping);
+        //Calculate total amount
+        this.totalAmount= addCostOfShipping.add(subtotal);
     }
 
 
