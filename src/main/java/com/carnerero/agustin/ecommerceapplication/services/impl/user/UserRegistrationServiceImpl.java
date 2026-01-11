@@ -24,7 +24,7 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
-    private final PasswordEncoder passwordEncoder;
+    //private final PasswordEncoder passwordEncoder;
 
     @Override
     public UserResponseDTO registerUser(UserRequestDTO request) {
@@ -70,21 +70,8 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
         }
         UserEntity userEntity = userMapper.toUserEntity(request);
         var addresses=userEntity.getAddresses();
-        // Asignag rol de admin
-        if(isAdmin){
-            roles.add(RoleEntity.builder()
-                    .id(2L)
-                    .role(Roles.ADMIN)
-                    .build());
-        }
-        //Asignar rol de usuario
-        RoleEntity rol=RoleEntity.builder()
-                .id(1L)
-                .role(Roles.USER)
-                .build();
-        roles.add(rol);
-        userEntity.setRoles(roles);
-        userEntity.setPassword(passwordEncoder.encode(request.getPassword()));
+        userEntity.addRolesToUser(isAdmin);
+        userEntity.encodePassword(request.getPassword());
         // Lado dueño de la relación: asigna el usuario a cada dirección
         addresses.forEach(userEntity::addAddressSafe);
         UserEntity savedUser = userRepository.save(userEntity);

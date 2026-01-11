@@ -5,6 +5,7 @@ import com.carnerero.agustin.ecommerceapplication.dtos.requests.SuspensionReques
 import com.carnerero.agustin.ecommerceapplication.services.interfaces.user.UserAccountSettingService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,8 +31,9 @@ public class UserAccountSettingController {
      * @return a {@link ResponseEntity} with HTTP status 204 (No Content)
      */
     @PatchMapping("/deactivate")
-    public ResponseEntity<Void> deactivateUser(@RequestBody SuspensionRequestDTO reason) {
-        String email = Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName();
+    public ResponseEntity<Void> deactivatedUser(@RequestBody SuspensionRequestDTO reason,
+                                            Authentication authentication) {
+        String email = authentication.getName();
         useAccountSetting.deactivateAccount(email, reason.getReason());
         return ResponseEntity.noContent().build();
     }

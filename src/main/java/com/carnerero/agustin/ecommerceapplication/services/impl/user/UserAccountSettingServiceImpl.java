@@ -26,19 +26,33 @@ public class UserAccountSettingServiceImpl implements UserAccountSettingService 
 
     @Override
     public void activateAccount(String email) {
-        changeUserStatus(email,UserStatus.ACTIVE,"User active.","");
+        var user=userRepository.findByEmail(email).orElseThrow(()->new UserNotFoundException("User not found"));
+        user.activateUser();
     }
     @Override
     public void deactivateAccount(String email,
-                                             String reason) {
-        changeUserStatus(email,UserStatus.DEACTIVATED,"User deactivated.",reason);
+                                  String reason) {
+        var user=userRepository.findByEmail(email).orElseThrow(()->new UserNotFoundException("User not found"));
+        user.deactivateUser(reason);
     }
 
     @Override
-    public void suspendAccount(String email, String reason) {
-         changeUserStatus(email, UserStatus.SUSPENDED, "User suspended.", reason);
+    public void suspendAccount(String email, String reason,Long userId) {
+        //Verify if admin exists
+        userRepository.findByEmail(email).orElseThrow(()->new UserNotFoundException("Admin not found"));
+        //verify if user exists
+        var user = userRepository.findById(userId).orElseThrow(()->new UserNotFoundException("User not found"));
+        user.suspendUser();
     }
 
+    @Override
+    public void reactivateAccount(String email, Long userId) {
+        //Verify if admin exists
+        userRepository.findByEmail(email).orElseThrow(()->new UserNotFoundException("Admin not found"));
+        //verify if user exists
+        var user = userRepository.findById(userId).orElseThrow(()->new UserNotFoundException("User not found"));
+        user.reactivateUser();
+    }
 
 
     @Override
@@ -56,24 +70,5 @@ public class UserAccountSettingServiceImpl implements UserAccountSettingService 
     public void deleteProfileImage(Long userId) {
 
     }
-    private  void changeUserStatus(String email,
-                                              UserStatus status,
-                                              String description,
-                                              String reason){
-        //Search user by id
-        var updatedAt= LocalDateTime.now();
-        var user=userRepository.findByEmail(email).orElseThrow(()->new UserNotFoundException("User not found"));
-        var message=description;
-        //Activate status
-        user.setStatus(status);
-        user.setUpdatedAt(updatedAt);
-        if(!reason.isBlank()){
-            message+=reason;
-        }
-        user.setStatusDescription(message);
 
-        // Guardar cambios
-        UserEntity updatedUser = userRepository.save(user);
-
-    }
 }

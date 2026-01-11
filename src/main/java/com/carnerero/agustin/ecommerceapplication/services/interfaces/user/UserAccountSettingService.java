@@ -26,14 +26,21 @@ public interface UserAccountSettingService {
     void deactivateAccount(String email, String reason);
 
     /**
-     * Permanently suspends a user's account.
+     * Suspends a user's account.
      *
-     * @param email the user identifier
+     * @param email the admin user identifier
+     * @param userId the userId identifier
      * @param reason the reason for suspension
      */
-    void suspendAccount(String email, String reason);
+    void suspendAccount(String email, String reason,Long userId);
 
-
+    /**
+     * Reactivate account by admin
+     *
+     * @param email
+     * @param userId
+     */
+    void reactivateAccount(String email, Long userId);
     /**
      * Checks whether the user's account is currently active.
      *

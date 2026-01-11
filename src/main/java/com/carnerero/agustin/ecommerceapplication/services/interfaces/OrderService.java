@@ -36,8 +36,6 @@ public interface OrderService {
     PageResponse<OrderResponseDTO> getOrdersByUser(Integer numberOfPages,
                                                    String email);
 
-
-
     /**
      * Cancel an order.
      * This should handle stock restoration and payment reversal if needed.

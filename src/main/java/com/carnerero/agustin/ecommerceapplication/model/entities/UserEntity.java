@@ -1,10 +1,12 @@
 package com.carnerero.agustin.ecommerceapplication.model.entities;
 
+import com.carnerero.agustin.ecommerceapplication.model.enums.Roles;
 import com.carnerero.agustin.ecommerceapplication.model.enums.UserStatus;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
+
+import java.beans.Encoder;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -13,13 +15,13 @@ import java.util.List;
 import java.util.Set;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-
+import org.jspecify.annotations.Nullable;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
 import java.util.*;
 
-
+@Component
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
@@ -27,7 +29,7 @@ import java.util.*;
 @Slf4j
 @Entity
 @Table(name = "users")
-public class UserEntity implements UserDetails {
+public class UserEntity  {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_seq")
@@ -129,39 +131,66 @@ public class UserEntity implements UserDetails {
     // Utility methods
     // ---------------------------
     public void addAddressSafe(UserAddressEntity address) {
-        if (!addresses.contains(address)) {
-            addresses.add(address);
-        }
+        addresses.add(address);
         if (address.getUser() != this) {
             address.setUser(this); // asigna el lado dueño
         }
     }
-
-    public void deactivateUser() {
-        status = UserStatus.DEACTIVATED;
-        statusDescription = "User deactivated";
+    public void addRolesToUser(boolean isAdmin){
+        Set<RoleEntity>userRoles = new HashSet<>();
+        if(isAdmin){
+            var adminRol=(RoleEntity.builder()
+                    .id(2L)
+                    .role(Roles.ADMIN)
+                    .build());
+            userRoles.add(adminRol);
+        }
+        //Asignar rol de usuario
+        RoleEntity userRol=RoleEntity.builder()
+                .id(1L)
+                .role(Roles.USER)
+                .build();
+       userRoles.add(userRol);
+        this.roles=userRoles;
     }
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-
-        Collection<? extends GrantedAuthority> authorities =
-                getRoles().stream()
-                        .map(role -> new SimpleGrantedAuthority(role.getRole().toString())) // USER, ADMIN
-                        .toList();
-
-        // Debug usando log
-        authorities.forEach(a -> log.info("ROL CARGADO: {}", a.getAuthority()));
-
-        return authorities;
-
+    public void encodePassword(String password) {
+        var  passwordEncoder =new BCryptPasswordEncoder();
+        this.password= passwordEncoder.encode(password);
     }
-    @Transient // evita que JPA lo considere
-    @JsonIgnore // evita que MapStruct y Jackson lo usen
-    @Override
-    public String getUsername() {
-        return this.email;
+    public void deactivateUser(String reason) {
+        if(this.status==UserStatus.DEACTIVATED){
+            throw new IllegalStateException("User has been deactivated");
+        }
+
+        this.status = UserStatus.DEACTIVATED;
+        this.statusDescription = "User deactivated because "+reason;
+        this.updatedAt = LocalDateTime.now();
     }
-
-
-}
+    public void activateUser(){
+        if(this.status==UserStatus.ACTIVE){
+            throw new IllegalStateException("User has been activated");
+        }
+        if(this.status==UserStatus.SUSPENDED){
+            throw new IllegalStateException("Only an admin user can activate this account");
+        }
+        this.status = UserStatus.ACTIVE;
+        this.statusDescription = "User active";
+        this.updatedAt = LocalDateTime.now();
+    }
+    public void suspendUser(){
+        if(this.status==UserStatus.SUSPENDED){
+            throw new IllegalStateException("User has been suspended");
+        }
+        this.status = UserStatus.SUSPENDED;
+        this.statusDescription = "User suspended";
+        this.updatedAt = LocalDateTime.now();
+    }
+    public void reactivateUser(){
+        if(this.status==UserStatus.ACTIVE){
+            throw  new IllegalStateException("User has been activated");
+        }
+        this.status = UserStatus.ACTIVE;
+        this.statusDescription = "User active";
+        this.updatedAt = LocalDateTime.now();
+    }
+  }

@@ -4,6 +4,7 @@ import com.carnerero.agustin.ecommerceapplication.dtos.requests.SuspensionReques
 import com.carnerero.agustin.ecommerceapplication.services.interfaces.user.UserAccountSettingService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,24 +28,31 @@ public class AdminAccountSettingController {
      */
     @PatchMapping("/suspend")
     public ResponseEntity<Void> suspendUserById(
-            @RequestBody SuspensionRequestDTO reason
+            @RequestBody SuspensionRequestDTO reason,
+            @RequestParam Long userId,
+            Authentication authentication
+
     ) {
-        String email = Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName();
-        userAccountSettingService.deactivateAccount(email, reason.getReason());
+        String email = authentication.getName();
+        userAccountSettingService.suspendAccount(email, reason.getReason(),userId);
+        return ResponseEntity.noContent().build();
+    }
+    /**
+     * Reactivate a user account by admin.
+     *
+     * @param userId the userId reactivated by admin
+     * @return a {@link ResponseEntity} with HTTP status 204 (No Content)
+     */
+    @PatchMapping("/reactivate")
+    public ResponseEntity<Void> reactivateUserById(
+            @RequestParam Long userId,
+            Authentication authentication
+
+    ) {
+        String email = authentication.getName();
+        userAccountSettingService.reactivateAccount(email,userId);
         return ResponseEntity.noContent().build();
     }
 
-    /**
-     * Activates a previously deactivated or suspended user account.
-     * <p>
-     * Only admin users should perform this action.
-     * @return a {@link ResponseEntity} with HTTP status 204 (No Content)
-     */
-    @PatchMapping("/activate")
-    public ResponseEntity<Void> activatedUserById() {
-        String email = Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName();
-        userAccountSettingService.activateAccount(email);
-        return ResponseEntity.noContent().build();
-    }
 
 }
