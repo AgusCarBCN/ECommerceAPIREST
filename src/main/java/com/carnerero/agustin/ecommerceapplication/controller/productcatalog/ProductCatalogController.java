@@ -1,11 +1,14 @@
 package com.carnerero.agustin.ecommerceapplication.controller.productcatalog;
 
 
+import com.carnerero.agustin.ecommerceapplication.dtos.requests.ProductCatalogRequestDTO;
 import com.carnerero.agustin.ecommerceapplication.dtos.responses.PageResponse;
 import com.carnerero.agustin.ecommerceapplication.dtos.responses.ProductCatalogResponseDTO;
 import com.carnerero.agustin.ecommerceapplication.services.interfaces.productcatalog.ProductCatalogService;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -13,6 +16,7 @@ import java.util.UUID;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/products")
+@PreAuthorize("permitAll()")
 public class ProductCatalogController {
 
     private final ProductCatalogService productCatalogService;
@@ -118,5 +122,51 @@ public class ProductCatalogController {
         return ResponseEntity.ok(products);
     }
 
+
+    /**
+     * Create a new product in the system.
+     * This endpoint creates a new product and returns
+     * the created product's details along with relevant information.
+     *
+     * @param productCatalogRequestDTO the registration data for the product
+     * @return a {@link ResponseEntity} containing the created user and HTTP status 201 (Created)
+     */
+    @PostMapping("/addProduct")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ProductCatalogResponseDTO> addProduct(@RequestBody ProductCatalogRequestDTO productCatalogRequestDTO) {
+
+        var productResponse=productCatalogService.addProductCatalog(productCatalogRequestDTO);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(productResponse);
+
+    }
+    /**
+     * Delete new product in the system.
+     *
+     * @param productId the id for the product
+     * @return void
+     */
+
+    @DeleteMapping("/delete/{productId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> deleteProduct(@PathVariable UUID productId) {
+        productCatalogService.deleteProductCatalog(productId);
+        return ResponseEntity.noContent().build();
+    }
+    /**
+     * Update product in the system.
+     *
+     * @param productId the id for the product
+     *
+     * @return void
+     */
+    @PutMapping("/update/{productId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ProductCatalogResponseDTO> updateProduct(@PathVariable UUID productId,
+                                                                   @RequestBody ProductCatalogRequestDTO productCatalogRequestDTO) {
+        var updatedProduct= productCatalogService.updateProductCatalog(productCatalogRequestDTO, productId);
+        return ResponseEntity.ok(updatedProduct);
+    }
 
 }

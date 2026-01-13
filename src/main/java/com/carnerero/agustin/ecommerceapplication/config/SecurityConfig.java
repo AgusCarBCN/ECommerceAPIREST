@@ -9,12 +9,16 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
+@EnableWebSecurity
+@EnableMethodSecurity()
 @AllArgsConstructor
 public class SecurityConfig {
 
@@ -25,14 +29,14 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(csrf -> csrf.disable()) // APIs REST no necesitan CSRF
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/admin/**"). hasAuthority("ADMIN") // solo rol ADMIN
-                        .requestMatchers("/user/**"). hasAnyAuthority("USER","ADMIN") // solo rol USER
+               /* .authorizeHttpRequests(auth -> auth
+                      /*  .requestMatchers("/admin/**"). hasRole("ADMIN") // solo rol ADMIN
+                        .requestMatchers("/user/**"). hasAnyRole("USER","ADMIN") // solo rol USER
                         .requestMatchers("/products/**").permitAll()   // público
                         .requestMatchers("/register/**").permitAll()   // público
                         .requestMatchers("/login").permitAll()
-                        .anyRequest().authenticated()                  // resto requiere login
-                )
+                        .anyRequest().denyAll()                 // resto requiere login
+                )*/
                 .httpBasic(Customizer.withDefaults()) // Basic Auth por ahora
                 .build();
     }

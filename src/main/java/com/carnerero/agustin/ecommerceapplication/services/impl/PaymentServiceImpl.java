@@ -38,6 +38,9 @@ public class PaymentServiceImpl implements PaymentService {
         if (order.getPayment() != null) {
             throw new BusinessException("Order already paid");
         }
+        if(!order.isOrderPayable()){
+            throw new BusinessException("Order is not payable");
+        }
 
         PaymentEntity payment = PaymentEntity.builder()
                 .paymentMethod(paymentRequest.getPaymentMethod())

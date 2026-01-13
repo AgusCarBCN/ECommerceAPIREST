@@ -10,6 +10,7 @@ import com.carnerero.agustin.ecommerceapplication.services.interfaces.OrderServi
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,12 +18,14 @@ import java.security.Principal;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/user/orders")
+@RequestMapping("/orders")
+@PreAuthorize("denyAll()")
 public class OrderController {
 
     private final OrderService orderService;
 
     @PostMapping
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<OrderResponseDTO> createOrder(@RequestBody OrderRequestDTO orderRequestDTO,
                                                         Authentication authentication) {
 
@@ -31,6 +34,7 @@ public class OrderController {
                 .body(response);
     }
     @GetMapping("/by-user")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<PageResponse<OrderResponseDTO>> getOrdersByUser(@RequestParam Integer page,
                                                                           Authentication authentication   )
     {
@@ -40,6 +44,7 @@ public class OrderController {
     }
 
     @PatchMapping("/cancel")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<OrderResponseDTO> cancelOrder(@RequestParam Long orderId,
                                                         Authentication authentication
     )  {
@@ -48,6 +53,7 @@ public class OrderController {
                 .body(response);
     }
     @PutMapping("/update")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<OrderResponseDTO> updateOrder(@RequestParam Long orderId,
                                                         @RequestParam boolean isAdd,
                                                         @RequestBody ListOfProductsRequestsDTO requestDTO) {

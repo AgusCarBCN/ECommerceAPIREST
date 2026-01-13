@@ -9,12 +9,14 @@ import com.carnerero.agustin.ecommerceapplication.services.interfaces.user.UserQ
 import lombok.AllArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping(path="admin/search-users")
+@RequestMapping(path="/search-users")
+@PreAuthorize("hasRole('ADMIN')")
 public class UserQueriesController {
     private final UserQueryService useCase;
 

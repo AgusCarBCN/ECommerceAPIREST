@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -27,19 +28,13 @@ public class ProductCatalogEntity {
     private String description;
 
     @Column(nullable = false)
-    private BigDecimal price = BigDecimal.ZERO;
+    private BigDecimal price;
 
-    @Column(
-            name = "discount_price",
-            precision = 10,
-            scale = 2,
-            insertable = false,
-            updatable = false
-    )
+    @Column(insertable = false,updatable = false, name = "discount_price")
     private BigDecimal discountPrice;
 
     @Column(nullable = false)
-    private BigDecimal discountPercentage = BigDecimal.ZERO;
+    private BigDecimal discountPercentage=BigDecimal.ZERO;
 
     @Column(name="stock_quantity",nullable = false)
     private Integer stockQuantity;
@@ -69,11 +64,13 @@ public class ProductCatalogEntity {
     @PrePersist
     public void prePersist() {
         this.createdAt = LocalDateTime.now();
+
     }
 
     @PreUpdate
     public void preUpdate() {
         this.updatedAt = LocalDateTime.now();
+
     }
 
     public void restoreStock(int quantity) {

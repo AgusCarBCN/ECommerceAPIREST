@@ -8,6 +8,8 @@ import com.carnerero.agustin.ecommerceapplication.services.interfaces.user.UserU
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -16,6 +18,7 @@ import java.io.IOException;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/user/update")
+@PreAuthorize("hasRole('USER')")
 public class UserUpdateController {
 
     private final UserUpdateService userUpdateService;
@@ -27,16 +30,16 @@ public class UserUpdateController {
      *
      * Example request: PATCH /users/{userId}
      *
-     * @param userId the identifier of the user to update
+     * @param authentication
      * @param request the fields to update wrapped in {@link UpdateUserRequestDTO}
      * @return a {@link ResponseEntity} containing the updated user and HTTP status 200 (OK)
      */
-    @PatchMapping("/{userId}")
+    @PatchMapping()
     public ResponseEntity<UserResponseDTO> updateUser(
-            @PathVariable Long userId,
-            @RequestBody UpdateUserRequestDTO request
+            @RequestBody UpdateUserRequestDTO request,
+            Authentication authentication
     ) {
-        UserResponseDTO updatedUser = userUpdateService.updateUserFields(userId, request);
+        UserResponseDTO updatedUser = userUpdateService.updateUserFields(authentication.getName(), request);
         return ResponseEntity.ok(updatedUser);
     }
 
@@ -48,18 +51,18 @@ public class UserUpdateController {
      *
      * Example request: PUT /users/{userId}/addresses/{addressId}
      *
-     * @param userId the identifier of the user
+     * @param authentication
      * @param addressId the identifier of the address to update
      * @param request the new address data wrapped in {@link UserAddressRequestDTO}
      * @return a {@link ResponseEntity} containing the updated user and HTTP status 200 (OK)
      */
-    @PutMapping("/{userId}/addresses/{addressId}")
+    @PutMapping("/addresses/{addressId}")
     public ResponseEntity<UserResponseDTO> updateUserAddress(
-            @PathVariable Long userId,
             @PathVariable Long addressId,
-            @RequestBody UserAddressRequestDTO request
+            @RequestBody UserAddressRequestDTO request,
+            Authentication authentication
     ) {
-        UserResponseDTO updatedUser = userUpdateService.updateUserAddress(userId, addressId, request);
+        UserResponseDTO updatedUser = userUpdateService.updateUserAddress(authentication.getName(), addressId, request);
         return ResponseEntity.ok(updatedUser);
     }
 

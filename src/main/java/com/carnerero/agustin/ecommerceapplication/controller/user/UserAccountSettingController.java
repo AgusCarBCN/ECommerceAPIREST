@@ -5,6 +5,7 @@ import com.carnerero.agustin.ecommerceapplication.dtos.requests.SuspensionReques
 import com.carnerero.agustin.ecommerceapplication.services.interfaces.user.UserAccountSettingService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +15,7 @@ import java.util.Objects;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/user")
+@PreAuthorize("hasRole('USER')")
 public class UserAccountSettingController {
 
     private final UserAccountSettingService useAccountSetting;

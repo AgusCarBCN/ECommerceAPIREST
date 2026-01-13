@@ -10,11 +10,13 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @AllArgsConstructor
 @RequestMapping
+@PreAuthorize("permitAll()")
 public class UserRegistrationController {
 
     private UserRegistrationService useCase;
@@ -53,8 +55,6 @@ public class UserRegistrationController {
       }
 
 
-
-
     /**
      * Registers a new admin user in the system.
      * <p>
@@ -67,6 +67,7 @@ public class UserRegistrationController {
      * @return a {@link ResponseEntity} containing the created admin user and HTTP status 201 (Created)
      */
     @PostMapping("/register/admin")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserResponseDTO> registerAdmin(
             @RequestBody UserRequestDTO userRequestDTO
     ) {

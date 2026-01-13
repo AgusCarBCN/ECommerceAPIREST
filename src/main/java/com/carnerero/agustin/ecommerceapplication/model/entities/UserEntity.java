@@ -6,20 +6,15 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
-import java.beans.Encoder;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import jakarta.persistence.*;
-import lombok.*;
-import org.jspecify.annotations.Nullable;
+
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-import java.util.*;
 
 @Component
 @AllArgsConstructor
@@ -141,14 +136,14 @@ public class UserEntity  {
         if(isAdmin){
             var adminRol=(RoleEntity.builder()
                     .id(2L)
-                    .role(Roles.ADMIN)
+                    .role(Roles.ROLE_ADMIN)
                     .build());
             userRoles.add(adminRol);
         }
         //Asignar rol de usuario
         RoleEntity userRol=RoleEntity.builder()
                 .id(1L)
-                .role(Roles.USER)
+                .role(Roles.ROLE_USER)
                 .build();
        userRoles.add(userRol);
         this.roles=userRoles;

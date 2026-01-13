@@ -12,13 +12,13 @@ public interface UserUpdateService {
     /**
      * Updates a user's address.
      *
-     * @param userId the user identifier
+     * @param email the user's email
      * @param addressId the identifier of the address to update
      * @param request the new address data
      * @return the updated user profile
      */
     UserResponseDTO updateUserAddress(
-            Long userId,
+            String email,
             Long addressId,
             UserAddressRequestDTO request
     );
@@ -26,12 +26,12 @@ public interface UserUpdateService {
     /**
      * Updates user profile fields (contact and personal information).
      *
-     * @param userId the user identifier
+     * @param email the user's email
      * @param request the fields to be updated
      * @return the updated user profile
      */
     UserResponseDTO updateUserFields(
-            Long userId,
+            String email,
             UpdateUserRequestDTO request
     );
 

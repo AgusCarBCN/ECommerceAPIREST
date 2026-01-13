@@ -8,6 +8,7 @@ import com.carnerero.agustin.ecommerceapplication.services.interfaces.PaymentSer
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,12 +16,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/user/payment")
+@RequestMapping("/payment")
+@PreAuthorize("denyAll()")
 public class PaymentController {
 
     private final PaymentService paymentService;
 
     @PostMapping("/create")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<PaymentResponseDTO> createPayment(@RequestBody PaymentRequestDTO paymentRequestDTO) {
 
         var response=paymentService.createPayment(paymentRequestDTO);

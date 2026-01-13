@@ -141,12 +141,18 @@ public class OrderEntity {
         }
     }
 
+
+
+    // OrderEntity
+    public boolean isCancelableByClient() {
+        return status == OrderStatus.CREATED || status == OrderStatus.PENDING_PAYMENT;
+    }
+
     // ---------------------------
     // Cancel order safely
     // ---------------------------
-    public void cancelOrder() {
+    public void cancelByClient() {
         this.status = OrderStatus.CANCELLED;
-
         // Optionally update payment
         if (payment != null) {
             payment.setPaymentStatus(PaymentStatus.CANCELLED);
@@ -157,15 +163,6 @@ public class OrderEntity {
             bill.setStatus(BillStatus.CANCELLED);
         }
     }
-    // OrderEntity
-    public boolean isCancelableByClient() {
-        return status == OrderStatus.CREATED || status == OrderStatus.PENDING_PAYMENT;
-    }
-
-    public void cancelByClient() {
-        this.status = OrderStatus.CANCELLED;
-    }
-
 
     public void addProduct(ProductCatalogEntity catalog, int quantity) {
         // 0️⃣ Limpiar productos corruptos
@@ -238,11 +235,10 @@ public class OrderEntity {
         this.setShippingCost(shippingMethod);
         var addCostOfShipping=subtotal.add(this.shippingAmount);
         //Calculate tax amount
-        this.calculateTaxAmount(addCostOfShipping);
+        calculateTaxAmount(addCostOfShipping);
         //Calculate total amount
-        this.totalAmount= addCostOfShipping.add(subtotal);
+        this.totalAmount=addCostOfShipping.add(this.taxAmount);
     }
-
 
     public void setShippingCost(ShippingMethod method) {
         this.setShippingAmount(method.getPrice());
@@ -250,5 +246,8 @@ public class OrderEntity {
     public void calculateTaxAmount(BigDecimal amount) {
         BigDecimal tax = amount.multiply(AppConstants.TAX_RATE);
         this.setTaxAmount(tax);
+    }
+    public boolean isOrderPayable(){
+        return this.status == OrderStatus.CREATED;
     }
 }

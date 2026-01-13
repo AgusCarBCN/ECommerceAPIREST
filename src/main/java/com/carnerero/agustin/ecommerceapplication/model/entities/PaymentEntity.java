@@ -1,5 +1,7 @@
 package com.carnerero.agustin.ecommerceapplication.model.entities;
 
+import com.carnerero.agustin.ecommerceapplication.exception.user.BusinessException;
+import com.carnerero.agustin.ecommerceapplication.model.enums.OrderStatus;
 import com.carnerero.agustin.ecommerceapplication.model.enums.PaymentMethod;
 import com.carnerero.agustin.ecommerceapplication.model.enums.PaymentStatus;
 import jakarta.persistence.*;
@@ -58,11 +60,38 @@ public class PaymentEntity {
     // Helper method to cancel payment
     // ---------------------------
     public void cancelPayment() {
+
+        if (this.paymentStatus == PaymentStatus.CANCELLED) {
+            throw new BusinessException("This payment has already been cancelled.");
+        }
+
+        if (this.paymentStatus == PaymentStatus.SUCCESS) {
+            throw new BusinessException("A successful payment cannot be cancelled.");
+        }
+
+        if (this.paymentStatus == PaymentStatus.FAILED) {
+            throw new BusinessException("A failed payment cannot be cancelled.");
+        }
+
         this.paymentStatus = PaymentStatus.CANCELLED;
+
     }
+
 
     // Optional: mark as refunded
     public void refundPayment() {
+        if (this.paymentStatus == PaymentStatus.REFUNDED) {
+            throw new BusinessException("This payment has already been refunded.");
+        }
+
+        if (this.paymentStatus == PaymentStatus.PENDING) {
+            throw new BusinessException("A pending payment cannot be refunded.");
+        }
+
+        if (this.paymentStatus == PaymentStatus.FAILED) {
+            throw new BusinessException("A failed payment cannot be cancelled.");
+        }
+
         this.paymentStatus = PaymentStatus.REFUNDED;
     }
 
@@ -79,4 +108,5 @@ public class PaymentEntity {
     public void calculateAmount(){
 
     }
+
 }

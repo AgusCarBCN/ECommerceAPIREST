@@ -5,12 +5,14 @@ import com.carnerero.agustin.ecommerceapplication.services.interfaces.BillServic
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/user/bill")
+@RequestMapping("/bill")
+@PreAuthorize("hasRole('USER')")
 public class BillController {
 
     private final BillService billService;

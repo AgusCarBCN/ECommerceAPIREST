@@ -106,6 +106,7 @@ public class OrderServiceImpl implements OrderService {
             throw new IllegalStateException("Order cannot be canceled");
         }
 
+
         // 3️⃣ Restaurar stock
         for (ProductEntity product : order.getProducts()) {
             var productCatalog=product.getProductCatalog();

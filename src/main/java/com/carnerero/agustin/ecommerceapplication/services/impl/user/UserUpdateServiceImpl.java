@@ -19,7 +19,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Service
-@Transactional()
+@Transactional
 @AllArgsConstructor
 public class UserUpdateServiceImpl implements UserUpdateService {
 
@@ -28,13 +28,13 @@ public class UserUpdateServiceImpl implements UserUpdateService {
     private final UserMapper userMapper;
 
     @Override
-    public UserResponseDTO updateUserAddress(Long userId,
+    public UserResponseDTO updateUserAddress(String email,
                                              Long userAddressId,
                                              UserAddressRequestDTO request) {
         // 1️⃣ Buscar usuario
-        UserEntity user = userRepository.findById(userId)
+        UserEntity user = userRepository.findByEmail(email)
                 .orElseThrow(() ->
-                        new UserNotFoundException("User not found with ID " + userId));
+                        new UserNotFoundException("User not found with ID " + email));
         var addresses = user.getAddresses();
         // 2️⃣ Buscar dirección
         UserAddressEntity address = userAddressRespository.findById(userAddressId)
@@ -72,10 +72,10 @@ public class UserUpdateServiceImpl implements UserUpdateService {
 
 
     @Override
-    @Transactional
-    public UserResponseDTO updateUserFields(Long userId, UpdateUserRequestDTO request) {
-        UserEntity user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User not found with ID " + userId));
+
+    public UserResponseDTO updateUserFields(String email, UpdateUserRequestDTO request) {
+        UserEntity user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("User not found with ID " + email));
 
         if (request.getName() != null) user.setName(request.getName());
         if (request.getSurname() != null) user.setSurname(request.getSurname());
