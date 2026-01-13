@@ -15,9 +15,13 @@ import com.carnerero.agustin.ecommerceapplication.services.interfaces.PaymentSer
 import com.carnerero.agustin.ecommerceapplication.util.mapper.PaymentMapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.carnerero.agustin.ecommerceapplication.model.entities.PaymentEntity;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @Transactional
@@ -81,22 +85,13 @@ public class PaymentServiceImpl implements PaymentService {
 
     }
 
-    @Override
-    public PaymentResponseDTO updatePaymentStatus(Long paymentId, PaymentStatus newStatus) {
-        var payment=paymentRepository.findById(paymentId).orElseThrow(()->new RuntimeException("Payment not found"));
-        payment.setPaymentStatus(newStatus);       //Guardar cambios
-
-        //paymentRepository.save(payment);
-        return paymentMapper.toPaymentResponseDTO(payment);
-    }
 
     @Override
-    public PaymentResponseDTO getPaymentsByOrder(Long orderId) {
-        //Verify if order exists
-        var order=orderRepository.findById(orderId).orElseThrow(()->new RuntimeException("Order not found"));
+    public List<PaymentResponseDTO> getUserPayments(String email) {
 
-        var payment=paymentRepository.findByOrderId(orderId);
-        return paymentMapper.toPaymentResponseDTO(payment);
+        var payments= paymentRepository.findPaymentsByUserEmail(email);
+        return payments.stream().map(paymentMapper::toPaymentResponseDTO).toList();
+
 
     }
 }

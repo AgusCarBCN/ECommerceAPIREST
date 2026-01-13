@@ -5,6 +5,8 @@ import com.carnerero.agustin.ecommerceapplication.dtos.responses.PageResponse;
 import com.carnerero.agustin.ecommerceapplication.dtos.responses.PaymentResponseDTO;
 import com.carnerero.agustin.ecommerceapplication.model.enums.PaymentStatus;
 
+import java.util.List;
+
 public interface PaymentService {
 
     /**
@@ -15,18 +17,12 @@ public interface PaymentService {
      */
     PaymentResponseDTO createPayment(PaymentRequestDTO paymentRequest);
 
-    /**
-     * Update the status of a payment (e.g., PENDING → PAID, FAILED, REFUNDED)
-     * @param paymentId ID of the payment
-     * @param newStatus new payment status
-     * @return updated PaymentResponseDTO
-     */
-    PaymentResponseDTO updatePaymentStatus(Long paymentId, PaymentStatus newStatus);
+
 
     /**
      * Retrieve all payments associated with a specific order.
-     * @param orderId ID of the order
+     * @param email the email of the order
      * @return PageResponse of PaymentResponseDTO
      */
-    PaymentResponseDTO getPaymentsByOrder(Long orderId);
+    List<PaymentResponseDTO> getUserPayments(String email);
 }
