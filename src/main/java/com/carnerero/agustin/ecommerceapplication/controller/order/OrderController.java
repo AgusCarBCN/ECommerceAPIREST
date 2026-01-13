@@ -19,13 +19,12 @@ import java.security.Principal;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/orders")
-@PreAuthorize("denyAll()")
+@PreAuthorize("hasRole('USER')")
 public class OrderController {
 
     private final OrderService orderService;
 
     @PostMapping
-    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<OrderResponseDTO> createOrder(@RequestBody OrderRequestDTO orderRequestDTO,
                                                         Authentication authentication) {
 
@@ -34,7 +33,6 @@ public class OrderController {
                 .body(response);
     }
     @GetMapping("/by-user")
-    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<PageResponse<OrderResponseDTO>> getOrdersByUser(@RequestParam Integer page,
                                                                           Authentication authentication   )
     {
@@ -44,7 +42,6 @@ public class OrderController {
     }
 
     @PatchMapping("/cancel")
-    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<OrderResponseDTO> cancelOrder(@RequestParam Long orderId,
                                                         Authentication authentication
     )  {
@@ -53,7 +50,6 @@ public class OrderController {
                 .body(response);
     }
     @PutMapping("/update")
-    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<OrderResponseDTO> updateOrder(@RequestParam Long orderId,
                                                         @RequestParam boolean isAdd,
                                                         @RequestBody ListOfProductsRequestsDTO requestDTO) {

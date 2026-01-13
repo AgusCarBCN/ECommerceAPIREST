@@ -250,4 +250,24 @@ public class OrderEntity {
     public boolean isOrderPayable(){
         return this.status == OrderStatus.CREATED;
     }
+    public void addSuccessfulPayment(PaymentEntity payment) {
+        this.payment = payment;
+        this.payment.completePayment();
+        this.status = OrderStatus.PAID;
+
+        this.bill = BillEntity.builder()
+                .status(BillStatus.ACTIVE)
+                .totalAmount(this.totalAmount)
+                .shippingAmount(this.shippingAmount)
+                .taxAmount(this.taxAmount)
+                .order(this)
+                .build();
+
+    }
+
+    public void addFailedPayment(PaymentEntity payment) {
+        this.payment = payment;
+        this.payment.failPayment();
+        this.status = OrderStatus.PENDING_PAYMENT;
+    }
 }

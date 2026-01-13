@@ -1,6 +1,7 @@
 package com.carnerero.agustin.ecommerceapplication.services.impl;
 
 import com.carnerero.agustin.ecommerceapplication.dtos.requests.PaymentRequestDTO;
+import com.carnerero.agustin.ecommerceapplication.dtos.responses.PageResponse;
 import com.carnerero.agustin.ecommerceapplication.dtos.responses.PaymentResponseDTO;
 import com.carnerero.agustin.ecommerceapplication.exception.user.BusinessException;
 import com.carnerero.agustin.ecommerceapplication.model.entities.BillEntity;
@@ -12,16 +13,21 @@ import com.carnerero.agustin.ecommerceapplication.repository.BillRepository;
 import com.carnerero.agustin.ecommerceapplication.repository.OrderRepository;
 import com.carnerero.agustin.ecommerceapplication.repository.PaymentRepository;
 import com.carnerero.agustin.ecommerceapplication.services.interfaces.PaymentService;
+import com.carnerero.agustin.ecommerceapplication.util.helper.Sort;
+import com.carnerero.agustin.ecommerceapplication.util.mapper.PageResponseMapper;
 import com.carnerero.agustin.ecommerceapplication.util.mapper.PaymentMapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.carnerero.agustin.ecommerceapplication.model.entities.PaymentEntity;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @Transactional
@@ -33,6 +39,13 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentRepository paymentRepository;
     private final PaymentMapper paymentMapper;
     private final PaymentSimulationService paymentSimulationService;
+    private final static Set<String> allowedPaymentFields = Set.of(
+            "amount",
+            "createdAt",
+            "updatedAt"
+    );
+
+
     @Override
     public PaymentResponseDTO createPayment(PaymentRequestDTO paymentRequest) {
 
@@ -55,27 +68,12 @@ public class PaymentServiceImpl implements PaymentService {
         // Simular pago
         boolean success = paymentSimulationService.simulatePayment(paymentRequest);
 
-        // Actualizar estado del pago y de la orden según resultado
-        if (success) {
-            payment.completePayment();
-            order.setStatus(OrderStatus.PAID);
-            //Crear factura
-            BillEntity bill=BillEntity.builder()
-                    .status(BillStatus.ACTIVE)
-                    .totalAmount(order.getTotalAmount())
-                    .shippingAmount(order.getShippingAmount())
-                    .taxAmount(order.getTaxAmount())
-                    .order(order)
-                    .build();
-            billRepository.save(bill);
-            order.setBill(bill);
-        } else {
-            payment.failPayment();
-            order.setStatus(OrderStatus.PENDING_PAYMENT);
+        if(success){
+            order.addSuccessfulPayment(payment);
+            billRepository.save(order.getBill());
+        }else{
+            order.addFailedPayment(payment);
         }
-
-        // Asignar pago a la orden
-        order.setPayment(payment);
 
         // Guardar pago en DB
         paymentRepository.save(payment);
@@ -87,11 +85,14 @@ public class PaymentServiceImpl implements PaymentService {
 
 
     @Override
-    public List<PaymentResponseDTO> getUserPayments(String email) {
-
-        var payments= paymentRepository.findPaymentsByUserEmail(email);
-        return payments.stream().map(paymentMapper::toPaymentResponseDTO).toList();
-
-
+    public PageResponse<PaymentResponseDTO> getUserPayments(String email,
+                                                            String field,
+                                                            Boolean desc,
+                                                            Integer numberOfPages) {
+        final var sorting= Sort.getSort(field,desc,allowedPaymentFields);
+        var page=paymentRepository.findPaymentsByUserEmail(email,
+                        PageRequest.of(numberOfPages, Sort.PAGE_SIZE, sorting))
+                .map(paymentMapper::toPaymentResponseDTO);
+        return PageResponseMapper.mapToPageResponse(page);
     }
 }

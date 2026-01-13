@@ -4,7 +4,10 @@ import com.carnerero.agustin.ecommerceapplication.dtos.requests.PaymentRequestDT
 import com.carnerero.agustin.ecommerceapplication.dtos.responses.PageResponse;
 import com.carnerero.agustin.ecommerceapplication.dtos.responses.PaymentResponseDTO;
 import com.carnerero.agustin.ecommerceapplication.model.enums.PaymentStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface PaymentService {
@@ -24,5 +27,8 @@ public interface PaymentService {
      * @param email the email of the order
      * @return PageResponse of PaymentResponseDTO
      */
-    List<PaymentResponseDTO> getUserPayments(String email);
+    PageResponse<PaymentResponseDTO> getUserPayments(String email,
+                                             String field,
+                                             Boolean desc,
+                                             Integer numberOfPages);
 }
