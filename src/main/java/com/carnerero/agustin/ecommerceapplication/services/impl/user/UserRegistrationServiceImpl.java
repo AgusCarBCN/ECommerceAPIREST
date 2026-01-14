@@ -1,18 +1,16 @@
 package com.carnerero.agustin.ecommerceapplication.services.impl.user;
 
-import com.carnerero.agustin.ecommerceapplication.dtos.requests.LoginRequestDTO;
+import com.carnerero.agustin.ecommerceapplication.dtos.requests.AuthRequestDTO;
 import com.carnerero.agustin.ecommerceapplication.dtos.requests.UserRequestDTO;
 import com.carnerero.agustin.ecommerceapplication.dtos.responses.UserResponseDTO;
 import com.carnerero.agustin.ecommerceapplication.exception.user.BusinessException;
 import com.carnerero.agustin.ecommerceapplication.model.entities.RoleEntity;
 import com.carnerero.agustin.ecommerceapplication.model.entities.UserEntity;
-import com.carnerero.agustin.ecommerceapplication.model.enums.Roles;
 import com.carnerero.agustin.ecommerceapplication.repository.UserRepository;
 import com.carnerero.agustin.ecommerceapplication.services.interfaces.user.UserRegistrationService;
 import com.carnerero.agustin.ecommerceapplication.util.mapper.UserMapper;
 
 import lombok.AllArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.HashSet;
@@ -37,7 +35,7 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
     }
 
     @Override
-    public void login(LoginRequestDTO loginRequest) {
+    public void login(AuthRequestDTO loginRequest) {
         // Find user by username or email
         UserEntity user = userRepository.findByEmail(
                 loginRequest.getEmail()).orElseThrow(() -> new BusinessException("User not found"));

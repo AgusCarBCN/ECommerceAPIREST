@@ -1,17 +1,27 @@
 package com.carnerero.agustin.ecommerceapplication.controller.user;
 
 
-import com.carnerero.agustin.ecommerceapplication.dtos.requests.LoginRequestDTO;
+import com.carnerero.agustin.ecommerceapplication.dtos.requests.AuthRequestDTO;
 import com.carnerero.agustin.ecommerceapplication.dtos.requests.UserRequestDTO;
-import com.carnerero.agustin.ecommerceapplication.dtos.responses.LoginResponseDTO;
+import com.carnerero.agustin.ecommerceapplication.dtos.responses.AuthResponse;
 import com.carnerero.agustin.ecommerceapplication.dtos.responses.UserResponseDTO;
+import com.carnerero.agustin.ecommerceapplication.security.JwtService;
 import com.carnerero.agustin.ecommerceapplication.services.interfaces.user.UserRegistrationService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.stream.Collectors;
 
 @RestController
 @AllArgsConstructor
@@ -19,8 +29,9 @@ import org.springframework.web.bind.annotation.*;
 @PreAuthorize("permitAll()")
 public class UserRegistrationController {
 
-    private UserRegistrationService useCase;
-
+    private UserRegistrationService registrationService;
+    private AuthenticationManager authenticationManager;
+    private JwtService jwtService;
     /**
      * Registers a new user in the system.
      * <p>
@@ -36,7 +47,7 @@ public class UserRegistrationController {
     public ResponseEntity<UserResponseDTO> registerUser(
             @RequestBody UserRequestDTO userRequestDTO
     ) {
-        UserResponseDTO response = useCase.registerUser(userRequestDTO);
+        UserResponseDTO response = registrationService.registerUser(userRequestDTO);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(response);
@@ -45,13 +56,37 @@ public class UserRegistrationController {
        /**
        * POST /api/auth/login
        * Authenticate a user and return user info (optionally token)
-       * @param loginRequest DTO containing username/email and password
+       * @param request DTO containing username/email and password
        * @return AuthResponseDTO with user info and optional token
        */
       @PostMapping("/login")
-      public ResponseEntity<Void> login(@RequestBody @Valid LoginRequestDTO loginRequest) {
-          useCase.login(loginRequest);
-          return ResponseEntity.noContent().build();
+      public ResponseEntity<AuthResponse> login(@RequestBody @Valid AuthRequestDTO request) {
+          // 1️⃣ Autenticación del usuario
+          Authentication authentication = authenticationManager.authenticate(
+                  new UsernamePasswordAuthenticationToken(
+                          request.getEmail(),
+                          request.getPassword()
+                  )
+          );
+
+          // 2️⃣ Guardar en el contexto de seguridad
+          SecurityContextHolder.getContext().setAuthentication(authentication);
+
+          // 3️⃣ Generar token JWT
+          UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+          String jwt = jwtService.generateToken(userDetails);
+
+          // 4️⃣ Crear response DTO
+          AuthResponse response = AuthResponse.builder()
+                  .token(jwt)
+                  .userName(userDetails.getUsername())
+                  .roles(userDetails.getAuthorities().stream()
+                          .map(GrantedAuthority::getAuthority)
+                          .collect(Collectors.toList())).build();
+
+
+          // 5️⃣ Devolver respuesta
+          return ResponseEntity.ok(response);
       }
 
 
@@ -71,7 +106,7 @@ public class UserRegistrationController {
     public ResponseEntity<UserResponseDTO> registerAdmin(
             @RequestBody UserRequestDTO userRequestDTO
     ) {
-        UserResponseDTO response = useCase.registerAdminUser(userRequestDTO);
+        UserResponseDTO response = registrationService.registerAdminUser(userRequestDTO);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(response);

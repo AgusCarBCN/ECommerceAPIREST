@@ -1,8 +1,7 @@
 package com.carnerero.agustin.ecommerceapplication.services.interfaces.user;
 
-import com.carnerero.agustin.ecommerceapplication.dtos.requests.LoginRequestDTO;
+import com.carnerero.agustin.ecommerceapplication.dtos.requests.AuthRequestDTO;
 import com.carnerero.agustin.ecommerceapplication.dtos.requests.UserRequestDTO;
-import com.carnerero.agustin.ecommerceapplication.dtos.responses.LoginResponseDTO;
 import com.carnerero.agustin.ecommerceapplication.dtos.responses.UserResponseDTO;
 import com.carnerero.agustin.ecommerceapplication.exception.user.UserExistException;
 
@@ -33,7 +32,7 @@ public interface UserRegistrationService {
      * @throws UserExistException if the user already exists in the system
      */
 
-    public void login(LoginRequestDTO loginRequest);
+    public void login(AuthRequestDTO loginRequest);
     /**
      * Resends the account verification email.
      *
