@@ -8,7 +8,7 @@ CREATE SEQUENCE categories_seq START 1;
 CREATE SEQUENCE orders_seq START 1;
 CREATE SEQUENCE payments_seq START 1;
 CREATE SEQUENCE product_seq START 1;
-
+CREATE SEQUENCE refresh_seq START 1;
 -- ==============================================
 -- ROLES
 -- ==============================================
@@ -33,6 +33,19 @@ CREATE TABLE users
     updated_at         TIMESTAMP                    DEFAULT CURRENT_TIMESTAMP,
     status             VARCHAR(30)         NOT NULL DEFAULT 'ACTIVE',
     status_description VARCHAR(255)
+);
+-- ==============================================
+-- REFRESH TOKEN
+-- ==============================================
+CREATE TABLE refresh_tokens (
+                                id                 BIGINT PRIMARY KEY           DEFAULT nextval('refresh_seq'),
+                                token VARCHAR(255) NOT NULL UNIQUE,
+                                user_id BIGINT NOT NULL,
+                                expiry_date TIMESTAMP NOT NULL,
+                                CONSTRAINT fk_refresh_tokens_user
+                                    FOREIGN KEY (user_id)
+                                        REFERENCES users(id)
+                                        ON DELETE CASCADE
 );
 
 -- ==============================================
