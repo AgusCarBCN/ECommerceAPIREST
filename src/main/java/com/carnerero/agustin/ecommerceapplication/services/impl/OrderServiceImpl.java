@@ -124,8 +124,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderResponseDTO modifyOrder(
             Long orderId,
-            ListOfProductsRequestsDTO request,
-            boolean isAdd
+            ListOfProductsRequestsDTO request
     ) {
         // 1️⃣ Cargar la orden
         OrderEntity order = orderRepository.findByIdWithProducts(orderId)

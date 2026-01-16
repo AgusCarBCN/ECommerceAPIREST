@@ -48,7 +48,7 @@ public interface OrderService {
      * @param orderId the ID of the order
      * @param requestsDTO the requests of the product to add to order
      */
-    OrderResponseDTO modifyOrder(Long orderId, ListOfProductsRequestsDTO requestsDTO, boolean isAdd);
+    OrderResponseDTO modifyOrder(Long orderId, ListOfProductsRequestsDTO requestsDTO);
 
 
 

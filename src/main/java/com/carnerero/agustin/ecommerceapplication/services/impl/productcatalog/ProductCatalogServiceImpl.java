@@ -140,6 +140,7 @@ public class ProductCatalogServiceImpl implements ProductCatalogService {
         Optional.ofNullable(request.getProductName()).ifPresent(product::setProductName);
         Optional.ofNullable(request.getDescription()).ifPresent(product::setDescription);
         Optional.ofNullable(request.getPrice()).ifPresent(product::setPrice);
+        Optional.ofNullable(request.getDiscountPercentage()).ifPresent(product::setDiscountPercentage);
         Optional.ofNullable(request.getStockQuantity()).ifPresent(product::setStockQuantity);
         if (request.getCategories() != null) {
             var categoriesEntity = request.getCategories()

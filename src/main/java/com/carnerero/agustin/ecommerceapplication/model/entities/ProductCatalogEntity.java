@@ -34,7 +34,7 @@ public class ProductCatalogEntity {
     private BigDecimal discountPrice;
 
     @Column(nullable = false)
-    private BigDecimal discountPercentage=BigDecimal.ZERO;
+    private BigDecimal discountPercentage;
 
     @Column(name="stock_quantity",nullable = false)
     private Integer stockQuantity;
