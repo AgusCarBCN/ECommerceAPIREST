@@ -1,11 +1,12 @@
 package com.carnerero.agustin.ecommerceapplication.model.entities;
 
-import com.carnerero.agustin.ecommerceapplication.exception.user.BusinessException;
-import com.carnerero.agustin.ecommerceapplication.model.enums.OrderStatus;
+import com.carnerero.agustin.ecommerceapplication.exception.BusinessException;
+import com.carnerero.agustin.ecommerceapplication.exception.ErrorCode;
 import com.carnerero.agustin.ecommerceapplication.model.enums.PaymentMethod;
 import com.carnerero.agustin.ecommerceapplication.model.enums.PaymentStatus;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.http.HttpStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -62,15 +63,21 @@ public class PaymentEntity {
     public void cancelPayment() {
 
         if (this.paymentStatus == PaymentStatus.CANCELLED) {
-            throw new BusinessException("This payment has already been cancelled.");
+            throw new BusinessException(ErrorCode.PAYMENT_IS_CANCEL_BEFORE.name(),
+                    ErrorCode.PAYMENT_IS_CANCEL_BEFORE.getDefaultMessage(),
+                    HttpStatus.CONFLICT);
         }
 
         if (this.paymentStatus == PaymentStatus.SUCCESS) {
-            throw new BusinessException("A successful payment cannot be cancelled.");
+            throw new BusinessException(ErrorCode.PAYMENT_CANNOT_CANCEL.name(),
+                    ErrorCode.PAYMENT_CANNOT_CANCEL.getDefaultMessage()+this.paymentStatus,
+                    HttpStatus.CONFLICT);
         }
 
         if (this.paymentStatus == PaymentStatus.FAILED) {
-            throw new BusinessException("A failed payment cannot be cancelled.");
+            throw new BusinessException(ErrorCode.PAYMENT_CANNOT_CANCEL.name(),
+                    ErrorCode.PAYMENT_CANNOT_CANCEL.getDefaultMessage()+this.paymentStatus,
+                    HttpStatus.CONFLICT);
         }
 
         this.paymentStatus = PaymentStatus.CANCELLED;
@@ -81,15 +88,21 @@ public class PaymentEntity {
     // Optional: mark as refunded
     public void refundPayment() {
         if (this.paymentStatus == PaymentStatus.REFUNDED) {
-            throw new BusinessException("This payment has already been refunded.");
+            throw new BusinessException(ErrorCode.PAYMENT_IS_REFUND.name(),
+                    ErrorCode.PAYMENT_IS_REFUND.getDefaultMessage(),
+                    HttpStatus.CONFLICT);
         }
 
         if (this.paymentStatus == PaymentStatus.PENDING) {
-            throw new BusinessException("A pending payment cannot be refunded.");
+            throw new BusinessException(ErrorCode.PAYMENT_CANNOT_REFUND.getDefaultMessage(),
+                    ErrorCode.PAYMENT_CANNOT_REFUND.getDefaultMessage()+this.paymentStatus,
+                    HttpStatus.CONFLICT);
         }
 
         if (this.paymentStatus == PaymentStatus.FAILED) {
-            throw new BusinessException("A failed payment cannot be cancelled.");
+            throw new BusinessException(ErrorCode.PAYMENT_CANNOT_REFUND.getDefaultMessage(),
+                    ErrorCode.PAYMENT_CANNOT_REFUND.getDefaultMessage()+this.paymentStatus,
+                    HttpStatus.CONFLICT);
         }
 
         this.paymentStatus = PaymentStatus.REFUNDED;

@@ -1,6 +1,11 @@
 package com.carnerero.agustin.ecommerceapplication.util.helper;
 
 
+import com.carnerero.agustin.ecommerceapplication.exception.BusinessException;
+import com.carnerero.agustin.ecommerceapplication.exception.ErrorCode;
+import org.springframework.http.HttpStatus;
+
+import java.util.Locale;
 import java.util.Set;
 
 public final class Sort {
@@ -23,7 +28,9 @@ public final class Sort {
         if (allowedFields.contains(field)) {
             return desc? org.springframework.data.domain.Sort.by(field).descending(): org.springframework.data.domain.Sort.by(field).ascending();
         }else{
-             throw new IllegalArgumentException("Invalid field");
+             throw new BusinessException(ErrorCode.INVALID_FIELD.name(),
+                     ErrorCode.INVALID_FIELD.getDefaultMessage(),
+                     HttpStatus.NOT_ACCEPTABLE);
         }
     }
 }

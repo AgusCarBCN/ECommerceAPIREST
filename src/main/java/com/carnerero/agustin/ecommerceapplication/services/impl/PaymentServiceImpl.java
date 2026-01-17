@@ -3,31 +3,28 @@ package com.carnerero.agustin.ecommerceapplication.services.impl;
 import com.carnerero.agustin.ecommerceapplication.dtos.requests.PaymentRequestDTO;
 import com.carnerero.agustin.ecommerceapplication.dtos.responses.PageResponse;
 import com.carnerero.agustin.ecommerceapplication.dtos.responses.PaymentResponseDTO;
-import com.carnerero.agustin.ecommerceapplication.exception.user.BusinessException;
-import com.carnerero.agustin.ecommerceapplication.model.entities.BillEntity;
+import com.carnerero.agustin.ecommerceapplication.exception.BusinessException;
+import com.carnerero.agustin.ecommerceapplication.exception.ErrorCode;
 import com.carnerero.agustin.ecommerceapplication.model.entities.OrderEntity;
-import com.carnerero.agustin.ecommerceapplication.model.enums.BillStatus;
-import com.carnerero.agustin.ecommerceapplication.model.enums.OrderStatus;
 import com.carnerero.agustin.ecommerceapplication.model.enums.PaymentStatus;
 import com.carnerero.agustin.ecommerceapplication.repository.BillRepository;
 import com.carnerero.agustin.ecommerceapplication.repository.OrderRepository;
 import com.carnerero.agustin.ecommerceapplication.repository.PaymentRepository;
 import com.carnerero.agustin.ecommerceapplication.repository.ProductCatalogRepository;
 import com.carnerero.agustin.ecommerceapplication.services.interfaces.PaymentService;
+import com.carnerero.agustin.ecommerceapplication.util.AppConstants;
 import com.carnerero.agustin.ecommerceapplication.util.helper.Sort;
 import com.carnerero.agustin.ecommerceapplication.util.mapper.PageResponseMapper;
 import com.carnerero.agustin.ecommerceapplication.util.mapper.PaymentMapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.security.access.AccessDeniedException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.carnerero.agustin.ecommerceapplication.model.entities.PaymentEntity;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 @Service
@@ -52,13 +49,22 @@ public class PaymentServiceImpl implements PaymentService {
     public PaymentResponseDTO createPayment(PaymentRequestDTO paymentRequest) {
 
         OrderEntity order = orderRepository.findById(paymentRequest.getId())
-                .orElseThrow(() -> new RuntimeException("Order not found"));
+                .orElseThrow(() -> new BusinessException(
+                        ErrorCode.ORDER_NOT_FOUND.name(),
+                        ErrorCode.ORDER_NOT_FOUND.getDefaultMessage(),
+                        HttpStatus.NOT_FOUND));
 
         if (order.getPayment() != null) {
-            throw new BusinessException("Order already paid");
+            throw new BusinessException(
+                    ErrorCode.ORDER_PAID.name(),
+                    ErrorCode.ORDER_PAID.getDefaultMessage(),
+                    HttpStatus.CONFLICT);
         }
         if (!order.isOrderPayable()) {
-            throw new BusinessException("Order is not payable");
+            throw new BusinessException(
+                    ErrorCode.ORDER_NOT_PAYABLE.name(),
+                    ErrorCode.ORDER_NOT_PAYABLE.getDefaultMessage(),
+                    HttpStatus.CONFLICT);
         }
 
         PaymentEntity payment = PaymentEntity.builder()
@@ -99,30 +105,44 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public PaymentResponseDTO refundPayment(Long paymentId) {
+    public String refundPayment(Long paymentId) {
         //Verify if payment exists
         var payment = paymentRepository.findById(paymentId)
-                .orElseThrow(() -> new BusinessException("Payment not found"));
+                .orElseThrow(() ->new BusinessException(
+                        ErrorCode.PAYMENT_NOT_FOUND.name(),
+                        ErrorCode.PAYMENT_NOT_FOUND.getDefaultMessage(),
+                        HttpStatus.NOT_FOUND) );
         if (payment.getPaymentStatus().equals(PaymentStatus.REFUND_PENDING
         )) {
-            throw new BusinessException("Payment is yet pending to refund.");
+            throw new BusinessException(
+                    ErrorCode.PAYMENT_IS_PENDING_REFUND.name(),
+                    ErrorCode.PAYMENT_IS_PENDING_REFUND.getDefaultMessage(),
+                    HttpStatus.CONFLICT) ;
         }
         if (!payment.getPaymentStatus().equals(PaymentStatus.SUCCESS)) {
-            throw new BusinessException("Cannot refund payment if is " + payment.getPaymentStatus());
+            throw  new BusinessException(
+                    ErrorCode.PAYMENT_CANNOT_REFUND.getDefaultMessage(),
+                    ErrorCode.PAYMENT_CANNOT_REFUND.getDefaultMessage()+payment.getPaymentStatus(),
+                    HttpStatus.CONFLICT);
         }
-        var responsePaymentDTO=paymentMapper.toPaymentResponseDTO(payment);
         //Change payment to pending refund
         payment.setPaymentStatus(PaymentStatus.REFUND_PENDING);
-        return responsePaymentDTO;
+        return AppConstants.PENDING_REFUND;
     }
 
     @Override
-    public PaymentResponseDTO confirmRefundPayment(Long paymentId) {
+    public String confirmRefundPayment(Long paymentId) {
         //Verify if payment exists
         var payment = paymentRepository.findById(paymentId)
-                .orElseThrow(() -> new BusinessException("Payment not found"));
+                .orElseThrow(() -> new BusinessException(
+                        ErrorCode.PAYMENT_NOT_FOUND.name(),
+                        ErrorCode.PAYMENT_NOT_FOUND.getDefaultMessage(),
+                        HttpStatus.NOT_FOUND));
         if (!payment.getPaymentStatus().equals(PaymentStatus.REFUND_PENDING)){
-            throw new BusinessException("Cannot refund payment if is " + payment.getPaymentStatus());
+            throw new BusinessException(
+                    ErrorCode.PAYMENT_CANNOT_REFUND.getDefaultMessage(),
+                    ErrorCode.PAYMENT_CANNOT_REFUND.getDefaultMessage()+payment.getPaymentStatus(),
+                    HttpStatus.CONFLICT);
         }
 
         var order=orderRepository.findById(payment.getOrder().getId())
@@ -140,11 +160,11 @@ public class PaymentServiceImpl implements PaymentService {
             productCatalog.restoreStock(product.getQuantity());
 
         });
-        var responsePaymentDTO=paymentMapper.toPaymentResponseDTO(payment);
+
         //Change bill
         bill.setTotalAmount(order.getTotalAmount().multiply(BigDecimal.valueOf(-1)));
         bill.setTaxAmount(BigDecimal.ZERO);
         bill.setShippingAmount(BigDecimal.ZERO);
-        return responsePaymentDTO;
+        return AppConstants.CONFIRM_REFUND;
     }
 }

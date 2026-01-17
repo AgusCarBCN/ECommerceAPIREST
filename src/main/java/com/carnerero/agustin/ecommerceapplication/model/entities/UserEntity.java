@@ -1,5 +1,7 @@
 package com.carnerero.agustin.ecommerceapplication.model.entities;
 
+import com.carnerero.agustin.ecommerceapplication.exception.BusinessException;
+import com.carnerero.agustin.ecommerceapplication.exception.ErrorCode;
 import com.carnerero.agustin.ecommerceapplication.model.enums.Roles;
 import com.carnerero.agustin.ecommerceapplication.model.enums.UserStatus;
 import jakarta.persistence.*;
@@ -13,6 +15,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -157,7 +160,9 @@ public class UserEntity  {
     }
     public void deactivateUser(String reason) {
         if(this.status==UserStatus.DEACTIVATED){
-            throw new IllegalStateException("User has been deactivated");
+            throw new BusinessException(ErrorCode.USER_IS_DEACTIVATE.name(),
+                    ErrorCode.USER_IS_DEACTIVATE.getDefaultMessage(),
+                    HttpStatus.CONFLICT);
         }
 
         this.status = UserStatus.DEACTIVATED;
@@ -166,10 +171,14 @@ public class UserEntity  {
     }
     public void activateUser(){
         if(this.status==UserStatus.ACTIVE){
-            throw new IllegalStateException("User has been activated");
+            throw new BusinessException(ErrorCode.USER_IS_ACTIVATE.name(),
+                    ErrorCode.USER_IS_ACTIVATE.getDefaultMessage(),
+                    HttpStatus.CONFLICT);
         }
         if(this.status==UserStatus.SUSPENDED){
-            throw new IllegalStateException("Only an admin user can activate this account");
+            throw new BusinessException(ErrorCode.ADMIN_AUTHORIZE.name(),
+                    ErrorCode.ADMIN_AUTHORIZE.getDefaultMessage()+this.status,
+                    HttpStatus.UNAUTHORIZED);
         }
         this.status = UserStatus.ACTIVE;
         this.statusDescription = "User active";
@@ -177,7 +186,9 @@ public class UserEntity  {
     }
     public void suspendUser(){
         if(this.status==UserStatus.SUSPENDED){
-            throw new IllegalStateException("User has been suspended");
+            throw new BusinessException(ErrorCode.USER_IS_SUSPEND.name(),
+                    ErrorCode.USER_IS_SUSPEND.getDefaultMessage(),
+                    HttpStatus.CONFLICT);
         }
         this.status = UserStatus.SUSPENDED;
         this.statusDescription = "User suspended";
@@ -185,7 +196,9 @@ public class UserEntity  {
     }
     public void reactivateUser(){
         if(this.status==UserStatus.ACTIVE){
-            throw  new IllegalStateException("User has been activated");
+            throw  new BusinessException(ErrorCode.USER_IS_ACTIVATE.name(),
+                    ErrorCode.USER_IS_ACTIVATE.getDefaultMessage()+this.status,
+                    HttpStatus.CONFLICT);
         }
         this.status = UserStatus.ACTIVE;
         this.statusDescription = "User active";

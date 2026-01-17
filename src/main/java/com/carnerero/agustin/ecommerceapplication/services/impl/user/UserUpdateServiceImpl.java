@@ -3,8 +3,8 @@ package com.carnerero.agustin.ecommerceapplication.services.impl.user;
 import com.carnerero.agustin.ecommerceapplication.dtos.requests.UpdateUserRequestDTO;
 import com.carnerero.agustin.ecommerceapplication.dtos.requests.UserAddressRequestDTO;
 import com.carnerero.agustin.ecommerceapplication.dtos.responses.UserResponseDTO;
-import com.carnerero.agustin.ecommerceapplication.exception.address.AddressNotFoundException;
-import com.carnerero.agustin.ecommerceapplication.exception.user.UserNotFoundException;
+import com.carnerero.agustin.ecommerceapplication.exception.BusinessException;
+import com.carnerero.agustin.ecommerceapplication.exception.ErrorCode;
 import com.carnerero.agustin.ecommerceapplication.model.entities.UserAddressEntity;
 import com.carnerero.agustin.ecommerceapplication.model.entities.UserEntity;
 import com.carnerero.agustin.ecommerceapplication.repository.UserAddressRepository;
@@ -12,10 +12,10 @@ import com.carnerero.agustin.ecommerceapplication.repository.UserRepository;
 import com.carnerero.agustin.ecommerceapplication.services.interfaces.user.UserUpdateService;
 import com.carnerero.agustin.ecommerceapplication.util.mapper.UserMapper;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Service
@@ -24,7 +24,7 @@ import java.time.LocalDateTime;
 public class UserUpdateServiceImpl implements UserUpdateService {
 
     private final UserRepository userRepository;
-    private final UserAddressRepository userAddressRespository;
+    private final UserAddressRepository userAddressRepository;
     private final UserMapper userMapper;
 
     @Override
@@ -33,17 +33,27 @@ public class UserUpdateServiceImpl implements UserUpdateService {
                                              UserAddressRequestDTO request) {
         // 1️⃣ Buscar usuario
         UserEntity user = userRepository.findByEmail(email)
-                .orElseThrow(() ->
-                        new UserNotFoundException("User not found with ID " + email));
+                .orElseThrow(()->new BusinessException(
+                                        ErrorCode.USER_NOT_FOUND.name(),
+                                        ErrorCode.USER_NOT_FOUND.getDefaultMessage(),
+                                        HttpStatus.NOT_FOUND)
+                        );
         var addresses = user.getAddresses();
         // 2️⃣ Buscar dirección
-        UserAddressEntity address = userAddressRespository.findById(userAddressId)
-                .orElseThrow(() ->
-                        new AddressNotFoundException("Address not found with ID " + userAddressId));
+        UserAddressEntity address = userAddressRepository.findById(userAddressId)
+                .orElseThrow(() ->new BusinessException(
+                                ErrorCode.ADDRESS_NOT_FOUND.name(),
+                                ErrorCode.ADDRESS_NOT_FOUND.getDefaultMessage(),
+                                HttpStatus.NOT_FOUND)
+                        );
 
         // 3️⃣ Verificar que la dirección pertenece al usuario
         if (!address.getUser().getId().equals(user.getId())) {
-            throw new RuntimeException("Address does not belong to the user");
+            throw new BusinessException(
+                    ErrorCode.ADDRESS_NOT_FOUND.name(),
+                    ErrorCode.ADDRESS_NOT_FOUND.getDefaultMessage(),
+                    HttpStatus.NOT_FOUND);
+
         }
         // Si se marca como default, limpiar otras direcciones
         if (request.getIsDefault() == true) {
@@ -60,7 +70,7 @@ public class UserUpdateServiceImpl implements UserUpdateService {
         address.setUpdatedAt(LocalDateTime.now());
 
         // ️⃣ Guardar cambios en direccion
-        userAddressRespository.save(address);
+        userAddressRepository.save(address);
 
         return userMapper.toUserResponseDTO(user);
     }
@@ -75,7 +85,10 @@ public class UserUpdateServiceImpl implements UserUpdateService {
 
     public UserResponseDTO updateUserFields(String email, UpdateUserRequestDTO request) {
         UserEntity user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UserNotFoundException("User not found with ID " + email));
+                .orElseThrow(() -> new BusinessException(
+                        ErrorCode.USER_NOT_FOUND.name(),
+                        ErrorCode.USER_NOT_FOUND.getDefaultMessage(),
+                        HttpStatus.NOT_FOUND));
 
         if (request.getName() != null) user.setName(request.getName());
         if (request.getSurname() != null) user.setSurname(request.getSurname());

@@ -2,9 +2,9 @@ package com.carnerero.agustin.ecommerceapplication.security;
 
 
 import com.carnerero.agustin.ecommerceapplication.dtos.requests.TokenRequestDTO;
-import com.carnerero.agustin.ecommerceapplication.exception.user.UserNotFoundException;
+import com.carnerero.agustin.ecommerceapplication.exception.BusinessException;
+import com.carnerero.agustin.ecommerceapplication.exception.ErrorCode;
 import com.carnerero.agustin.ecommerceapplication.model.entities.RefreshTokenEntity;
-import com.carnerero.agustin.ecommerceapplication.model.entities.UserEntity;
 import com.carnerero.agustin.ecommerceapplication.repository.RefreshTokenRepository;
 import com.carnerero.agustin.ecommerceapplication.repository.UserRepository;
 import io.jsonwebtoken.Claims;
@@ -13,7 +13,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.convert.ValueConverter;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -44,7 +44,9 @@ public class JwtService {
 
         // Buscar al usuario
         var user = userRepository.findByEmailWithRoles(userDetails.getUsername())
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND.name(),
+                        ErrorCode.USER_NOT_FOUND.getDefaultMessage(),
+                        HttpStatus.NOT_FOUND));
 
         // Buscar refresh token existente
         var refreshToken = refreshTokenRepository.findByUserId(user.getId()).orElse(null);
@@ -134,7 +136,10 @@ public class JwtService {
         return token;
     }
     public RefreshTokenEntity findRefreshToken(TokenRequestDTO tokenRequestDTO) {
-        var refreshTokenEntity=  refreshTokenRepository.findByToken(tokenRequestDTO.getToken()).orElseThrow(()->new UserNotFoundException("Invalid refresh token"));
+        var refreshTokenEntity=  refreshTokenRepository.findByToken(tokenRequestDTO.getToken())
+                .orElseThrow(()->new BusinessException(ErrorCode.INVALID_REFRESH_TOKEN.name(),
+                        ErrorCode.INVALID_FIELD.getDefaultMessage(),
+                        HttpStatus.BAD_REQUEST));
                  new RuntimeException("Invalid refresh token");
                  return refreshTokenEntity;
 

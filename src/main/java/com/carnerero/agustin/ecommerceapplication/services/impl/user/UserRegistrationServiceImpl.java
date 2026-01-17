@@ -3,7 +3,8 @@ package com.carnerero.agustin.ecommerceapplication.services.impl.user;
 import com.carnerero.agustin.ecommerceapplication.dtos.requests.AuthRequestDTO;
 import com.carnerero.agustin.ecommerceapplication.dtos.requests.UserRequestDTO;
 import com.carnerero.agustin.ecommerceapplication.dtos.responses.UserResponseDTO;
-import com.carnerero.agustin.ecommerceapplication.exception.user.BusinessException;
+import com.carnerero.agustin.ecommerceapplication.exception.BusinessException;
+import com.carnerero.agustin.ecommerceapplication.exception.ErrorCode;
 import com.carnerero.agustin.ecommerceapplication.model.entities.RoleEntity;
 import com.carnerero.agustin.ecommerceapplication.model.entities.UserEntity;
 import com.carnerero.agustin.ecommerceapplication.repository.UserRepository;
@@ -11,6 +12,7 @@ import com.carnerero.agustin.ecommerceapplication.services.interfaces.user.UserR
 import com.carnerero.agustin.ecommerceapplication.util.mapper.UserMapper;
 
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.HashSet;
@@ -38,11 +40,17 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
     public void login(AuthRequestDTO loginRequest) {
         // Find user by username or email
         UserEntity user = userRepository.findByEmail(
-                loginRequest.getEmail()).orElseThrow(() -> new BusinessException("User not found"));
+                loginRequest.getEmail()).orElseThrow( ()->new BusinessException(
+                ErrorCode.USER_NOT_FOUND.name(),
+                ErrorCode.USER_NOT_FOUND.getDefaultMessage(),
+                HttpStatus.NOT_FOUND));
 
         // Verify password
         if(!user.getPassword().equals(loginRequest.getPassword())) {
-            throw  new BusinessException("Wrong Password");
+            throw new BusinessException(
+                    ErrorCode.INVALID_CREDENTIALS_PASSWORD.name(),
+                    ErrorCode.INVALID_CREDENTIALS_PASSWORD.getDefaultMessage(),
+                    HttpStatus.UNAUTHORIZED);
         }
 
     }
@@ -61,10 +69,16 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
         var roles=new HashSet<RoleEntity>();
         // Verificar si el nombre y/o el email están disponibles
         if (!isEmailAvailable(request.getEmail())) {
-            throw new BusinessException("Email already exists");
+            throw new BusinessException(
+                    ErrorCode.INVALID_CREDENTIALS_EMAIL.name(),
+                    ErrorCode.INVALID_CREDENTIALS_EMAIL.getDefaultMessage(),
+                    HttpStatus.UNAUTHORIZED);
         }
         if (!isUserNameAvailable(request.getName())) {
-            throw new BusinessException("Username already exists");
+            throw new BusinessException(
+                    ErrorCode.INVALID_CREDENTIALS_PASSWORD.name(),
+                    ErrorCode.INVALID_CREDENTIALS_PASSWORD.getDefaultMessage(),
+                    HttpStatus.UNAUTHORIZED);
         }
         UserEntity userEntity = userMapper.toUserEntity(request);
         var addresses=userEntity.getAddresses();

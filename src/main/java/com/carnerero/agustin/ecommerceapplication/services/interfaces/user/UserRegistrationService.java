@@ -3,7 +3,6 @@ package com.carnerero.agustin.ecommerceapplication.services.interfaces.user;
 import com.carnerero.agustin.ecommerceapplication.dtos.requests.AuthRequestDTO;
 import com.carnerero.agustin.ecommerceapplication.dtos.requests.UserRequestDTO;
 import com.carnerero.agustin.ecommerceapplication.dtos.responses.UserResponseDTO;
-import com.carnerero.agustin.ecommerceapplication.exception.user.UserExistException;
 
 public interface UserRegistrationService {
 

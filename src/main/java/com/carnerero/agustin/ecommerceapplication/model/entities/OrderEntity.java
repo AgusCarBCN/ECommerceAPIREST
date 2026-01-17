@@ -1,6 +1,7 @@
 package com.carnerero.agustin.ecommerceapplication.model.entities;
 
-import com.carnerero.agustin.ecommerceapplication.exception.user.BusinessException;
+import com.carnerero.agustin.ecommerceapplication.exception.BusinessException;
+import com.carnerero.agustin.ecommerceapplication.exception.ErrorCode;
 import com.carnerero.agustin.ecommerceapplication.model.enums.BillStatus;
 import com.carnerero.agustin.ecommerceapplication.model.enums.OrderStatus;
 import com.carnerero.agustin.ecommerceapplication.model.enums.PaymentStatus;
@@ -9,6 +10,8 @@ import com.carnerero.agustin.ecommerceapplication.util.AppConstants;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -193,11 +196,15 @@ public class OrderEntity {
         ProductEntity product = this.products.stream()
                 .filter(p -> p.getProductCatalog().getId().equals(catalog.getId()))
                 .findFirst()
-                .orElseThrow(() -> new BusinessException("Product not found in order"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.PRODUCT_NOT_FOUND.name(),
+                        ErrorCode.PRODUCT_NOT_FOUND.getDefaultMessage(),
+                        HttpStatus.NOT_FOUND));
 
         // 2️⃣ Validar cantidad a eliminar
         if (product.getQuantity() < quantity) {
-            throw new BusinessException("Cannot remove more items than ordered");
+            throw new BusinessException(ErrorCode.TOO_MANY_ITEMS.name(),
+                    ErrorCode.TOO_MANY_ITEMS.getDefaultMessage(),
+                    HttpStatus.CONFLICT);
         }
 
         // 3️⃣ Reducir cantidad o eliminar producto

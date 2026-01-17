@@ -5,7 +5,8 @@ import com.carnerero.agustin.ecommerceapplication.dtos.requests.OrderRequestDTO;
 import com.carnerero.agustin.ecommerceapplication.dtos.requests.ProductRequestDTO;
 import com.carnerero.agustin.ecommerceapplication.dtos.responses.OrderResponseDTO;
 import com.carnerero.agustin.ecommerceapplication.dtos.responses.PageResponse;
-import com.carnerero.agustin.ecommerceapplication.exception.user.BusinessException;
+import com.carnerero.agustin.ecommerceapplication.exception.BusinessException;
+import com.carnerero.agustin.ecommerceapplication.exception.ErrorCode;
 import com.carnerero.agustin.ecommerceapplication.model.entities.*;
 import com.carnerero.agustin.ecommerceapplication.model.enums.OrderStatus;
 import com.carnerero.agustin.ecommerceapplication.repository.OrderRepository;
@@ -20,10 +21,10 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.*;
 
 @Service
 @Transactional
@@ -43,7 +44,10 @@ public class OrderServiceImpl implements OrderService {
     public OrderResponseDTO createOrder(OrderRequestDTO request, String email) {
 
         UserEntity user = userRepository.findByEmail(
-                email).orElseThrow(() -> new BusinessException("User not found"));
+                email).orElseThrow(() ->  new BusinessException(
+                ErrorCode.USER_NOT_FOUND.name(),
+                ErrorCode.USER_NOT_FOUND.getDefaultMessage(),
+                HttpStatus.NOT_FOUND));
 
         // 1️⃣ Create OrderEntity
         OrderEntity order = orderMapper.toOrderEntity(request);
@@ -53,9 +57,11 @@ public class OrderServiceImpl implements OrderService {
 
         // 3️⃣ Validate products
         if (request.getProducts() == null || request.getProducts().isEmpty()) {
-            throw new BusinessException("Order must contain at least one product");
+            throw new BusinessException(
+                    ErrorCode.EMPTY_ORDER.name(),
+                    ErrorCode.EMPTY_ORDER.getDefaultMessage(),
+                    HttpStatus.BAD_REQUEST);
         }
-
 
         // Init order amount
 
@@ -74,7 +80,10 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderResponseDTO getOrderById(Long orderId) {
         OrderEntity order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new EntityNotFoundException("Order not found"));
+                .orElseThrow(() -> new BusinessException(
+                        ErrorCode.ORDER_NOT_FOUND.name(),
+                        ErrorCode.ORDER_NOT_FOUND.getDefaultMessage(),
+                        HttpStatus.NOT_FOUND));
 
        return orderMapper.toOrderResponseDTO(order);
 
@@ -94,16 +103,25 @@ public class OrderServiceImpl implements OrderService {
     public OrderResponseDTO cancelOrder(Long orderId, String email) {
 
         OrderEntity order = orderRepository.findByIdWithProducts(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
+                .orElseThrow(() ->new BusinessException(
+                        ErrorCode.ORDER_NOT_FOUND.name(),
+                        ErrorCode.ORDER_NOT_FOUND.getDefaultMessage(),
+                        HttpStatus.NOT_FOUND));
 
         // 1️⃣ Ownership
         if (!order.getUser().getEmail().equals(email)) {
-            throw new AccessDeniedException("You cannot cancel this order");
+            throw new BusinessException(
+                    ErrorCode.ORDER_CANNOT_CANCEL.name(),
+                    ErrorCode.ORDER_CANNOT_CANCEL.getDefaultMessage(),
+                    HttpStatus.UNAUTHORIZED);
         }
 
         // 2️⃣ Validación de estado
         if (!order.isCancelableByClient()) {
-            throw new IllegalStateException("Order cannot be canceled");
+            throw new BusinessException(
+                    ErrorCode.ORDER_CANNOT_CANCEL.name(),
+                    ErrorCode.ORDER_CANNOT_CANCEL.getDefaultMessage(),
+                    HttpStatus.UNAUTHORIZED);
         }
 
 
@@ -128,11 +146,17 @@ public class OrderServiceImpl implements OrderService {
     ) {
         // 1️⃣ Cargar la orden
         OrderEntity order = orderRepository.findByIdWithProducts(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
+                .orElseThrow(() -> new BusinessException(
+                        ErrorCode.ORDER_NOT_FOUND.name(),
+                        ErrorCode.ORDER_NOT_FOUND.getDefaultMessage(),
+                        HttpStatus.NOT_FOUND));
 
         // 2️⃣ Validar estado de la orden
         if (order.getStatus() != OrderStatus.CREATED) {
-            throw new IllegalStateException("Cannot modify order in status: " + order.getStatus());
+            throw new BusinessException(
+                    ErrorCode.ORDER_CANNOT_MODIFY.name(),
+                    ErrorCode.ORDER_CANNOT_MODIFY.getDefaultMessage()+order.getStatus(),
+                    HttpStatus.NOT_MODIFIED) ;
         }
 
         // 1️⃣ Primero quitar productos
@@ -156,8 +180,9 @@ public class OrderServiceImpl implements OrderService {
     private ProductCatalogEntity getProductCatalogById(ProductRequestDTO p) {
         return productCatalogRepository
                 .findById(p.getProductCatalogId())
-                .orElseThrow(() -> new EntityNotFoundException(
-                        "Product catalog not found: " + p.getProductCatalogId()
-                ));
+                .orElseThrow(() -> new BusinessException(
+                        ErrorCode.PRODUCT_NOT_FOUND.name(),
+                        ErrorCode.PRODUCT_NOT_FOUND.getDefaultMessage(),
+                        HttpStatus.NOT_FOUND));
     }
 }

@@ -5,8 +5,6 @@ import com.carnerero.agustin.ecommerceapplication.dtos.requests.ProductCatalogRe
 import com.carnerero.agustin.ecommerceapplication.dtos.responses.CategoryResponseDTO;
 import com.carnerero.agustin.ecommerceapplication.dtos.responses.PageResponse;
 import com.carnerero.agustin.ecommerceapplication.dtos.responses.ProductCatalogResponseDTO;
-import com.carnerero.agustin.ecommerceapplication.exception.productCatalog.ProductExistException;
-import com.carnerero.agustin.ecommerceapplication.exception.productCatalog.ProductNotFoundException;
 
 import java.math.BigDecimal;
 import java.util.UUID;

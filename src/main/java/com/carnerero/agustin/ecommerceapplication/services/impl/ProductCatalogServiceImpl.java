@@ -6,7 +6,8 @@ import com.carnerero.agustin.ecommerceapplication.dtos.requests.ProductCatalogRe
 import com.carnerero.agustin.ecommerceapplication.dtos.responses.CategoryResponseDTO;
 import com.carnerero.agustin.ecommerceapplication.dtos.responses.PageResponse;
 import com.carnerero.agustin.ecommerceapplication.dtos.responses.ProductCatalogResponseDTO;
-import com.carnerero.agustin.ecommerceapplication.exception.productCatalog.ProductNotFoundException;
+import com.carnerero.agustin.ecommerceapplication.exception.BusinessException;
+import com.carnerero.agustin.ecommerceapplication.exception.ErrorCode;
 import com.carnerero.agustin.ecommerceapplication.model.entities.CategoryEntity;
 import com.carnerero.agustin.ecommerceapplication.model.entities.ProductCatalogEntity;
 import com.carnerero.agustin.ecommerceapplication.repository.CategoryRepository;
@@ -19,6 +20,7 @@ import com.carnerero.agustin.ecommerceapplication.util.mapper.ProductCatalogMapp
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
@@ -45,7 +47,10 @@ public class ProductCatalogServiceImpl implements ProductCatalogService {
     );
     @Override
     public ProductCatalogResponseDTO getProductById(UUID id) {
-        var product= productCatalogRepository.findById(id).orElseThrow(()->new ProductNotFoundException("Product not found"));
+        var product= productCatalogRepository.findById(id).orElseThrow(()->new BusinessException(
+                ErrorCode.PRODUCT_NOT_FOUND.name(),
+                ErrorCode.PRODUCT_NOT_FOUND.getDefaultMessage(),
+                HttpStatus.NOT_FOUND));
         return productCatalogMapper.toProductCatalogResponseDTO(product);
     }
 
@@ -155,6 +160,9 @@ public class ProductCatalogServiceImpl implements ProductCatalogService {
     }
 
     private ProductCatalogEntity findProductById(UUID productId) {
-        return productCatalogRepository.findById(productId).orElseThrow(()->new EntityNotFoundException("Product not found"));
+        return productCatalogRepository.findById(productId).orElseThrow(()->new BusinessException(
+                ErrorCode.PRODUCT_NOT_FOUND.name(),
+                ErrorCode.PRODUCT_NOT_FOUND.getDefaultMessage(),
+                HttpStatus.NOT_FOUND));
     }
 }

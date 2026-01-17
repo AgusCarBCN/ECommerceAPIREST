@@ -2,6 +2,8 @@ package com.carnerero.agustin.ecommerceapplication.services.impl.user;
 
 import com.carnerero.agustin.ecommerceapplication.dtos.responses.PageResponse;
 import com.carnerero.agustin.ecommerceapplication.dtos.responses.UserResponseDTO;
+import com.carnerero.agustin.ecommerceapplication.exception.BusinessException;
+import com.carnerero.agustin.ecommerceapplication.exception.ErrorCode;
 import com.carnerero.agustin.ecommerceapplication.model.enums.Roles;
 import com.carnerero.agustin.ecommerceapplication.model.enums.UserStatus;
 import com.carnerero.agustin.ecommerceapplication.repository.UserRepository;
@@ -11,6 +13,7 @@ import com.carnerero.agustin.ecommerceapplication.util.mapper.PageResponseMapper
 import com.carnerero.agustin.ecommerceapplication.util.mapper.UserMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,7 +41,7 @@ public class UserQueryServiceImpl implements UserQueryService {
     public UserResponseDTO getUserById(Long userId) {
         var userEntity=userRepository
                 .findById(userId)
-                .orElseThrow(()-> new RuntimeException("User not found"));
+                .orElseThrow(this::userNotFound);
         return userMapper.toUserResponseDTO(userEntity);
     }
 
@@ -46,7 +49,7 @@ public class UserQueryServiceImpl implements UserQueryService {
     public UserResponseDTO getUserByEmail(String email) {
         var userEntity=userRepository
                 .findByEmail(email)
-                .orElseThrow(()-> new RuntimeException("User not found"));
+                .orElseThrow(this::userNotFound);
         return userMapper.toUserResponseDTO(userEntity);
     }
 
@@ -54,7 +57,7 @@ public class UserQueryServiceImpl implements UserQueryService {
     public UserResponseDTO getUserByUsername(String username) {
         var userEntity=userRepository
                 .findByNameIgnoreCase(username)
-                .orElseThrow(()-> new RuntimeException("User not found"));
+                .orElseThrow(this::userNotFound);
         return userMapper.toUserResponseDTO(userEntity);
     }
 
@@ -140,5 +143,10 @@ public class UserQueryServiceImpl implements UserQueryService {
         return "";
     }
 
-
+    private BusinessException userNotFound() {
+        return new BusinessException(
+                ErrorCode.USER_NOT_FOUND.name(),
+                ErrorCode.USER_NOT_FOUND.getDefaultMessage(),
+                HttpStatus.NOT_FOUND);
+    }
 }
