@@ -3,6 +3,10 @@ package com.carnerero.agustin.ecommerceapplication.controller.user;
 
 import com.carnerero.agustin.ecommerceapplication.dtos.requests.SuspensionRequestDTO;
 import com.carnerero.agustin.ecommerceapplication.services.interfaces.user.UserAccountSettingService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,18 +24,19 @@ public class UserAccountSettingController {
 
     private final UserAccountSettingService useAccountSetting;
 
-    /**
-     * Deactivates the user's own account (soft delete).
-     * <p>
-     * This operation allows a user to temporarily deactivate their account.
-     * The reason for deactivation is provided in the request body.
-     *
-     * Example request: PATCH /users/{userId}/deactivate
-     *
-
-     * @param reason the reason for deactivation wrapped in {@link SuspensionRequestDTO}
-     * @return a {@link ResponseEntity} with HTTP status 204 (No Content)
-     */
+    // ---------------------------
+    // Deactivate User Account
+    // ---------------------------
+    @Operation(
+            summary = "Deactivate user account",
+            description = "Deactivates the authenticated user's account with a provided reason.",
+            security = @SecurityRequirement(name = "Security Token")
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "User account deactivated successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid request or reason"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized access")
+    })
     @PatchMapping("/deactivate")
     public ResponseEntity<Void> deactivatedUser(@RequestBody SuspensionRequestDTO reason,
                                             Authentication authentication) {
@@ -40,15 +45,19 @@ public class UserAccountSettingController {
         return ResponseEntity.noContent().build();
     }
 
-    /**
-     * Activates the user's own account.
-     * <p>
-     * This operation allows a user to reactivate their previously deactivated account.
-     *
-     * Example request: PATCH /users/{userId}/activate
-     *
-     * @return a {@link ResponseEntity} with HTTP status 204 (No Content)
-     */
+    // ---------------------------
+    // Activate User Account
+    // ---------------------------
+    @Operation(
+            summary = "Activate user account",
+            description = "Activates the authenticated user's account. Only users with DEACTIVATED status can activate their account.",
+            security = @SecurityRequirement(name = "Security Token")
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "User account activated successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid request"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized access")
+    })
     @PatchMapping("/activate")
     public ResponseEntity<Void> activatedUserById() {
         String email = Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName();

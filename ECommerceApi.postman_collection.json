@@ -1,0 +1,1202 @@
+{
+	"info": {
+		"_postman_id": "71025e2c-31c2-46e0-84d1-8983361cba82",
+		"name": "ECommerceApi",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "19822192"
+	},
+	"item": [
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "Get user by id",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBlY29tbWVyY2UuY29tIiwicm9sZXMiOlt7ImF1dGhvcml0eSI6IlJPTEVfQURNSU4ifV0sImlhdCI6MTc2ODU5MjMxNCwiZXhwIjoxNzY4NTk1OTE0fQ._uVrQyVapbHtZM-zxxKoJjQEuZ637JbpKarGPwNySlU",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"clientName\": \"Juan Pérez\",\n  \"clientRfc\": \"JUAP900101XX1\",\n  \"products\": [\n    {\n      \"productCatalogId\": \"e4dfce6f-0e4e-4143-ac4b-7eb5684b6596\",      \n      \"quantity\": 1\n    },\n    {\n      \"productCatalogId\": \"1f50b138-dd56-4087-b042-56090ba3e292\",\n      \"quantity\": 1\n    }\n  ]\n}\n"
+						},
+						"url": {
+							"raw": "{{base_url}}/search-users/id/2",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"search-users",
+								"id",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get user by username",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBlY29tbWVyY2UuY29tIiwicm9sZXMiOlt7ImF1dGhvcml0eSI6IlJPTEVfQURNSU4ifV0sImlhdCI6MTc2ODU5MjMxNCwiZXhwIjoxNzY4NTk1OTE0fQ._uVrQyVapbHtZM-zxxKoJjQEuZ637JbpKarGPwNySlU",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8081/search-users/by-username?userName=Agustin",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"search-users",
+								"by-username"
+							],
+							"query": [
+								{
+									"key": "userName",
+									"value": "Agustin"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get user by email",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBlY29tbWVyY2UuY29tIiwicm9sZXMiOlt7ImF1dGhvcml0eSI6IlJPTEVfQURNSU4ifV0sImlhdCI6MTc2ODU5MjMxNCwiZXhwIjoxNzY4NTk1OTE0fQ._uVrQyVapbHtZM-zxxKoJjQEuZ637JbpKarGPwNySlU",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/search-users/by-email?email=agusticar@gmail.com",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"search-users",
+								"by-email"
+							],
+							"query": [
+								{
+									"key": "email",
+									"value": "agusticar@gmail.com"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all active users",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBlY29tbWVyY2UuY29tIiwicm9sZXMiOlt7ImF1dGhvcml0eSI6IlJPTEVfQURNSU4ifV0sImlhdCI6MTc2ODU5MjMxNCwiZXhwIjoxNzY4NTk1OTE0fQ._uVrQyVapbHtZM-zxxKoJjQEuZ637JbpKarGPwNySlU",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/search-users/active-users?page=0&field=name&desc=true",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"search-users",
+								"active-users"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "field",
+									"value": "name"
+								},
+								{
+									"key": "desc",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all users by role",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBlY29tbWVyY2UuY29tIiwicm9sZXMiOlt7ImF1dGhvcml0eSI6IlJPTEVfQURNSU4ifV0sImlhdCI6MTc2ODU5MjMxNCwiZXhwIjoxNzY4NTk1OTE0fQ._uVrQyVapbHtZM-zxxKoJjQEuZ637JbpKarGPwNySlU",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/search-users/by-role?page=0&field=name&desc=true&role=ROLE_ADMIN",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"search-users",
+								"by-role"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "field",
+									"value": "name"
+								},
+								{
+									"key": "desc",
+									"value": "true"
+								},
+								{
+									"key": "role",
+									"value": "ROLE_ADMIN"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all users by status",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBlY29tbWVyY2UuY29tIiwicm9sZXMiOlt7ImF1dGhvcml0eSI6IlJPTEVfQURNSU4ifV0sImlhdCI6MTc2ODU5MjMxNCwiZXhwIjoxNzY4NTk1OTE0fQ._uVrQyVapbHtZM-zxxKoJjQEuZ637JbpKarGPwNySlU",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/search-users/by-status?page=0&field=name&desc=true&status=ACTIVE",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"search-users",
+								"by-status"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "field",
+									"value": "name"
+								},
+								{
+									"key": "desc",
+									"value": "true"
+								},
+								{
+									"key": "status",
+									"value": "ACTIVE"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get users by date",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBlY29tbWVyY2UuY29tIiwicm9sZXMiOlt7ImF1dGhvcml0eSI6IlJPTEVfQURNSU4ifV0sImlhdCI6MTc2ODU5MjMxNCwiZXhwIjoxNzY4NTk1OTE0fQ._uVrQyVapbHtZM-zxxKoJjQEuZ637JbpKarGPwNySlU",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/search-users/by-date/equals?date=2026-01-03&field=createdAt&desc=false&page=0",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"search-users",
+								"by-date",
+								"equals"
+							],
+							"query": [
+								{
+									"key": "date",
+									"value": "2026-01-03"
+								},
+								{
+									"key": "field",
+									"value": "createdAt"
+								},
+								{
+									"key": "desc",
+									"value": "false"
+								},
+								{
+									"key": "page",
+									"value": "0"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create user",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{    \n    \"name\": \"Agustin\",\n    \"surname\":\"Carnerero Peña\",\n    \"taxId\":\"46578286C\",\n    \"email\": \"agusticar@gmail.com\",\n    \"password\": \"Nina1971$\",   \n    \"addresses\": [\n        {            \n            \"street\": \"Bassegoda, 30\",\n            \"city\": \"Barcelona\",\n            \"state\": \"Catalunya\",\n            \"postalCode\": \"08028\",\n            \"country\": \"Spain\",\n            \"addressType\": \"HOME\",\n            \"isDefault\": true\n        }      \n\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{auth}}/register/user",
+							"host": [
+								"{{auth}}"
+							],
+							"path": [
+								"register",
+								"user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Soft delete by user",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZ3VzdGljYXJAZ21haWwuY29tIiwicm9sZXMiOlt7ImF1dGhvcml0eSI6IlJPTEVfVVNFUiJ9XSwiaWF0IjoxNzY4NTkyNjIxLCJleHAiOjE3Njg1OTYyMjF9.aq4PYEs2piSsPwWYsJKQYnSvJpelSEpP-gU4Nm9Twbw",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"reason\":\"No me gusta la tienda\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/user/deactivate",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"user",
+								"deactivate"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Suspend account by admin",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZ3VzdGljYXJAZ21haWwuY29tIiwicm9sZXMiOlt7ImF1dGhvcml0eSI6IlJPTEVfVVNFUiJ9XSwiaWF0IjoxNzY4NTkyNjIxLCJleHAiOjE3Njg1OTYyMjF9.aq4PYEs2piSsPwWYsJKQYnSvJpelSEpP-gU4Nm9Twbw",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"reason\":\"Multiple failed login attempts\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/admin/suspend?userId=2",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admin",
+								"suspend"
+							],
+							"query": [
+								{
+									"key": "userId",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Activate account by user",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZ3VzdGljYXJAZ21haWwuY29tIiwicm9sZXMiOlt7ImF1dGhvcml0eSI6IlJPTEVfVVNFUiJ9XSwiaWF0IjoxNzY4NTkyODE1LCJleHAiOjE3Njg1OTY0MTV9.GfiyVN6GP_8R_tQNhwRAOeeDzMrSROk7APvVSkZHSx0",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/user/activate",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"user",
+								"activate"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Activate account by admin",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "admin123",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin@ecommerce.com",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8081/admin/reactivate?userId=2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"admin",
+								"reactivate"
+							],
+							"query": [
+								{
+									"key": "userId",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update user fields by user",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZ3VzdGljYXJAZ21haWwuY29tIiwicm9sZXMiOlt7ImF1dGhvcml0eSI6IlJPTEVfVVNFUiJ9XSwiaWF0IjoxNzY4NTkyODE1LCJleHAiOjE3Njg1OTY0MTV9.GfiyVN6GP_8R_tQNhwRAOeeDzMrSROk7APvVSkZHSx0",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\":\"Agus\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/user/update",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"user",
+								"update"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update user address",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZ3VzdGljYXJAZ21haWwuY29tIiwicm9sZXMiOlt7ImF1dGhvcml0eSI6IlJPTEVfVVNFUiJ9XSwiaWF0IjoxNzY4NTkyODE1LCJleHAiOjE3Njg1OTY0MTV9.GfiyVN6GP_8R_tQNhwRAOeeDzMrSROk7APvVSkZHSx0",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{            \n            \"street\": \"Bassegoda ,30-34 3º1ª\",\n            \"city\": \"Barcelona\",\n            \"state\": \"Catalunya\",\n            \"postalCode\": \"08028\",\n            \"country\": \"Spain\",\n            \"addressType\": \"HOME\",\n            \"isDefault\": true\n        }    ",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/user/update/addresses/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"user",
+								"update",
+								"addresses",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\":\"admin@ecommerce.com\",\n    \"password\":\"Admin123$$\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{auth}}/login",
+							"host": [
+								"{{auth}}"
+							],
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh token",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"token\":\"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZ3VzdGljYXJAZ21haWwuY29tIiwicm9sZXMiOlt7ImF1dGhvcml0eSI6IlJPTEVfVVNFUiJ9XSwiaWF0IjoxNzY4NjU1MDY2LCJleHAiOjE3Njk4NjQ2NjZ9.rXdVd8PkBZsBvm2NlivwO0pPR0xyPqFjHG2EH-Lv7K4\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{auth}}/refresh-token",
+							"host": [
+								"{{auth}}"
+							],
+							"path": [
+								"refresh-token"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Product Catalog",
+			"item": [
+				{
+					"name": "Get product by id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/products/id/43001da6-12ed-4d4e-bc7d-3a40a88d5319",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"products",
+								"id",
+								"43001da6-12ed-4d4e-bc7d-3a40a88d5319"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Ger product by category",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/products/category?categoryId=7&field=price&desc=false&page=0",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"products",
+								"category"
+							],
+							"query": [
+								{
+									"key": "categoryId",
+									"value": "7"
+								},
+								{
+									"key": "field",
+									"value": "price"
+								},
+								{
+									"key": "desc",
+									"value": "false"
+								},
+								{
+									"key": "page",
+									"value": "0"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get products containing text",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/products/by-productName?productName=Samsung&field=price&desc=false&page=0",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"products",
+								"by-productName"
+							],
+							"query": [
+								{
+									"key": "productName",
+									"value": "Samsung"
+								},
+								{
+									"key": "field",
+									"value": "price"
+								},
+								{
+									"key": "desc",
+									"value": "false"
+								},
+								{
+									"key": "page",
+									"value": "0"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get products between max and min price",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/products/by-price?minPrice=50&maxPrice=100&field=price&desc=true&page=0\n",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"products",
+								"by-price"
+							],
+							"query": [
+								{
+									"key": "minPrice",
+									"value": "50"
+								},
+								{
+									"key": "maxPrice",
+									"value": "100"
+								},
+								{
+									"key": "field",
+									"value": "price"
+								},
+								{
+									"key": "desc",
+									"value": "true"
+								},
+								{
+									"key": "page",
+									"value": "0\n"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add product by admin",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBlY29tbWVyY2UuY29tIiwicm9sZXMiOlt7ImF1dGhvcml0eSI6IlJPTEVfQURNSU4ifV0sImlhdCI6MTc2ODU5NDQ2MSwiZXhwIjoxNzY4NTk4MDYxfQ.gtn7s_BLN9gEMXPhyoCLouqG3NLI39QzE9jmwx8sVKs",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"productName\":\"Philips 40 monitor\",  \n    \"description\": \"High-performance monitor fullHD Dolby audio\",\n    \"price\": 189.99, \n    \"discountPercentage\": 10.00,  \n    \"stockQuantity\": 10,  // o \"cantidad\": 10 si lo mapeas\n    \"categories\": [\n    {\"id\": 1}\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/products/addProduct",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"products",
+								"addProduct"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete product by admin",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBlY29tbWVyY2UuY29tIiwicm9sZXMiOlt7ImF1dGhvcml0eSI6IlJPTEVfQURNSU4ifV0sImlhdCI6MTc2ODU5NDQ2MSwiZXhwIjoxNzY4NTk4MDYxfQ.gtn7s_BLN9gEMXPhyoCLouqG3NLI39QzE9jmwx8sVKs",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/products/delete/480be85c-0ada-4879-9183-810384b87494",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"products",
+								"delete",
+								"480be85c-0ada-4879-9183-810384b87494"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update product by admin",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBlY29tbWVyY2UuY29tIiwicm9sZXMiOlt7ImF1dGhvcml0eSI6IlJPTEVfQURNSU4ifV0sImlhdCI6MTc2ODU5NTAzNiwiZXhwIjoxNzY4NTk4NjM2fQ.39PfbFQj1uV94pI2eK7q4jITU-CtaiwKB3FnCmdJjU0",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{  \n  \n    \n    \"discountPercentage\":10.00\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/products/update/43001da6-12ed-4d4e-bc7d-3a40a88d5319",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"products",
+								"update",
+								"43001da6-12ed-4d4e-bc7d-3a40a88d5319"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Order",
+			"item": [
+				{
+					"name": "Create order",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZ3VzdGljYXJAZ21haWwuY29tIiwicm9sZXMiOlt7ImF1dGhvcml0eSI6IlJPTEVfVVNFUiJ9XSwiaWF0IjoxNzY4NjYyMDg2LCJleHAiOjE3Njg2NjU2ODZ9.XNgGy2BULj8bpD_3_nFOSxJueoWh-85sXdCM2G_ba2E",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \n  \"shippingMethod\": \"EXPRESS\", \n  \"products\": [    \n    {\n      \"productCatalogId\": \"7b5b1623-2549-41c7-ba6b-601b7e99ef71\",\n      \"quantity\": 1\n    }\n  ]\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/orders",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"orders"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get user order",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZ3VzdGljYXJAZ21haWwuY29tIiwicm9sZXMiOlt7ImF1dGhvcml0eSI6IlJPTEVfVVNFUiJ9XSwiaWF0IjoxNzY4NTk2MjE0LCJleHAiOjE3Njg1OTk4MTR9.P8OsH4IiIRR2FRURHVwBwMywsi0V9Cw8HLr8oxcYgww",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/orders/by-user?page=0",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"orders",
+								"by-user"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cancel order",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "Nina71",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "agusticar@gmail.com",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8081/orders/cancel?orderId=1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"orders",
+								"cancel"
+							],
+							"query": [
+								{
+									"key": "orderId",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update order adding products",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZ3VzdGljYXJAZ21haWwuY29tIiwicm9sZXMiOlt7ImF1dGhvcml0eSI6IlJPTEVfVVNFUiJ9XSwiaWF0IjoxNzY4NTk2MjE0LCJleHAiOjE3Njg1OTk4MTR9.P8OsH4IiIRR2FRURHVwBwMywsi0V9Cw8HLr8oxcYgww",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\n  \"productsToAdd\": [\n    {\"productCatalogId\": \"a5445d0d-f945-41a2-8537-86b39e56560d\", \"quantity\": 1}\n   \n  ]\n}\n\n\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/orders/update?orderId=2",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"orders",
+								"update"
+							],
+							"query": [
+								{
+									"key": "orderId",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Payment",
+			"item": [
+				{
+					"name": "Create payment",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZ3VzdGljYXJAZ21haWwuY29tIiwicm9sZXMiOlt7ImF1dGhvcml0eSI6IlJPTEVfVVNFUiJ9XSwiaWF0IjoxNzY4NjYyMDg2LCJleHAiOjE3Njg2NjU2ODZ9.XNgGy2BULj8bpD_3_nFOSxJueoWh-85sXdCM2G_ba2E",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\n    \"id\":\"1\",\n    \"paymentMethod\":\"CREDIT_CARD\",\n    \"cardNumber\":\"3121 2129 1291 2129\",\n    \"expiration\":\"10/2032\",\n    \"cvv\":\"211\"\n\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/payment/create",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"payment",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get payments by user",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZ3VzdGljYXJAZ21haWwuY29tIiwicm9sZXMiOlt7ImF1dGhvcml0eSI6IlJPTEVfVVNFUiJ9XSwiaWF0IjoxNzY4NjQwMTQyLCJleHAiOjE3Njg2NDM3NDJ9.MxN2OSXIy9JZQ6hJpnwR7oRTOBAa8-_lxUljtCWv9gA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/payment/all?page=0&field=createdAt&desc=false",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"payment",
+								"all"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "field",
+									"value": "createdAt"
+								},
+								{
+									"key": "desc",
+									"value": "false"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get bill",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZ3VzdGljYXJAZ21haWwuY29tIiwicm9sZXMiOlt7ImF1dGhvcml0eSI6IlJPTEVfVVNFUiJ9XSwiaWF0IjoxNzY4NjQ2MTI5LCJleHAiOjE3Njg2NDk3Mjl9.5qhnPYfqAeNGPDUiIVU7qNjpn43l3eSaJ90Se1pMzQ4",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/bill?orderId=1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"bill"
+							],
+							"query": [
+								{
+									"key": "orderId",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Refund payment by user",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZ3VzdGljYXJAZ21haWwuY29tIiwicm9sZXMiOlt7ImF1dGhvcml0eSI6IlJPTEVfVVNFUiJ9XSwiaWF0IjoxNzY4NjYyMDg2LCJleHAiOjE3Njg2NjU2ODZ9.XNgGy2BULj8bpD_3_nFOSxJueoWh-85sXdCM2G_ba2E",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{base_url}}/payment/1/refund",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"payment",
+								"1",
+								"refund"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Confirm refund by admin",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBlY29tbWVyY2UuY29tIiwicm9sZXMiOlt7ImF1dGhvcml0eSI6IlJPTEVfQURNSU4ifV0sImlhdCI6MTc2ODY2MjM1NywiZXhwIjoxNzY4NjY1OTU3fQ.9AggRkPxxbFkZ3LjIeGq-i4DYNdBv5KrQeRXt4nuDWU",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/payment/1/confirm-refund",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"payment",
+								"1",
+								"confirm-refund"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

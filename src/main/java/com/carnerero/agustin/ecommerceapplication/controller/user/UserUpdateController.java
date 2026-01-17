@@ -5,6 +5,10 @@ import com.carnerero.agustin.ecommerceapplication.dtos.requests.UpdateUserReques
 import com.carnerero.agustin.ecommerceapplication.dtos.requests.UserAddressRequestDTO;
 import com.carnerero.agustin.ecommerceapplication.dtos.responses.UserResponseDTO;
 import com.carnerero.agustin.ecommerceapplication.services.interfaces.user.UserUpdateService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,17 +27,19 @@ public class UserUpdateController {
 
     private final UserUpdateService userUpdateService;
 
-    /**
-     * Updates any user fields based on the provided request.
-     * <p>
-     * Supports partial updates for fields included in {@link UpdateUserRequestDTO}.
-     *
-     * Example request: PATCH /users/{userId}
-     *
-     * @param authentication
-     * @param request the fields to update wrapped in {@link UpdateUserRequestDTO}
-     * @return a {@link ResponseEntity} containing the updated user and HTTP status 200 (OK)
-     */
+    // ---------------------------
+    // Update user fields
+    // ---------------------------
+    @Operation(
+            summary = "Update user profile fields",
+            description = "Update authenticated user's profile information such as name, surname, or email.",
+            security = @SecurityRequirement(name = "Security Token")
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User updated successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid request data"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized access")
+    })
     @PatchMapping()
     public ResponseEntity<UserResponseDTO> updateUser(
             @RequestBody UpdateUserRequestDTO request,
@@ -43,19 +49,20 @@ public class UserUpdateController {
         return ResponseEntity.ok(updatedUser);
     }
 
-    /**
-     * Updates a specific address of the user.
-     * <p>
-     * This endpoint replaces the address details for the given address ID.
-     * PUT is used since the update replaces the resource.
-     *
-     * Example request: PUT /users/{userId}/addresses/{addressId}
-     *
-     * @param authentication
-     * @param addressId the identifier of the address to update
-     * @param request the new address data wrapped in {@link UserAddressRequestDTO}
-     * @return a {@link ResponseEntity} containing the updated user and HTTP status 200 (OK)
-     */
+    // ---------------------------
+    // Update user address
+    // ---------------------------
+    @Operation(
+            summary = "Update user address",
+            description = "Update an address of the authenticated user by address ID.",
+            security = @SecurityRequirement(name = "Security Token")
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User address updated successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid request data"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized access"),
+            @ApiResponse(responseCode = "404", description = "Address not found")
+    })
     @PutMapping("/addresses/{addressId}")
     public ResponseEntity<UserResponseDTO> updateUserAddress(
             @PathVariable Long addressId,
@@ -66,19 +73,20 @@ public class UserUpdateController {
         return ResponseEntity.ok(updatedUser);
     }
 
-    /**
-     * Updates the user's profile image.
-     * <p>
-     * Accepts a multipart file upload and updates the user's profile image.
-     * Returns the URL of the new image upon success.
-     *
-     * Example request: PUT /users/{userId}/profile-image
-     *
-     * @param userId the identifier of the user
-     * @param file the profile image file to upload
-     * @return a {@link ResponseEntity} containing the URL of the updated profile image
-     *         and HTTP status 200 (OK), or 500 if the upload fails
-     */
+    // ---------------------------
+    // Update profile image
+    // ---------------------------
+    @Operation(
+            summary = "Update user profile image",
+            description = "Update profile image of the user by uploading a file.",
+            security = @SecurityRequirement(name = "Security Token")
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Profile image updated successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid image file"),
+            @ApiResponse(responseCode = "500", description = "Failed to upload image"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized access")
+    })
     @PutMapping("/{userId}/profile-image")
     public ResponseEntity<String> updateProfileImage(
             @PathVariable Long userId,

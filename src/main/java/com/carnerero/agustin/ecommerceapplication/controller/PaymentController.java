@@ -7,6 +7,7 @@ import com.carnerero.agustin.ecommerceapplication.services.interfaces.PaymentSer
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -26,6 +27,19 @@ public class PaymentController {
 
     private final PaymentService paymentService;
 
+    // ---------------------------
+    // Create Payment
+    // ---------------------------
+    @Operation(
+            summary = "Create a new payment",
+            description = "Creates a payment for a user's order. Returns payment details.",
+            security = @SecurityRequirement(name = "Security Token")
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Payment created successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid request or order has no products"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized access")
+    })
     @PostMapping("/create")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<PaymentResponseDTO> createPayment(@RequestBody PaymentRequestDTO paymentRequestDTO) {
@@ -34,6 +48,19 @@ public class PaymentController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(response);
     }
+
+    // ---------------------------
+    // Get All Payments for User
+    // ---------------------------
+    @Operation(
+            summary = "Get all payments for a user",
+            description = "Returns paginated payments for the authenticated user.",
+            security = @SecurityRequirement(name = "Security Token")
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Payments retrieved successfully"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized access")
+    })
     @GetMapping("/all")
     public ResponseEntity<PageResponse<PaymentResponseDTO>> getAllPayments(@RequestParam String field,
                                                                            @RequestParam boolean desc,
@@ -43,17 +70,23 @@ public class PaymentController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(response);
     }
+    // ---------------------------
+    // Request Refund
+    // ---------------------------
     @Operation(
             summary = "Request payment refund",
             description = """
                 Marks a successful payment as REFUND_PENDING.
                 Only payments with status SUCCESS can be refunded.
-                """)
+                """,
+            security = @SecurityRequirement(name = "Security Token")
+    )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Refund initiated and pending to confirm."),
             @ApiResponse(responseCode = "400", description = "Invalid payment state"),
             @ApiResponse(responseCode = "404", description = "Payment not found"),
-            @ApiResponse(responseCode = "500", description = "Cannot refund payment if is REFUNDED")
+            @ApiResponse(responseCode = "409", description = "Cannot refund payment if already refunded"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized access")
     })
     @PostMapping("/{paymentId}/refund")
     @PreAuthorize("hasRole('USER')")
@@ -61,12 +94,29 @@ public class PaymentController {
             var response=paymentService.refundPayment(paymentId);
             return ResponseEntity.ok(response);
     }
+
+    // ---------------------------
+    // Confirm Refund (Admin)
+    // ---------------------------
+    @Operation(
+            summary = "Confirm a payment refund",
+            description = """
+                Confirms a payment refund. 
+                Only payments with status REFUND_PENDING can be confirmed.
+                Restores product stock and cancels the order.
+                """,
+            security = @SecurityRequirement(name = "Security Token")
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Refund confirmed and order canceled."),
+            @ApiResponse(responseCode = "404", description = "Payment or Order not found"),
+            @ApiResponse(responseCode = "409", description = "Cannot confirm refund if payment is not pending"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized access")
+    })
     @PostMapping("/{paymentId}/confirm-refund")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> confirmRefundPayment(@PathVariable Long paymentId) {
                    var response=paymentService.confirmRefundPayment(paymentId);
             return ResponseEntity.ok(response);
-
-
     }
 }

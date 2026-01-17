@@ -5,6 +5,10 @@ import com.carnerero.agustin.ecommerceapplication.dtos.requests.ProductCatalogRe
 import com.carnerero.agustin.ecommerceapplication.dtos.responses.PageResponse;
 import com.carnerero.agustin.ecommerceapplication.dtos.responses.ProductCatalogResponseDTO;
 import com.carnerero.agustin.ecommerceapplication.services.interfaces.ProductCatalogService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,36 +25,38 @@ public class ProductCatalogController {
 
     private final ProductCatalogService productCatalogService;
 
-    /**
-     * Retrieves a product from the catalog by its unique identifier.
-     * <p>
-     * This endpoint returns the product details as a {@link ProductCatalogResponseDTO}.
-     * The product is fetched from the {@link ProductCatalogService}.
-     * <p>
-     * Example request: GET /products/{productCatalogId}
-     *
-     * @param productCatalogId the UUID of the product to retrieve
-     * @return a {@link ResponseEntity} containing the product details with HTTP status 200 (OK)
-     */
-
+    // ---------------------------
+    // Get product by ID
+    // ---------------------------
+    @Operation(
+            summary = "Get product by ID",
+            description = "Returns a single product from the catalog by its UUID",
+            security = @SecurityRequirement(name = "Security Token")
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Product found"),
+            @ApiResponse(responseCode = "404", description = "Product not found"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized access")
+    })
     @GetMapping("/id/{productCatalogId}")
     public ResponseEntity<ProductCatalogResponseDTO> getProductCatalogById(@PathVariable UUID productCatalogId) {
         var product=productCatalogService.getProductById(productCatalogId);
 
         return ResponseEntity.ok(product);
     }
-    /**
-     * Retrieves a product from the catalog by its unique name.
-     * <p>
-     * This endpoint returns the product details as a {@link ProductCatalogResponseDTO}.
-     * The product is fetched from the {@link ProductCatalogService}.
-     * <p>
-     * Example request: GET /products/{productName}
-     *
-     * @param productName the unique name of the product to retrieve
-     * @return a {@link ResponseEntity} containing the product details with HTTP status 200 (OK)
-     */
 
+    // ---------------------------
+    // Search products by name
+    // ---------------------------
+    @Operation(
+            summary = "Search products by name",
+            description = "Returns paginated products whose names match the search query",
+            security = @SecurityRequirement(name = "Security Token")
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Products found"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized access")
+    })
     @GetMapping("/by-productName")
     public ResponseEntity<PageResponse<ProductCatalogResponseDTO>> getProductCatalogByName(
             @RequestParam String productName,
@@ -61,21 +67,19 @@ public class ProductCatalogController {
         var product=productCatalogService.searchProductsByName(productName,field,desc,page);
         return ResponseEntity.ok(product);
     }
-    /**
-     * Retrieves a paginated list of products belonging to a specific category.
-     * <p>
-     * This endpoint allows sorting and pagination of products within the specified category.
-     * <p>
-     * Example request: GET /products/category?categoryId=1&field=price&desc=true&page=0
-     *
-     * @param categoryId the ID of the category to filter products by
-     * @param field the field used for sorting (e.g., "price", "productName")
-     * @param desc true for descending order, false for ascending order
-     * @param page the page number to retrieve (0-based)
-     * @return a {@link ResponseEntity} containing a paginated response of products
-     *         within the specified category and HTTP status 200 (OK)
-     */
 
+    // ---------------------------
+    // Get products by category
+    // ---------------------------
+    @Operation(
+            summary = "Get products by category",
+            description = "Returns paginated products belonging to a given category",
+            security = @SecurityRequirement(name = "Security Token")
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Products found"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized access")
+    })
     @GetMapping("/category")
     public ResponseEntity<PageResponse<ProductCatalogResponseDTO>> getProductsByCategory(
             @RequestParam Long categoryId,
@@ -90,22 +94,18 @@ public class ProductCatalogController {
         return ResponseEntity.ok(products);
     }
 
-    /**
-     * Retrieves a paginated list of products whose price falls within the specified range.
-     * <p>
-     * This endpoint supports sorting and pagination, allowing clients to filter
-     * products by minimum and maximum price.
-     * <p>
-     * Example request: GET /products/by-price?minPrice=10&maxPrice=100&field=price&desc=true&page=0
-     *
-     * @param minPrice the minimum price of the products to retrieve
-     * @param maxPrice the maximum price of the products to retrieve
-     * @param field the field used for sorting (e.g., "price", "productName")
-     * @param desc true for descending order, false for ascending order
-     * @param page the page number to retrieve (0-based)
-     * @return a {@link ResponseEntity} containing a paginated response of products
-     *         within the specified price range and HTTP status 200 (OK)
-     */
+    // ---------------------------
+    // Get products by price range
+    // ---------------------------
+    @Operation(
+            summary = "Get products by price range",
+            description = "Returns paginated products within the specified min and max price",
+            security = @SecurityRequirement(name = "Security Token")
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Products found"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized access")
+    })
     @GetMapping("/by-price")
     public ResponseEntity<PageResponse<ProductCatalogResponseDTO>> getProductsByPrice(
             @RequestParam BigDecimal minPrice,
@@ -122,15 +122,20 @@ public class ProductCatalogController {
         return ResponseEntity.ok(products);
     }
 
-
-    /**
-     * Create a new product in the system.
-     * This endpoint creates a new product and returns
-     * the created product's details along with relevant information.
-     *
-     * @param productCatalogRequestDTO the registration data for the product
-     * @return a {@link ResponseEntity} containing the created user and HTTP status 201 (Created)
-     */
+    // ---------------------------
+    // Add product (Admin only)
+    // ---------------------------
+    @Operation(
+            summary = "Add a new product",
+            description = "Creates a new product in the catalog. Admin access required.",
+            security = @SecurityRequirement(name = "Security Token")
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Product created successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid request"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized access"),
+            @ApiResponse(responseCode = "403", description = "Forbidden: Admin role required")
+    })
     @PostMapping("/addProduct")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ProductCatalogResponseDTO> addProduct(@RequestBody ProductCatalogRequestDTO productCatalogRequestDTO) {
@@ -141,26 +146,43 @@ public class ProductCatalogController {
                 .body(productResponse);
 
     }
-    /**
-     * Delete new product in the system.
-     *
-     * @param productId the id for the product
-     * @return void
-     */
 
+    // ---------------------------
+    // Delete product (Admin only)
+    // ---------------------------
+    @Operation(
+            summary = "Delete a product",
+            description = "Deletes a product by its UUID. Admin access required.",
+            security = @SecurityRequirement(name = "Security Token")
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Product deleted successfully"),
+            @ApiResponse(responseCode = "404", description = "Product not found"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized access"),
+            @ApiResponse(responseCode = "403", description = "Forbidden: Admin role required")
+    })
     @DeleteMapping("/delete/{productId}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteProduct(@PathVariable UUID productId) {
         productCatalogService.deleteProductCatalog(productId);
         return ResponseEntity.noContent().build();
     }
-    /**
-     * Update product in the system.
-     *
-     * @param productId the id for the product
-     *
-     * @return void
-     */
+
+    // ---------------------------
+    // Update product (Admin only)
+    // ---------------------------
+    @Operation(
+            summary = "Update a product",
+            description = "Updates a product in the catalog by UUID. Admin access required.",
+            security = @SecurityRequirement(name = "Security Token")
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Product updated successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid request"),
+            @ApiResponse(responseCode = "404", description = "Product not found"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized access"),
+            @ApiResponse(responseCode = "403", description = "Forbidden: Admin role required")
+    })
     @PutMapping("/update/{productId}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ProductCatalogResponseDTO> updateProduct(@PathVariable UUID productId,
