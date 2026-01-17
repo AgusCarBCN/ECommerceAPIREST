@@ -124,24 +124,6 @@ public class OrderEntity {
         this.user = user;
     }
 
-    // ---------------------------
-    // Helper methods for products
-    // ---------------------------
-    public void addProduct(ProductEntity product) {
-        if (!products.contains(product)) {
-            products.add(product);
-            product.setOrder(this); // Ensure bidirectional consistency
-        }
-    }
-
-    public void removeProduct(ProductEntity product) {
-        if (products.contains(product)) {
-            products.remove(product);
-            product.setOrder(null);
-        }
-    }
-
-
 
     // OrderEntity
     public boolean isCancelableByClient() {
@@ -163,6 +145,20 @@ public class OrderEntity {
             bill.setStatus(BillStatus.CANCELLED);
         }
     }
+    public void confirmRefund() {
+        this.status = OrderStatus.REFUNDED;
+        this.payment.refundPayment();
+        // Optionally update payment
+        if (payment != null) {
+            payment.setPaymentStatus(PaymentStatus.CANCELLED);
+        }
+
+        // Optionally cancel invoice
+        if (bill != null) {
+            bill.setStatus(BillStatus.REFUNDED);
+        }
+    }
+
 
     public void addProduct(ProductCatalogEntity catalog, int quantity) {
         // 0️⃣ Limpiar productos corruptos

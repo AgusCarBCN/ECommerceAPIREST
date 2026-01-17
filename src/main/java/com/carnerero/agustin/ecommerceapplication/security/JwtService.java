@@ -41,16 +41,46 @@ public class JwtService {
         return generateToken(userDetails,accessTokenExpiration);
     }
     public String generateRefreshToken(UserDetails userDetails) {
-        var user=userRepository.findByEmail(userDetails.getUsername()).orElseThrow(()->new UserNotFoundException("User not found"));
-        var refreshToken=generateToken(userDetails,refreshTokenExpiration);
-        var refreshEntity= RefreshTokenEntity.builder()
-                .expiryDate(Instant.now().plusMillis(refreshTokenExpiration))
-                .token(refreshToken)
-                .user(user)
-                .build();
-        refreshTokenRepository.save(refreshEntity);
-        return refreshToken;
+
+        // Buscar al usuario
+        var user = userRepository.findByEmailWithRoles(userDetails.getUsername())
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        // Buscar refresh token existente
+        var refreshToken = refreshTokenRepository.findByUserId(user.getId()).orElse(null);
+
+        // Si no existe token, crear uno nuevo
+        if (refreshToken == null) {
+            String newToken = generateToken(userDetails, refreshTokenExpiration);
+            Instant expiryDate = Instant.now().plusMillis(refreshTokenExpiration);
+
+            refreshToken = RefreshTokenEntity.builder()
+                    .user(user)
+                    .token(newToken)
+                    .expiryDate(expiryDate)
+                    .build();
+
+            refreshTokenRepository.save(refreshToken);
+            return newToken;
+        }
+
+        // Si el token existe, revisar si está expirado
+        if (refreshToken.getExpiryDate().isBefore(Instant.now())) {
+            // Token vencido → generar nuevo
+            String newToken = generateToken(userDetails, refreshTokenExpiration);
+            Instant expiryDate = Instant.now().plusMillis(refreshTokenExpiration);
+
+            refreshToken.setToken(newToken);
+            refreshToken.setExpiryDate(expiryDate);
+            refreshTokenRepository.save(refreshToken);
+
+            return newToken;
+        }
+
+        // Token aún válido → devolver el existente
+        return refreshToken.getToken();
     }
+
 
     // Generar token JWT
     public String generateToken(UserDetails userDetails,Long expiration) {
@@ -107,9 +137,7 @@ public class JwtService {
         var refreshTokenEntity=  refreshTokenRepository.findByToken(tokenRequestDTO.getToken()).orElseThrow(()->new UserNotFoundException("Invalid refresh token"));
                  new RuntimeException("Invalid refresh token");
                  return refreshTokenEntity;
-        // Generar nuevo access token
-        //UserDetails userDetails =re.loadUserByUsername(refreshTokenEntity.getUser().getEmail());
-        //String newAccessToken = jwtService.generateAccessToken(userDetails);
+
 
     }
 

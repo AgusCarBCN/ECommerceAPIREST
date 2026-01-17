@@ -31,4 +31,18 @@ public interface PaymentService {
                                              String field,
                                              Boolean desc,
                                              Integer numberOfPages);
+
+    /**
+     * Refund payment by user and  waiting for confirm
+     * @param paymentId the id of the payment to refund
+     *
+     */
+    void refundPayment(Long paymentId);
+
+    /**
+     * Confirm refund payment
+     * @param paymentId
+     *
+     */
+    void confirmRefundPayment(Long paymentId);
 }

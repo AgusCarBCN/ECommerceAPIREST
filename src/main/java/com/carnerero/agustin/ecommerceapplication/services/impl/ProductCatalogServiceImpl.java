@@ -1,4 +1,4 @@
-package com.carnerero.agustin.ecommerceapplication.services.impl.productcatalog;
+package com.carnerero.agustin.ecommerceapplication.services.impl;
 
 import com.carnerero.agustin.ecommerceapplication.dtos.requests.CategoryRequestDTO;
 import com.carnerero.agustin.ecommerceapplication.dtos.requests.CreateCategoryRequestDTO;
@@ -11,7 +11,7 @@ import com.carnerero.agustin.ecommerceapplication.model.entities.CategoryEntity;
 import com.carnerero.agustin.ecommerceapplication.model.entities.ProductCatalogEntity;
 import com.carnerero.agustin.ecommerceapplication.repository.CategoryRepository;
 import com.carnerero.agustin.ecommerceapplication.repository.ProductCatalogRepository;
-import com.carnerero.agustin.ecommerceapplication.services.interfaces.productcatalog.ProductCatalogService;
+import com.carnerero.agustin.ecommerceapplication.services.interfaces.ProductCatalogService;
 import com.carnerero.agustin.ecommerceapplication.util.helper.Sort;
 import com.carnerero.agustin.ecommerceapplication.util.mapper.CategoryMapper;
 import com.carnerero.agustin.ecommerceapplication.util.mapper.PageResponseMapper;

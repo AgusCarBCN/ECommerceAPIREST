@@ -1,5 +1,6 @@
 package com.carnerero.agustin.ecommerceapplication.exception;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -50,5 +51,13 @@ public class GlobalExceptionHandler {
                 "status", "500"
         );
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+    }
+    @ExceptionHandler(ExpiredJwtException.class)
+    public ResponseEntity<Map<String, String>> handleExpiredJwtException(ExpiredJwtException ex) {
+        Map<String, String> error = Map.of(
+                "error", "token expired. Refresh token",
+                "status", "401"
+        );
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
     }
 }

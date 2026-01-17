@@ -70,5 +70,9 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
     @Transactional
     @Query("DELETE FROM UserEntity u WHERE u.id = :id")
     void deleteByIdDirect(@Param("id") Long id);
+
+    @Query("SELECT u FROM UserEntity u JOIN FETCH u.roles WHERE u.email = :email")
+    Optional<UserEntity> findByEmailWithRoles(@Param("email") String email);
+
 }
 

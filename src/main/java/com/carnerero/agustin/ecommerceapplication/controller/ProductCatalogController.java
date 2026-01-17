@@ -1,10 +1,10 @@
-package com.carnerero.agustin.ecommerceapplication.controller.productcatalog;
+package com.carnerero.agustin.ecommerceapplication.controller;
 
 
 import com.carnerero.agustin.ecommerceapplication.dtos.requests.ProductCatalogRequestDTO;
 import com.carnerero.agustin.ecommerceapplication.dtos.responses.PageResponse;
 import com.carnerero.agustin.ecommerceapplication.dtos.responses.ProductCatalogResponseDTO;
-import com.carnerero.agustin.ecommerceapplication.services.interfaces.productcatalog.ProductCatalogService;
+import com.carnerero.agustin.ecommerceapplication.services.interfaces.ProductCatalogService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

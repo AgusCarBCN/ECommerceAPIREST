@@ -50,7 +50,6 @@ public class ProductEntity {
             this.subtotalAmount = BigDecimal.ZERO;
             return;
         }
-
         this.subtotalAmount = productCatalog.getDiscountPrice()
                 .multiply(BigDecimal.valueOf(this.quantity))
                 .setScale(2, RoundingMode.HALF_UP);

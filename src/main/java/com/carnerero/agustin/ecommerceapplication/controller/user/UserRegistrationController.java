@@ -136,6 +136,7 @@ public class UserRegistrationController {
 
     // ------------------- REFRESH TOKEN -------------------
     @PostMapping("/refresh-token")
+
     @PreAuthorize("permitAll()")
     public ResponseEntity<AuthResponse> refreshToken(@RequestBody TokenRequestDTO request) {
 

@@ -12,6 +12,7 @@ import com.carnerero.agustin.ecommerceapplication.model.enums.PaymentStatus;
 import com.carnerero.agustin.ecommerceapplication.repository.BillRepository;
 import com.carnerero.agustin.ecommerceapplication.repository.OrderRepository;
 import com.carnerero.agustin.ecommerceapplication.repository.PaymentRepository;
+import com.carnerero.agustin.ecommerceapplication.repository.ProductCatalogRepository;
 import com.carnerero.agustin.ecommerceapplication.services.interfaces.PaymentService;
 import com.carnerero.agustin.ecommerceapplication.util.helper.Sort;
 import com.carnerero.agustin.ecommerceapplication.util.mapper.PageResponseMapper;
@@ -35,6 +36,7 @@ import java.util.Set;
 @Slf4j
 public class PaymentServiceImpl implements PaymentService {
     private final OrderRepository orderRepository;
+    private final ProductCatalogRepository productCatalogRepository;
     private final BillRepository billRepository;
     private final PaymentRepository paymentRepository;
     private final PaymentMapper paymentMapper;
@@ -55,7 +57,7 @@ public class PaymentServiceImpl implements PaymentService {
         if (order.getPayment() != null) {
             throw new BusinessException("Order already paid");
         }
-        if(!order.isOrderPayable()){
+        if (!order.isOrderPayable()) {
             throw new BusinessException("Order is not payable");
         }
 
@@ -68,10 +70,10 @@ public class PaymentServiceImpl implements PaymentService {
         // Simular pago
         boolean success = paymentSimulationService.simulatePayment(paymentRequest);
 
-        if(success){
+        if (success) {
             order.addSuccessfulPayment(payment);
             billRepository.save(order.getBill());
-        }else{
+        } else {
             order.addFailedPayment(payment);
         }
 
@@ -89,10 +91,55 @@ public class PaymentServiceImpl implements PaymentService {
                                                             String field,
                                                             Boolean desc,
                                                             Integer numberOfPages) {
-        final var sorting= Sort.getSort(field,desc,allowedPaymentFields);
-        var page=paymentRepository.findPaymentsByUserEmail(email,
+        final var sorting = Sort.getSort(field, desc, allowedPaymentFields);
+        var page = paymentRepository.findPaymentsByUserEmail(email,
                         PageRequest.of(numberOfPages, Sort.PAGE_SIZE, sorting))
                 .map(paymentMapper::toPaymentResponseDTO);
         return PageResponseMapper.mapToPageResponse(page);
+    }
+
+    @Override
+    public void refundPayment(Long paymentId) {
+        //Verify if payment exists
+        var payment = paymentRepository.findById(paymentId)
+                .orElseThrow(() -> new BusinessException("Payment not found"));
+        if (payment.getPaymentStatus().equals(PaymentStatus.REFUND_PENDING
+        )) {
+            throw new BusinessException("Payment is yet pending to refund.");
+        }
+        if (!payment.getPaymentStatus().equals(PaymentStatus.SUCCESS)) {
+            throw new BusinessException("Cannot refund payment if is " + payment.getPaymentStatus());
+        }
+        //Change payment to pending refund
+        payment.setPaymentStatus(PaymentStatus.REFUND_PENDING);
+
+    }
+
+    @Override
+    public void confirmRefundPayment(Long paymentId) {
+        //Verify if payment exists
+        var payment = paymentRepository.findById(paymentId)
+                .orElseThrow(() -> new BusinessException("Payment not found"));
+        if (!payment.getPaymentStatus().equals(PaymentStatus.REFUND_PENDING)){
+            throw new BusinessException("Cannot refund payment if is " + payment.getPaymentStatus());
+        }
+
+        var order=orderRepository.findById(payment.getOrder().getId())
+                .orElseThrow();
+        order.confirmRefund();
+        //Get products by order
+        var products=order.getProducts();
+        //Replace quantity in stock
+        products.forEach(product -> {
+            //Replace quantity in stock
+            //Get product catalog
+            var productCatalog=productCatalogRepository.findById(product.getProductCatalog().getId()).orElseThrow();
+            productCatalog.restoreStock(product.getQuantity());
+            //Change bill
+
+
+        });
+        //Cancel order
+        order.cancelByClient();
     }
 }

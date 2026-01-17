@@ -1,8 +1,6 @@
-package com.carnerero.agustin.ecommerceapplication.controller.payment;
+package com.carnerero.agustin.ecommerceapplication.controller;
 
-import com.carnerero.agustin.ecommerceapplication.dtos.requests.OrderRequestDTO;
 import com.carnerero.agustin.ecommerceapplication.dtos.requests.PaymentRequestDTO;
-import com.carnerero.agustin.ecommerceapplication.dtos.responses.OrderResponseDTO;
 import com.carnerero.agustin.ecommerceapplication.dtos.responses.PageResponse;
 import com.carnerero.agustin.ecommerceapplication.dtos.responses.PaymentResponseDTO;
 import com.carnerero.agustin.ecommerceapplication.services.interfaces.PaymentService;
@@ -12,8 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @AllArgsConstructor

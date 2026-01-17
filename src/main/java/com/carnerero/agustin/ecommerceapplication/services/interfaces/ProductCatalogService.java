@@ -1,4 +1,4 @@
-package com.carnerero.agustin.ecommerceapplication.services.interfaces.productcatalog;
+package com.carnerero.agustin.ecommerceapplication.services.interfaces;
 
 import com.carnerero.agustin.ecommerceapplication.dtos.requests.CreateCategoryRequestDTO;
 import com.carnerero.agustin.ecommerceapplication.dtos.requests.ProductCatalogRequestDTO;
