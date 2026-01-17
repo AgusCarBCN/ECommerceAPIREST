@@ -51,9 +51,8 @@ public class OrderController {
     }
     @PutMapping("/update")
     public ResponseEntity<OrderResponseDTO> updateOrder(@RequestParam Long orderId,
-                                                        @RequestParam boolean isAdd,
                                                         @RequestBody ListOfProductsRequestsDTO requestDTO) {
-        var response=orderService.modifyOrder(orderId,requestDTO,isAdd);
+        var response=orderService.modifyOrder(orderId,requestDTO);
         return ResponseEntity.status(HttpStatus.ACCEPTED)
                 .body(response);
     }
