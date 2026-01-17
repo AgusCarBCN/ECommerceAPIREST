@@ -141,10 +141,10 @@ public class PaymentServiceImpl implements PaymentService {
 
         });
         var responsePaymentDTO=paymentMapper.toPaymentResponseDTO(payment);
-        //Cancel order
-        order.cancelByClient();
         //Change bill
         bill.setTotalAmount(order.getTotalAmount().multiply(BigDecimal.valueOf(-1)));
+        bill.setTaxAmount(BigDecimal.ZERO);
+        bill.setShippingAmount(BigDecimal.ZERO);
         return responsePaymentDTO;
     }
 }

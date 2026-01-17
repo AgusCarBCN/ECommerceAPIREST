@@ -35,7 +35,7 @@ public class LoadingAdminUser {
                         .surname("admin")
                         .email("admin@ecommerce.com")
                         .taxId("00000")
-                        .password(passwordEncoder.encode("admin123"))
+                        .password(passwordEncoder.encode("Admin123$$"))
                         .status(UserStatus.ACTIVE)
                         .statusDescription("Default admin")
                         .createdAt(LocalDate.now())

@@ -138,12 +138,16 @@ public class OrderEntity {
             bill.setStatus(BillStatus.CANCELLED);
         }
     }
+    // ---------------------------
+    // Cancel order safely
+    // ---------------------------
+
     public void confirmRefund() {
         this.status = OrderStatus.REFUNDED;
         this.payment.refundPayment();
         // Optionally update payment
         if (payment != null) {
-            payment.setPaymentStatus(PaymentStatus.CANCELLED);
+            payment.setPaymentStatus(PaymentStatus.REFUNDED);
         }
 
         // Optionally cancel invoice
