@@ -37,12 +37,12 @@ public interface PaymentService {
      * @param paymentId the id of the payment to refund
      *
      */
-    void refundPayment(Long paymentId);
+    PaymentResponseDTO refundPayment(Long paymentId);
 
     /**
      * Confirm refund payment
      * @param paymentId
      *
      */
-    void confirmRefundPayment(Long paymentId);
+    PaymentResponseDTO confirmRefundPayment(Long paymentId);
 }

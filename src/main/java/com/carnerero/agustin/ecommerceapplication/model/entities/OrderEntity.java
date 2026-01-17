@@ -48,6 +48,7 @@ public class OrderEntity {
     // Products of the order
     // ---------------------------
     @Setter
+    @Builder.Default
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductEntity> products = new ArrayList<>();
 
@@ -55,7 +56,7 @@ public class OrderEntity {
     // Payment (OneToOne)
     // ---------------------------
     @Setter
-    @OneToOne(fetch = FetchType.LAZY, mappedBy = "order")
+    @OneToOne(fetch = FetchType.EAGER, mappedBy = "order")
     private PaymentEntity payment; // Created manually when payment starts
 
     // ---------------------------
@@ -114,14 +115,6 @@ public class OrderEntity {
     @PostUpdate
     protected void afterUpdate() {
         log.info("Order Status updated: {}", status);
-    }
-
-    // ---------------------------
-    // Builder without ID
-    // ---------------------------
-    @Builder(builderMethodName = "orderBuilder")
-    private OrderEntity(UserEntity user) {
-        this.user = user;
     }
 
 

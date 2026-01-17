@@ -99,7 +99,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public void refundPayment(Long paymentId) {
+    public PaymentResponseDTO refundPayment(Long paymentId) {
         //Verify if payment exists
         var payment = paymentRepository.findById(paymentId)
                 .orElseThrow(() -> new BusinessException("Payment not found"));
@@ -110,13 +110,14 @@ public class PaymentServiceImpl implements PaymentService {
         if (!payment.getPaymentStatus().equals(PaymentStatus.SUCCESS)) {
             throw new BusinessException("Cannot refund payment if is " + payment.getPaymentStatus());
         }
+        var responsePaymentDTO=paymentMapper.toPaymentResponseDTO(payment);
         //Change payment to pending refund
         payment.setPaymentStatus(PaymentStatus.REFUND_PENDING);
-
+        return responsePaymentDTO;
     }
 
     @Override
-    public void confirmRefundPayment(Long paymentId) {
+    public PaymentResponseDTO confirmRefundPayment(Long paymentId) {
         //Verify if payment exists
         var payment = paymentRepository.findById(paymentId)
                 .orElseThrow(() -> new BusinessException("Payment not found"));
@@ -129,17 +130,21 @@ public class PaymentServiceImpl implements PaymentService {
         order.confirmRefund();
         //Get products by order
         var products=order.getProducts();
+        //Get bill by order
+        var bill=order.getBill();
         //Replace quantity in stock
         products.forEach(product -> {
             //Replace quantity in stock
             //Get product catalog
             var productCatalog=productCatalogRepository.findById(product.getProductCatalog().getId()).orElseThrow();
             productCatalog.restoreStock(product.getQuantity());
-            //Change bill
-
 
         });
+        var responsePaymentDTO=paymentMapper.toPaymentResponseDTO(payment);
         //Cancel order
         order.cancelByClient();
+        //Change bill
+        bill.setTotalAmount(order.getTotalAmount().multiply(BigDecimal.valueOf(-1)));
+        return responsePaymentDTO;
     }
 }

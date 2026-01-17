@@ -71,6 +71,7 @@ public class UserEntity  {
     // ---------------------------
     // Orders (1 user -> many orders)
     // ---------------------------
+    @Builder.Default
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<OrderEntity> orders = new ArrayList<>();
 
@@ -78,6 +79,7 @@ public class UserEntity  {
     // Addresses (1 user -> many addresses)
     // ---------------------------
     @EqualsAndHashCode.Exclude
+    @Builder.Default
     @OneToMany(
             mappedBy = "user",
             fetch = FetchType.LAZY,
@@ -90,6 +92,7 @@ public class UserEntity  {
     // Roles (ManyToMany)
     // ---------------------------
     @ManyToMany(fetch = FetchType.EAGER)
+    @Builder.Default
     @JoinTable(
             name = "user_roles",
             joinColumns = @JoinColumn(name = "user_id"),

@@ -9,12 +9,15 @@ import com.carnerero.agustin.ecommerceapplication.model.entities.ProductCatalogE
 import com.carnerero.agustin.ecommerceapplication.model.entities.ProductEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.ReportingPolicy;
 
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.List;
 
-@Mapper(componentModel = "spring",uses={
+@Mapper(componentModel = "spring",
+        unmappedTargetPolicy = ReportingPolicy.IGNORE,
+        uses={
         UserMapper.class,
         ProductMapper.class,
         ProductCatalogMapper.class})

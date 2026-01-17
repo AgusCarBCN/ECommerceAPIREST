@@ -37,6 +37,7 @@ public class UserAddressRequestDTO {
     private AddressType addressType;
 
     @NotNull
+    @Builder.Default
     private Boolean isDefault = false;
 
 

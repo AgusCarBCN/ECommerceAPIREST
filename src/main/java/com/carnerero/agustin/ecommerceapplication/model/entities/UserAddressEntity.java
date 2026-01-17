@@ -47,15 +47,19 @@ public class UserAddressEntity {
     private AddressType addressType;
 
     @Column(name = "is_default")
+    @Builder.Default
     private Boolean isDefault = false;
 
     @Column(name = "created_at", updatable = false)
+
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
+
     private LocalDateTime updatedAt;
 
     // Relación con usuario
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
