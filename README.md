@@ -30,8 +30,8 @@ The API is fully documented with **Swagger/OpenAPI** and secured with **JWT toke
 - Spring Security (JWT)  
 - Spring Data JPA / Hibernate  
 - Maven  
-- H2 / PostgreSQL (configurable)  
-- Swagger UI / OpenAPI 3  
+- PostgreSQL (configurable)  
+- Swagger UI / OpenAPI 3.01  
 - Docker & Docker Compose  
 
 ---
