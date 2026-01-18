@@ -2,7 +2,7 @@
 
 [![Java](https://img.shields.io/badge/Java-21-blue)](https://www.oracle.com/java/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0.1-green)](https://spring.io/projects/spring-boot)
-[![Maven](https://img.shields.io/badge/Maven-3.9.1-red)](https://maven.apache.org/)
+[![Maven](https://img.shields.io/badge/Maven-3.8.7-red)](https://maven.apache.org/)
 [![Docker](https://img.shields.io/badge/Docker-enabled-blue)](https://www.docker.com/)
 
 ---
